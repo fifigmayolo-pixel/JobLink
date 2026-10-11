@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Imports\StudentRosterImport;
+use App\Models\FieldChangeLog;
 use App\Models\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -27,6 +28,14 @@ class ImportStudentRoster implements ShouldQueue
         Excel::import($import, $this->filePath, 'local');
 
         $failures = $import->failures();
+
+        FieldChangeLog::create([
+            'action' => 'roster_import',
+            'changed_by' => $this->initiatedBy,
+            'details' => 'Roster imported as '.ucfirst($this->role).' — '.(
+                $failures->isEmpty() ? 'no rows skipped.' : $failures->count().' row(s) skipped.'
+            ),
+        ]);
 
         Notification::create([
             'recipient_id' => $this->initiatedBy,

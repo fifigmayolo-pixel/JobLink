@@ -7,28 +7,43 @@ use App\Models\User;
 class UserPolicy
 {
     /**
-     * PESO and Coordinator both create companies (Phase 1 spec).
+     * Creating company accounts — Job Coordinator only.
      */
     public function createCompany(User $user): bool
     {
-        return in_array($user->role, ['peso', 'job_coordinator']);
+        return $user->role === 'job_coordinator';
     }
 
     /**
-     * Viewing, editing, and deleting existing company accounts — same roles
+     * Viewing, editing, and deleting existing company accounts — same role
      * as createCompany, kept separate so the two abilities can diverge later.
      */
     public function manageCompanies(User $user): bool
     {
-        return in_array($user->role, ['peso', 'job_coordinator']);
+        return $user->role === 'job_coordinator';
     }
 
     /**
      * Everything else — create/view/edit/delete student & alumni records,
      * temp passwords, bulk update, tracer study links — is Coordinator-only.
-     * PESO's permission list never includes these.
      */
     public function manageStudentsAndAlumni(User $user): bool
+    {
+        return $user->role === 'job_coordinator';
+    }
+
+    /**
+     * The Coordinator sees the full audit log.
+     */
+    public function viewAuditLog(User $user): bool
+    {
+        return $user->role === 'job_coordinator';
+    }
+
+    /**
+     * Exporting is Coordinator-only.
+     */
+    public function exportAuditLog(User $user): bool
     {
         return $user->role === 'job_coordinator';
     }

@@ -15,6 +15,7 @@ class Notification extends Model
         'title',
         'message',
         'related_application_id',
+        'related_job_posting_id',
         'read_at',
     ];
 
@@ -33,6 +34,16 @@ class Notification extends Model
     public function application()
     {
         return $this->belongsTo(JobApplication::class, 'related_application_id');
+    }
+
+    /**
+     * withTrashed(): a removed posting still resolves, so the notification can
+     * keep showing the company logo. The view checks ->trashed() before
+     * offering a "View job" link.
+     */
+    public function jobPosting()
+    {
+        return $this->belongsTo(JobPosting::class, 'related_job_posting_id')->withTrashed();
     }
 
     public function scopeUnread($query)

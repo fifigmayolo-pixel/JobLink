@@ -12,9 +12,18 @@
         <form method="POST" action="{{ route('jobs.store') }}">
             @csrf
 
-            <div class="mb-3">
+                        <div class="mb-3">
                 <label class="form-label">Job title</label>
                 <input type="text" name="title" value="{{ old('title') }}" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Job type</label>
+                <select name="job_type" class="form-select" required>
+                    <option value="">Select job type&hellip;</option>
+                    <option value="full_time" @selected(old('job_type') === 'full_time')>Full-time</option>
+                    <option value="part_time" @selected(old('job_type') === 'part_time')>Part-time</option>
+                </select>
             </div>
 
             @if($companies)

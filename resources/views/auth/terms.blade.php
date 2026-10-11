@@ -14,10 +14,10 @@
             <p class="text-center mb-4">Pangasinan State University &ndash; Alaminos City Campus</p>
 
             <h2 class="h6" style="color: var(--jl-navy);">1. What JobLink Is</h2>
-            <p>JobLink is the official career-placement platform for PSU Alaminos City students, alumni, partner companies, and PESO/Job Coordinator staff. It connects job seekers with employers and supports the university's tracer study and job-placement reporting.</p>
+            <p>JobLink is the career-placement platform for PSU Alaminos City students, alumni, partner companies, and Job Coordinator staff. It connects job seekers with employers and supports the university's tracer study and job-placement reporting.</p>
 
             <h2 class="h6" style="color: var(--jl-navy);">2. Account Eligibility</h2>
-            <p>Student and Alumni accounts are activated using a Student ID on file with your Job Coordinator. Company, PESO, and Coordinator accounts are provisioned by university staff. You may not create or use an account using another person's identity or credentials.</p>
+            <p>Student and Alumni accounts are activated using a Student ID on file with your Job Coordinator. Company and Job Coordinator accounts are provisioned by authorized university staff. You may not create or use an account using another person's identity or credentials.</p>
 
             <h2 class="h6" style="color: var(--jl-navy);">3. Information We Collect</h2>
             <p>To use JobLink, we collect information such as your name, date of birth, gender, civil status, nationality, course/program, year level or year graduated, contact details including email and mobile number, home address, and, if you choose to add one, a profile picture.</p>
@@ -42,10 +42,10 @@
 
             <h2 class="h6" style="color: var(--jl-navy);">7. Companies and Job Postings</h2>
             <p>Companies are responsible for the accuracy of their job postings and for handling applicant data, including resumes, contact information, and application status, in accordance with the applicable policies and laws.</p>
-            <p>PESO and Job Coordinators reserve the right to review or remove postings that violate these Terms &amp; Conditions.</p>
+            <p>The Job Coordinator is responsible for reviewing job postings and may remove postings that violate these Terms &amp; Conditions.</p>
 
             <h2 class="h6" style="color: var(--jl-navy);">8. Data Retention and Removal</h2>
-            <p>Job Coordinators may correct, update, or remove student and alumni records as needed for administrative accuracy.</p>
+            <p>The Job Coordinator may correct, update, or remove student and alumni records as needed for administrative accuracy.</p>
             <p>You may contact your Job Coordinator to request information about the data associated with your account.</p>
 
             <h2 class="h6" style="color: var(--jl-navy);">9. Changes to These Terms</h2>
@@ -53,7 +53,7 @@
             <p>Continued use of JobLink after changes are posted constitutes acceptance of the revised terms.</p>
 
             <h2 class="h6 mb-2" style="color: var(--jl-navy);">10. Contact</h2>
-            <p class="mb-0">Questions about these Terms &amp; Conditions or your data should be directed to the PESO/Job Coordinator's office at PSU Alaminos City Campus.</p>
+            <p class="mb-0">Questions about these Terms &amp; Conditions or your data should be directed to the Job Coordinator's office at PSU Alaminos City Campus.</p>
         </div>
 
         <form method="POST" action="{{ route('terms.accept') }}">
@@ -81,4 +81,5 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endpush
+
 @endsection

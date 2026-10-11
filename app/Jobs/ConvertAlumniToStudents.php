@@ -15,7 +15,6 @@ class ConvertAlumniToStudents implements ShouldQueue
 
     public function __construct(
         public array $profileIds,
-        public string $yearLevel,
         public ?int $initiatedBy = null,
     ) {}
 
@@ -29,9 +28,9 @@ class ConvertAlumniToStudents implements ShouldQueue
             ->with('user')
             ->chunkById(100, function ($profiles) use (&$converted) {
                 foreach ($profiles as $profile) {
+                    /** @var StudentAlumniProfile $profile */
                     $profile->update([
                         'status' => 'student',
-                        'year_level' => $this->yearLevel,
                         'year_graduated' => null,
                     ]);
 
@@ -46,7 +45,7 @@ class ConvertAlumniToStudents implements ShouldQueue
                 'recipient_id' => $this->initiatedBy,
                 'type' => 'bulk_conversion_complete',
                 'title' => 'Bulk Conversion Finished',
-                'message' => "{$converted} alumni converted back to student (year level {$this->yearLevel}).",
+                'message' => "{$converted} alumni converted back to student.",
             ]);
         }
     }

@@ -2,8 +2,13 @@
 
 @section('title', 'Add Student/Alumni')
 
-@section('content')
-<div class="row justify-content-center">
+     @section('content')
+        <a href="{{ route('coordinator.accounts.index') }}"
+        class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-arrow-left"></i>
+            Back to Accounts
+        </a>
+        <div class="row justify-content-center">
     <div class="col-lg-6">
         <h1 class="h2 mb-1">Add Student/Alumni</h1>
         <p class="text-secondary mb-4">Straight from the master list — Student ID and name only. They'll fill in the rest when they activate.</p>

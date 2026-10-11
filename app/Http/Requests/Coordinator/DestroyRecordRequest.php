@@ -4,7 +4,7 @@ namespace App\Http\Requests\Coordinator;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreatePesoAccountRequest extends FormRequest
+class DestroyRecordRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,7 +14,7 @@ class CreatePesoAccountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email', 'unique:users,email'],
+            'reason' => ['required', 'string', 'max:500'],
         ];
     }
 }

@@ -7,7 +7,7 @@
 <p class="text-secondary mb-4">View records, correct locked fields, and manage accounts.</p>
 
 <form method="GET" class="row g-2 mb-4">
-    <div class="col-md-3">
+    <div class="col-md-4">
         <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Search by name or Student ID">
     </div>
     <div class="col-md-2">
@@ -26,14 +26,6 @@
         </select>
     </div>
     <div class="col-md-2">
-        <select name="year_level" class="form-select">
-            <option value="">All Year Levels</option>
-            @foreach(['First Year', 'Second Year', 'Third Year', 'Fourth Year'] as $year)
-                <option value="{{ $year }}" @selected(request('year_level') === $year)>{{ $year }}</option>
-            @endforeach
-        </select>
-    </div>
-    <div class="col-md-2">
         <select name="year_graduated" class="form-select">
             <option value="">All Grad Years</option>
             @foreach(\App\Models\StudentAlumniProfile::academicYearRanges() as $range)
@@ -41,7 +33,7 @@
             @endforeach
         </select>
     </div>
-    <div class="col-md-1">
+    <div class="col-md-2">
         <button type="submit" class="btn btn-jl-navy w-100">Filter</button>
     </div>
 </form>
@@ -69,7 +61,7 @@
                 <div class="form-check">
                     <input class="form-check-input bulk-checkbox" type="checkbox" name="profile_ids[]" value="{{ $profile->id }}" data-status="{{ $profile->status }}">
                 </div>
-                @include('partials.profile-avatar', ['profile' => $profile, 'size' => 48])
+                @include('partials.profile-avatar', ['imagePath' => $profile->profile_picture, 'label' => $profile->full_name, 'size' => 48])
                 <div>
                     <h2 class="h6 mb-1">
                         <a href="{{ route('coordinator.records.show', $profile) }}" class="text-decoration-none">{{ $profile->full_name }}</a>
@@ -85,9 +77,11 @@
                     <a href="{{ route('coordinator.records.show', $profile) }}#edit-record" class="btn btn-outline-secondary btn-sm">Edit</a>
                     <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteRecord('{{ route('coordinator.records.destroy', $profile) }}')">Delete</button>
                 </div>
-                <span class="badge rounded-pill" style="background: rgba(15,42,92,0.08); color: var(--jl-navy);">
-                    {{ $profile->status === 'student' ? $profile->year_level : ($profile->year_graduated ?? '—') }}
-                </span>
+                @if($profile->status === 'alumni')
+                    <span class="badge rounded-pill" style="background: rgba(15,42,92,0.08); color: var(--jl-navy);">
+                        {{ $profile->year_graduated ?? '—' }}
+                    </span>
+                @endif
             </div>
         </div>
     @empty
@@ -123,23 +117,11 @@
 
     @if($hasAlumni)
         <div class="jl-card p-4 mt-4" style="border: 2px solid var(--jl-navy);">
-            <h2 class="h6 mb-3">Convert Selected to Student</h2>
-            <div class="row g-2 align-items-end">
-                <div class="col-auto">
-                    <label class="form-label small">Year level</label>
-                    <select name="year_level" class="form-select" style="width: 180px;">
-                        <option value="" disabled selected>Select year level…</option>
-                        @foreach(\App\Models\StudentAlumniProfile::YEAR_LEVELS as $level)
-                            <option value="{{ $level }}">{{ $level }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-auto">
-                    <button type="submit" name="direction" value="to_student" class="btn btn-jl-navy" id="convertToStudentBtn" form="bulkUpdateForm" disabled>
-                        Convert Selected (<span id="toStudentCount">0</span>)
-                    </button>
-                </div>
-            </div>
+            <h2 class="h6 mb-1">Convert Selected to Student</h2>
+            <p class="text-secondary small mb-3">Use this to undo an accidental conversion to Alumni.</p>
+            <button type="submit" name="direction" value="to_student" class="btn btn-jl-navy" id="convertToStudentBtn" form="bulkUpdateForm" disabled>
+                Convert Selected (<span id="toStudentCount">0</span>)
+            </button>
             <p class="text-secondary small mb-0 mt-2">
                 Only checked alumni on this page are included. Section isn't restored automatically — correct it on the record's page afterward if needed. Conversion runs in the background.
             </p>
@@ -154,7 +136,12 @@
 const jlCsrfToken = '{{ csrf_token() }}';
 
 function deleteRecord(url) {
-    if (!confirm('Remove this record? This can be restored later if needed.')) {
+    const reason = prompt('Reason for removing this record (required):');
+    if (reason === null) {
+        return;
+    }
+    if (reason.trim() === '') {
+        alert('A reason is required to remove this record.');
         return;
     }
 
@@ -165,6 +152,13 @@ function deleteRecord(url) {
         <input type="hidden" name="_token" value="${jlCsrfToken}">
         <input type="hidden" name="_method" value="DELETE">
     `;
+
+    const reasonInput = document.createElement('input');
+    reasonInput.type = 'hidden';
+    reasonInput.name = 'reason';
+    reasonInput.value = reason;
+    form.appendChild(reasonInput);
+
     document.body.appendChild(form);
     form.submit();
 }

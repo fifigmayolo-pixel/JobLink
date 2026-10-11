@@ -27,7 +27,6 @@ class BulkUpdateController extends Controller
 
         ConvertAlumniToStudents::dispatch(
             $request->validated('profile_ids'),
-            $request->validated('year_level'),
             auth()->id(),
         );
 

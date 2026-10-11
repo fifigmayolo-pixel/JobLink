@@ -10,6 +10,7 @@ class NotificationController extends Controller
     public function index()
     {
         $notifications = auth()->user()->notifications()
+            ->with(['application.jobPosting.company', 'jobPosting.company'])
             ->latest()
             ->paginate(20);
 

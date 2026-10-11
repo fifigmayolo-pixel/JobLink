@@ -10,8 +10,9 @@ class JobPosting extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = [
+        protected $fillable = [
         'title',
+        'job_type',
         'description',
         'qualifications',
         'requirements',

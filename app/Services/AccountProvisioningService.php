@@ -48,24 +48,6 @@ class AccountProvisioningService
         return ['user' => $user, 'company' => $company, 'temp_password' => $tempPassword];
     }
 
-    /**
-     * PESO doesn't self-activate (no Student ID/Name to verify against),
-     * so it keeps the original hand-over-a-temp-password pattern, same as
-     * Company accounts.
-     */
-    public function createPesoAccount(string $email): array
-    {
-        $user = User::create([
-            'role' => 'peso',
-            'email' => $email,
-            'password' => $tempPassword = $this->generateTempPassword(),
-            'must_change_password' => true,
-            'activated_at' => now(),
-        ]);
-
-        return ['user' => $user, 'temp_password' => $tempPassword];
-    }
-
     public function regenerateTempPassword(User $user): string
     {
         $user->update([

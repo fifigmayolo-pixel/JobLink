@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Coordinator;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Coordinator\CreateCompanyAccountRequest;
-use App\Http\Requests\Coordinator\CreatePesoAccountRequest;
 use App\Http\Requests\Coordinator\UpdateCompanyAccountRequest;
-use App\Http\Requests\Coordinator\UpdatePesoAccountRequest;
 use App\Models\Company;
+use App\Models\FieldChangeLog;
 use App\Models\User;
 use App\Services\AccountProvisioningService;
 use Illuminate\Http\Request;
@@ -36,6 +35,13 @@ class AccountController extends Controller
         Gate::authorize('createCompany', User::class);
 
         $result = $this->provisioning->createCompanyWithTempPassword($request->validated(), auth()->id());
+
+        FieldChangeLog::create([
+            'action' => 'company_account_created',
+            'user_id' => $result['user']->id,
+            'changed_by' => auth()->id(),
+            'details' => 'Company: '.$result['company']->company_name,
+        ]);
 
         return back()->with(['status' => 'Company account created.', 'tempPassword' => $result['temp_password']]);
     }
@@ -98,80 +104,6 @@ class AccountController extends Controller
         abort_unless($company->user, 404);
 
         $tempPassword = $this->provisioning->regenerateTempPassword($company->user);
-
-        return back()->with(['status' => 'Temp password regenerated.', 'tempPassword' => $tempPassword]);
-    }
-
-    public function showPesoForm()
-    {
-        Gate::authorize('manageStudentsAndAlumni', User::class);
-
-        return view('coordinator.accounts.create-peso');
-    }
-
-    public function storePeso(CreatePesoAccountRequest $request)
-    {
-        Gate::authorize('manageStudentsAndAlumni', User::class);
-
-        $result = $this->provisioning->createPesoAccount($request->validated('email'));
-
-        return back()->with(['status' => 'PESO account created.', 'tempPassword' => $result['temp_password']]);
-    }
-
-    public function pesoIndex(Request $request)
-    {
-        Gate::authorize('manageStudentsAndAlumni', User::class);
-
-        $pesoUsers = User::query()
-            ->where('role', 'peso')
-            ->when($request->search, fn ($q, $search) => $q->where('full_name', 'like', "%{$search}%"))
-            ->orderBy('full_name')
-            ->paginate(25);
-
-        return view('coordinator.accounts.peso-index', compact('pesoUsers'));
-    }
-
-    public function showPeso(User $user)
-    {
-        Gate::authorize('manageStudentsAndAlumni', User::class);
-        abort_unless($user->role === 'peso', 404);
-
-        return view('coordinator.accounts.peso-show', compact('user'));
-    }
-
-    public function editPeso(User $user)
-    {
-        Gate::authorize('manageStudentsAndAlumni', User::class);
-        abort_unless($user->role === 'peso', 404);
-
-        return view('coordinator.accounts.peso-edit', compact('user'));
-    }
-
-    public function updatePeso(UpdatePesoAccountRequest $request, User $user)
-    {
-        Gate::authorize('manageStudentsAndAlumni', User::class);
-        abort_unless($user->role === 'peso', 404);
-
-        $user->update($request->validated());
-
-        return redirect()->route('coordinator.accounts.peso.show', $user)->with('status', 'PESO account updated.');
-    }
-
-    public function destroyPeso(User $user)
-    {
-        Gate::authorize('manageStudentsAndAlumni', User::class);
-        abort_unless($user->role === 'peso', 404);
-
-        $user->delete();
-
-        return redirect()->route('coordinator.accounts.peso.index')->with('status', 'PESO account removed.');
-    }
-
-    public function regenerateTempPassword(User $user)
-    {
-        Gate::authorize('manageStudentsAndAlumni', User::class);
-
-        $tempPassword = $this->provisioning->regenerateTempPassword($user);
 
         return back()->with(['status' => 'Temp password regenerated.', 'tempPassword' => $tempPassword]);
     }

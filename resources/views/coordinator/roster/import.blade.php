@@ -3,9 +3,14 @@
 @section('title', 'Import Roster')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-lg-6">
-        <h1 class="h2 mb-1">Import Roster</h1>
+        <a href="{{ route('coordinator.accounts.index') }}"
+        class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-arrow-left"></i>
+            Back to Accounts
+        </a>
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <h1 class="h2 mb-1">Import Roster</h1>
         <p class="text-secondary mb-4">Upload an Excel file (.xlsx) with two columns: <strong>Student ID</strong> and <strong>Full Name</strong>. First row should be the headers.</p>
 
         <div class="jl-card p-4">

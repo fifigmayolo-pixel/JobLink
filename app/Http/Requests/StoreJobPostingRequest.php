@@ -14,7 +14,7 @@ class StoreJobPostingRequest extends FormRequest
     }
 
     /**
-     * company_id is only a validated field for peso/job_coordinator — for a
+     * company_id is only a validated field for job_coordinator — for a
      * company posting its own job, it's never in $request->validated(), so
      * the controller sets it server-side from the logged-in company instead.
      */
@@ -22,6 +22,7 @@ class StoreJobPostingRequest extends FormRequest
     {
         $rules = [
             'title' => ['required', 'string', 'max:255'],
+            'job_type' => ['required', 'in:full_time,part_time'],
             'description' => ['required', 'string'],
             'qualifications' => ['required', 'string'],
             'requirements' => ['required', 'string'],
@@ -29,7 +30,7 @@ class StoreJobPostingRequest extends FormRequest
             'application_deadline' => ['required', 'date', 'after:today'],
         ];
 
-        if (in_array($this->user()->role, ['peso', 'job_coordinator'])) {
+        if ($this->user()->role === 'job_coordinator') {
             $rules['company_id'] = ['required', Rule::exists('companies', 'id')];
         }
 

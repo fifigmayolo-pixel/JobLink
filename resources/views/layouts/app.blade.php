@@ -127,14 +127,15 @@
         .jl-sidebar-toggle { background: none; border: none; font-size: 1.4rem; color: var(--jl-navy); line-height: 1; }
         .jl-topbar-icon { color: var(--jl-navy); font-size: 1.2rem; text-decoration: none; }
         .jl-topbar-profile {
-            display: flex;
-            flex-direction: column;
-            color: var(--jl-ink);
-            text-decoration: none;
-            line-height: 1.25;
-        }
-        .jl-topbar-profile:hover { color: var(--jl-navy); }
-        .jl-topbar-profile .jl-role-label { font-size: 0.78rem; color: var(--jl-slate); font-weight: 400; }
+           display: flex;
+           align-items: center;
+           gap: 0.6rem;
+           color: var(--jl-ink);
+           text-decoration: none;
+}
+.jl-topbar-profile:hover { color: var(--jl-navy); }
+.jl-topbar-profile-text { display: flex; flex-direction: column; line-height: 1.25; }
+.jl-topbar-profile .jl-role-label { font-size: 0.78rem; color: var(--jl-slate); font-weight: 400; }
 
         .jl-content { flex: 1; padding: 1.75rem; }
 
@@ -224,19 +225,10 @@
                         </a>
                     @endrole
 
-                    @role('peso|job_coordinator')
+                    @role('job_coordinator')
                         <a class="jl-sidebar-link {{ request()->routeIs('coordinator.dashboard') ? 'active' : '' }}" href="{{ route('coordinator.dashboard') }}">
                             <i class="bi bi-speedometer2"></i> Dashboard
                         </a>
-                    @endrole
-
-                    @role('peso')
-                        <a class="jl-sidebar-link {{ request()->routeIs('coordinator.accounts.company.*') ? 'active' : '' }}" href="{{ route('coordinator.accounts.company.index') }}">
-                            <i class="bi bi-building"></i> Company Accounts
-                       </a>
-                    @endrole
-
-                    @role('job_coordinator')
                         <a class="jl-sidebar-link {{ request()->routeIs('coordinator.accounts.*') ? 'active' : '' }}" href="{{ route('coordinator.accounts.index') }}">
                             <i class="bi bi-person-badge"></i> Accounts
                         </a>
@@ -245,6 +237,12 @@
                         </a>
                         <a class="jl-sidebar-link {{ request()->routeIs('coordinator.announcements.*') ? 'active' : '' }}" href="{{ route('coordinator.announcements.create') }}">
                             <i class="bi bi-megaphone"></i> Announce
+                        </a>
+                        <a class="jl-sidebar-link {{ request()->routeIs('coordinator.tracer-study-links.*') ? 'active' : '' }}" href="{{ route('coordinator.tracer-study-links.index') }}">
+                            <i class="bi bi-link-45deg"></i> Tracer Study Link
+                        </a>
+                        <a class="jl-sidebar-link {{ request()->routeIs('coordinator.audit-log.*') ? 'active' : '' }}" href="{{ route('coordinator.audit-log.index') }}">
+                            <i class="bi bi-clock-history"></i> Audit Log
                         </a>
                     @endrole
                 </nav>
@@ -270,28 +268,36 @@
                     </a>
 
                     <div class="dropdown">
-                        <a class="jl-topbar-profile dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            @if(in_array(auth()->user()->role, ['student', 'alumni', 'job_coordinator', 'peso']))
-                                <span>{{ auth()->user()->profile?->full_name ?? auth()->user()->full_name ?? auth()->user()->email }}</span>
-                                <span class="jl-role-label">
-                                    @switch(auth()->user()->role)
-                                        @case('job_coordinator')
-                                            Job Coordinator
-                                            @break
-                                        @case('peso')
-                                            PESO
-                                            @break
-                                        @case('student')
-                                            Student
-                                            @break
-                                        @case('alumni')
-                                            Alumni
-                                            @break
-                                    @endswitch
-                                </span>
-                            @else
-                                {{ auth()->user()->company?->company_name ?? auth()->user()->email ?? auth()->user()->student_id_number }}
-                            @endif
+                          <a class="jl-topbar-profile dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            @php
+                        $topbarAvatarPath = match (true) {
+                                in_array(auth()->user()->role, ['student', 'alumni']) => auth()->user()->profile?->profile_picture,
+                                auth()->user()->role === 'company' => auth()->user()->company?->logo,
+                                auth()->user()->role === 'job_coordinator' => auth()->user()->profile_picture,
+                                default => null,
+};
+                            @endphp
+                            @include('partials.profile-avatar', ['imagePath' => $topbarAvatarPath, 'label' => null, 'size' => 40])
+                            <span class="jl-topbar-profile-text">
+                                @if(in_array(auth()->user()->role, ['student', 'alumni', 'job_coordinator']))
+                                    <span>{{ auth()->user()->profile?->full_name ?? auth()->user()->full_name ?? auth()->user()->email }}</span>
+                                    <span class="jl-role-label">
+                                        @switch(auth()->user()->role)
+                                            @case('job_coordinator')
+                                                Job Coordinator
+                                                @break
+                                            @case('student')
+                                                Student
+                                                @break
+                                            @case('alumni')
+                                                Alumni
+                                                @break
+                                        @endswitch
+                                    </span>
+                                @else
+                                    {{ auth()->user()->company?->company_name ?? auth()->user()->email ?? auth()->user()->student_id_number }}
+                                @endif
+                            </span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             @role('student|alumni')
@@ -300,7 +306,7 @@
                             @role('company')
                                 <li><a class="dropdown-item" href="{{ route('company.profile.edit') }}">Company Profile</a></li>
                             @endrole
-                            @role('peso|job_coordinator')
+                            @role('job_coordinator')
                                 <li><a class="dropdown-item" href="{{ route('coordinator.profile.edit') }}">Profile</a></li>
                             @endrole
                             <li><a class="dropdown-item" href="{{ route('password.edit') }}">Change Password</a></li>

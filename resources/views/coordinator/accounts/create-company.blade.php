@@ -2,10 +2,15 @@
 
 @section('title', 'Create Company Account')
 
-@section('content')
-<div class="row justify-content-center">
-    <div class="col-lg-6">
-        <h1 class="h2 mb-1">Create Company Account</h1>
+        @section('content')
+        <a href="{{ auth()->user()->role === 'job_coordinator' ? route('coordinator.accounts.index') : route('coordinator.accounts.company.index') }}"
+        class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-arrow-left"></i>
+            Back to Accounts
+        </a>
+        <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <h1 class="h2 mb-1">Create Company Account</h1>
         <p class="text-secondary mb-4">A temporary password is generated — hand it over so they can log in and set their own.</p>
 
         <div class="jl-card p-4">

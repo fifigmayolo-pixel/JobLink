@@ -10,6 +10,7 @@ use App\Http\Controllers\Company\MessageController as CompanyMessageController;
 use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
 use App\Http\Controllers\Coordinator\AccountController as CoordinatorAccountController;
 use App\Http\Controllers\Coordinator\AnnouncementController;
+use App\Http\Controllers\Coordinator\AuditLogController;
 use App\Http\Controllers\Coordinator\BulkUpdateController;
 use App\Http\Controllers\Coordinator\DashboardController as CoordinatorDashboardController;
 use App\Http\Controllers\Coordinator\ProfileController as CoordinatorProfileController;
@@ -74,7 +75,7 @@ Route::middleware('auth')->group(function () {
 
     // Static /jobs/create MUST be registered before the /jobs/{jobPosting}
     // wildcard below, or "create" gets swallowed as a job ID and 404s.
-    Route::middleware('role:peso|job_coordinator|company')->group(function () {
+    Route::middleware('role:job_coordinator|company')->group(function () {
         Route::get('/jobs/create', [JobPostingController::class, 'create'])->name('jobs.create');
         Route::post('/jobs', [JobPostingController::class, 'store'])->name('jobs.store');
         Route::get('/jobs/{jobPosting}/edit', [JobPostingController::class, 'edit'])->name('jobs.edit');
@@ -119,11 +120,16 @@ Route::middleware(['auth', 'role:company'])->prefix('company')->name('company.')
     Route::post('/applications/{application}/message', [CompanyMessageController::class, 'store'])->name('applications.message');
 });
 
-// PESO + Coordinator shared
-    Route::middleware(['auth', 'role:peso|job_coordinator'])->prefix('coordinator')->name('coordinator.')->group(function () {
+// Job Coordinator only
+Route::middleware(['auth', 'role:job_coordinator'])->prefix('coordinator')->name('coordinator.')->group(function () {
     Route::get('/dashboard', [CoordinatorDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [CoordinatorProfileController::class, 'show'])->name('profile.edit');
     Route::patch('/profile', [CoordinatorProfileController::class, 'update'])->name('profile.update');
+
+    Route::get('/accounts', [CoordinatorAccountController::class, 'index'])->name('accounts.index');
+
+    // Static /accounts/company/create MUST stay before the
+    // /accounts/company/{company} wildcard, or "create" gets swallowed as a company ID.
     Route::get('/accounts/company/create', [CoordinatorAccountController::class, 'showCompanyForm'])->name('accounts.company.create');
     Route::post('/accounts/company', [CoordinatorAccountController::class, 'storeCompany'])->name('accounts.company.store');
     Route::get('/accounts/company', [CoordinatorAccountController::class, 'companyIndex'])->name('accounts.company.index');
@@ -132,20 +138,8 @@ Route::middleware(['auth', 'role:company'])->prefix('company')->name('company.')
     Route::patch('/accounts/company/{company}', [CoordinatorAccountController::class, 'updateCompany'])->name('accounts.company.update');
     Route::delete('/accounts/company/{company}', [CoordinatorAccountController::class, 'destroyCompany'])->name('accounts.company.destroy');
     Route::patch('/accounts/company/{company}/temp-password', [CoordinatorAccountController::class, 'regenerateCompanyTempPassword'])->name('accounts.company.temp-password');
-});
 
-// Coordinator only
-Route::middleware(['auth', 'role:job_coordinator'])->prefix('coordinator')->name('coordinator.')->group(function () {
-    Route::get('/accounts', [CoordinatorAccountController::class, 'index'])->name('accounts.index');
-    Route::get('/accounts/peso/create', [CoordinatorAccountController::class, 'showPesoForm'])->name('accounts.peso.create');
-    Route::post('/accounts/peso', [CoordinatorAccountController::class, 'storePeso'])->name('accounts.peso.store');
-    Route::patch('/accounts/{user}/temp-password', [CoordinatorAccountController::class, 'regenerateTempPassword'])->name('accounts.temp-password');
-
-    Route::get('/accounts/peso', [CoordinatorAccountController::class, 'pesoIndex'])->name('accounts.peso.index');
-    Route::get('/accounts/peso/{user}', [CoordinatorAccountController::class, 'showPeso'])->name('accounts.peso.show');
-    Route::get('/accounts/peso/{user}/edit', [CoordinatorAccountController::class, 'editPeso'])->name('accounts.peso.edit');
-    Route::patch('/accounts/peso/{user}', [CoordinatorAccountController::class, 'updatePeso'])->name('accounts.peso.update');
-    Route::delete('/accounts/peso/{user}', [CoordinatorAccountController::class, 'destroyPeso'])->name('accounts.peso.destroy');
+    
 
     Route::get('/roster/quick-add', [StudentRosterController::class, 'showQuickAddForm'])->name('roster.quick-add');
     Route::post('/roster/quick-add', [StudentRosterController::class, 'quickAdd'])->name('roster.quick-add.store');
@@ -164,4 +158,7 @@ Route::middleware(['auth', 'role:job_coordinator'])->prefix('coordinator')->name
 
     Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
     Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+
+    Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
+    Route::get('/audit-log/export', [AuditLogController::class, 'export'])->name('audit-log.export');
 });

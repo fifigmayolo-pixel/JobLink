@@ -15,6 +15,7 @@ class UpdateJobPostingRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
+            'job_type' => ['required', 'in:full_time,part_time'],
             'description' => ['required', 'string'],
             'qualifications' => ['required', 'string'],
             'requirements' => ['required', 'string'],

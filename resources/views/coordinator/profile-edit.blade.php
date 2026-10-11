@@ -10,10 +10,18 @@
         <hr class="jl-rule">
 
         <div class="jl-card p-4">
-            <form method="POST" action="{{ route('coordinator.profile.update') }}">
-                @csrf
-                @method('PATCH')
-                <div class="mb-3">
+    <form method="POST" action="{{ route('coordinator.profile.update') }}" enctype="multipart/form-data">
+        @csrf
+        @method('PATCH')
+        <div class="d-flex align-items-center gap-3 mb-4">
+            @include('partials.profile-avatar', ['imagePath' => auth()->user()->profile_picture, 'label' => auth()->user()->full_name, 'size' => 88])
+            <div>
+                <label class="form-label mb-1 d-block">Profile picture</label>
+                <input type="file" name="profile_picture" class="form-control" accept="image/*">
+                <div class="form-text">Leave blank to keep your current photo. JPG or PNG, up to 2MB.</div>
+            </div>
+        </div>
+        <div class="mb-3">
                     <label class="form-label">Full name</label>
                     <input type="text" name="full_name" value="{{ old('full_name', auth()->user()->full_name) }}" class="form-control" required>
                 </div>

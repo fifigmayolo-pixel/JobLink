@@ -84,7 +84,7 @@
                     <span class="jl-login-feature-icon"><i class="bi bi-briefcase"></i></span>
                     <div>
                         <h3>Curated Job Postings</h3>
-                        <p>Opportunities reviewed by PESO and your Job Coordinator.</p>
+                        <p>Opportunities reviewed by your Job Coordinator.</p>
                     </div>
                 </div>
                 <div class="jl-login-feature">
@@ -119,7 +119,7 @@
                     <div class="mb-4">
                         <label class="form-label">Student ID or email</label>
                         <input type="text" name="login" value="{{ old('login') }}" class="form-control form-control-lg" required autofocus>
-                        <div class="form-text">Students and alumni sign in with their Student ID. Companies, PESO, and Coordinators use email.</div>
+                        <div class="form-text">Students and alumni sign in with their Student ID. Companies and the Job Coordinator use email.</div>
                     </div>
                     <div class="mb-5">
                         <div class="d-flex justify-content-between align-items-center">

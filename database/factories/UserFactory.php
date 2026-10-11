@@ -31,15 +31,7 @@ class UserFactory extends Factory
         ]);
     }
 
-    public function peso(): static
-    {
-        return $this->state([
-            'role' => 'peso',
-            'student_id_number' => null,
-            'email' => fake()->unique()->safeEmail(),
-        ]);
-    }
-
+  
     public function jobCoordinator(): static
     {
         return $this->state([

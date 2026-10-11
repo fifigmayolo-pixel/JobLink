@@ -20,6 +20,7 @@ class User extends Authenticatable
         'full_name',
         'email',
         'password',
+        'profile_picture',
         'must_change_password',
         'activated_at',
         'terms_accepted_at',

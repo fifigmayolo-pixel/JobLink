@@ -9,6 +9,7 @@ use App\Models\StudentAlumniProfile;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use App\Http\Requests\Coordinator\DestroyRecordRequest;
 
 class RecordController extends Controller
 {
@@ -27,7 +28,6 @@ class RecordController extends Controller
                 });
             })
             ->when($request->program, fn ($q, $program) => $q->where('course_program', $program))
-            ->when($request->year_level, fn ($q, $yearLevel) => $q->where('year_level', $yearLevel))
             ->when($request->year_graduated, fn ($q, $yearGraduated) => $q->where('year_graduated', $yearGraduated))
             ->paginate(25);
 
@@ -68,9 +68,16 @@ class RecordController extends Controller
         return back()->with('status', 'Field updated and logged.');
     }
 
-    public function destroy(StudentAlumniProfile $profile)
+    public function destroy(DestroyRecordRequest $request, StudentAlumniProfile $profile)
     {
         Gate::authorize('manageStudentsAndAlumni', User::class);
+
+        FieldChangeLog::create([
+            'action' => 'record_deletion',
+            'user_id' => $profile->user_id,
+            'changed_by' => auth()->id(),
+            'reason' => $request->validated('reason'),
+        ]);
 
         $profile->user->delete(); // soft delete — preserves the profile + audit history
 

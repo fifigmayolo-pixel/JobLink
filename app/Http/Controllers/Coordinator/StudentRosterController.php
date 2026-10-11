@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Coordinator\ImportRosterRequest;
 use App\Http\Requests\Coordinator\QuickAddStudentRequest;
 use App\Jobs\ImportStudentRoster;
+use App\Models\FieldChangeLog;
 use App\Models\User;
 use App\Services\AccountProvisioningService;
 use Illuminate\Support\Facades\Gate;
@@ -23,11 +24,18 @@ class StudentRosterController extends Controller
     {
         Gate::authorize('manageStudentsAndAlumni', User::class);
 
-        $provisioning->quickAddStudentOrAlumni(
+                $user = $provisioning->quickAddStudentOrAlumni(
             $request->validated('student_id_number'),
             $request->validated('full_name'),
             $request->validated('role')
         );
+
+        FieldChangeLog::create([
+            'action' => 'student_alumni_added',
+            'user_id' => $user->id,
+            'changed_by' => auth()->id(),
+            'details' => 'Added as '.ucfirst($user->role).'.',
+        ]);
 
         return back()->with('status', 'Added. Ready for the next one.');
     }

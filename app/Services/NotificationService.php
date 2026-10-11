@@ -40,13 +40,19 @@ class NotificationService
      * announcements. Raw insert() in chunks rather than looping Eloquent
      * create(), since this can run against hundreds of users at once.
      */
-    public function announcement(string $title, string $message, array $recipientIds): int
+        /**
+     * $type defaults to 'announcement' for the existing Coordinator
+     * announcement feature. TracerStudyLinkController passes 'tracer_study'
+     * so those notifications get a distinct icon in the inbox, without a
+     * second bulk-insert method duplicating this one.
+     */
+    public function announcement(string $title, string $message, array $recipientIds, string $type = 'announcement'): int
     {
         $now = now();
 
         $rows = collect($recipientIds)->map(fn ($id) => [
             'recipient_id' => $id,
-            'type' => 'announcement',
+            'type' => $type,
             'title' => $title,
             'message' => $message,
             'related_application_id' => null,

@@ -6,7 +6,7 @@
 <div class="row justify-content-center">
     <div class="col-lg-8">
         <div class="d-flex align-items-center gap-3 mb-4">
-            @include('partials.profile-avatar', ['profile' => $profile, 'size' => 88])
+            @include('partials.profile-avatar', ['imagePath' => $profile->profile_picture, 'label' => $profile->full_name, 'size' => 88])
             <div>
                 <h1 class="h2 mb-1">{{ $profile->full_name }}</h1>
                 <p class="text-secondary mb-0">Update your contact details. Locked fields need your Job Coordinator to change.</p>

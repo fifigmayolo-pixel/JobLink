@@ -13,8 +13,15 @@ class ProfileController extends Controller
     }
 
     public function update(UpdateProfileRequest $request)
-    {
-        $request->user()->update($request->validated());
+{
+    $data = $request->validated();
+
+        if ($request->hasFile('profile_picture')) {
+            $data['profile_picture'] = $request->file('profile_picture')
+                ->store('profile-pictures', 'public');
+        }
+
+        $request->user()->update($data);
 
         return back()->with('status', 'Profile updated.');
     }

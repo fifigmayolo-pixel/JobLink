@@ -3,9 +3,17 @@
 @section('title', 'Company Accounts')
 
 @section('content')
+        @section('content')
+@role('job_coordinator')
+        <a href="{{ route('coordinator.accounts.index') }}"
+        class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-arrow-left"></i>
+            Back to Accounts
+        </a>
+    @endrole
 <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
-    <div>
-        <h1 class="h2 mb-1">Company Accounts</h1>
+            <div>
+                <h1 class="h2 mb-1">Company Accounts</h1>
         <p class="text-secondary mb-0">View and manage registered company accounts.</p>
     </div>
     <a href="{{ route('coordinator.accounts.company.create') }}" class="btn btn-jl-gold">Create Company Account</a>

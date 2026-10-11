@@ -20,7 +20,6 @@ class BulkUpdateStatusRequest extends FormRequest
             'profile_ids' => ['required', 'array', 'min:1'],
             'profile_ids.*' => ['exists:student_alumni_profiles,id'],
             'year_graduated' => [Rule::requiredIf($this->input('direction') === 'to_alumni'), Rule::in(StudentAlumniProfile::academicYearRanges())],
-            'year_level' => [Rule::requiredIf($this->input('direction') === 'to_student'), Rule::in(StudentAlumniProfile::YEAR_LEVELS)],
         ];
     }
 }

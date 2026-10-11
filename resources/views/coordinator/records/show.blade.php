@@ -12,17 +12,18 @@
         <div class="jl-card p-4 p-md-5 mt-3">
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-4">
                 <div class="d-flex align-items-center gap-3">
-                    @include('partials.profile-avatar', ['profile' => $profile, 'size' => 72])
+                   @include('partials.profile-avatar', ['imagePath' => $profile->profile_picture, 'label' => $profile->full_name, 'size' => 72])
                     <div>
                         <h1 class="h4 mb-1">{{ $profile->full_name }}</h1>
                         <p class="text-secondary mb-0">{{ $profile->user->student_id_number }} &middot; {{ ucfirst($profile->status) }}</p>
                     </div>
                 </div>
-                <form method="POST" action="{{ route('coordinator.accounts.temp-password', $profile->user) }}" onsubmit="return confirm('Generate a new temporary password?');">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">Regenerate Temp Password</button>
-                </form>
+            <form method="POST" action="{{ route('coordinator.records.destroy', $profile) }}" class="d-flex gap-2" onsubmit="return confirm('Remove this record? This can be restored later if needed.');">
+                @csrf
+                @method('DELETE')
+                <input type="text" name="reason" class="form-control form-control-sm" placeholder="Reason for removal" style="max-width: 240px;" required>
+                <button type="submit" class="btn btn-outline-danger btn-sm">Remove Record</button>
+            </form>
             </div>
 
             <dl class="row mb-4">

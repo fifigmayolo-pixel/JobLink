@@ -25,7 +25,7 @@ class ForgotPasswordController extends Controller
         $isEmail = (bool) filter_var($identifier, FILTER_VALIDATE_EMAIL);
 
         $user = $isEmail
-            ? User::whereIn('role', ['job_coordinator', 'peso', 'company'])->where('email', $identifier)->first()
+            ? User::whereIn('role', ['job_coordinator', 'company'])->where('email', $identifier)->first()
             : User::whereIn('role', ['student', 'alumni'])->where('student_id_number', $identifier)->first();
 
         if (! $user) {
@@ -132,7 +132,7 @@ class ForgotPasswordController extends Controller
 
     private function destinationEmailFor(User $user): ?string
     {
-        return in_array($user->role, ['job_coordinator', 'peso', 'company'])
+        return in_array($user->role, ['job_coordinator', 'company'])
             ? $user->email
             : $user->profile?->personal_email;
     }

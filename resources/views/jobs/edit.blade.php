@@ -13,9 +13,18 @@
             @csrf
             @method('PATCH')
 
-            <div class="mb-3">
+                        <div class="mb-3">
                 <label class="form-label">Job title</label>
                 <input type="text" name="title" value="{{ old('title', $jobPosting->title) }}" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Job type</label>
+                <select name="job_type" class="form-select" required>
+                    <option value="">Select job type&hellip;</option>
+                    <option value="full_time" @selected(old('job_type', $jobPosting->job_type) === 'full_time')>Full-time</option>
+                    <option value="part_time" @selected(old('job_type', $jobPosting->job_type) === 'part_time')>Part-time</option>
+                </select>
             </div>
 
             <div class="mb-3">
@@ -51,15 +60,31 @@
                 <textarea name="requirements" rows="3" class="form-control" required>{{ old('requirements', $jobPosting->requirements) }}</textarea>
             </div>
 
-            <div class="d-flex gap-2">
+                        <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-jl-gold btn-lg">Save Changes</button>
-                <form method="POST" action="{{ route('jobs.destroy', $jobPosting) }}" onsubmit="return confirm('Remove this job posting?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-outline-danger btn-lg">Remove</button>
-                </form>
+                <button type="button" class="btn btn-outline-danger btn-lg" onclick="deleteJobPosting('{{ route('jobs.destroy', $jobPosting) }}')">Remove</button>
             </div>
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+function deleteJobPosting(url) {
+    if (!confirm('Remove this job posting?')) {
+        return;
+    }
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = url;
+    form.innerHTML = `
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="_method" value="DELETE">
+    `;
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+@endpush
 @endsection

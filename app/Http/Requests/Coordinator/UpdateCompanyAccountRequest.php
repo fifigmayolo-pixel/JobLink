@@ -8,7 +8,7 @@ class UpdateCompanyAccountRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return in_array($this->user()->role, ['peso', 'job_coordinator']);
+        return $this->user()->role === 'job_coordinator';
     }
 
     public function rules(): array

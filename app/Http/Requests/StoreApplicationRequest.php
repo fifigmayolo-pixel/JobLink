@@ -20,8 +20,15 @@ class StoreApplicationRequest extends FormRequest
                 'file',
                 'mimes:pdf',
                 'mimetypes:application/pdf',
-                'max:5120', // 5MB
+                'max:5120', // 5 MB
             ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'resume.max' => 'The resume field must not be greater than 5 MB.',
         ];
     }
 

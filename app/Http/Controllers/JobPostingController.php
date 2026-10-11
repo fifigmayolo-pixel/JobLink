@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreJobPostingRequest;
 use App\Http\Requests\UpdateJobPostingRequest;
+use App\Jobs\NotifyNewJobPosting;
 use App\Models\Company;
 use App\Models\JobPosting;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use App\Models\FieldChangeLog;
 
 class JobPostingController extends Controller
 {
@@ -18,6 +21,7 @@ class JobPostingController extends Controller
             ->with('company')
             ->when($request->search, fn ($q, $search) => $q->where('title', 'like', "%{$search}%"))
             ->when($request->location, fn ($q, $location) => $q->where('location', 'like', "%{$location}%"))
+            ->when($request->job_type, fn ($q, $jobType) => $q->where('job_type', $jobType))
             ->latest('date_posted')
             ->paginate(15);
 
@@ -34,8 +38,8 @@ class JobPostingController extends Controller
         Gate::authorize('create', JobPosting::class);
 
         return view('jobs.create', [
-            'companies' => in_array(auth()->user()->role, ['peso', 'job_coordinator'])
-                ? Company::orderBy('company_name')->get()
+            'companies' => auth()->user()->role === 'job_coordinator'
+                ? Company::whereHas('user')->orderBy('company_name')->get()
                 : null,
         ]);
     }
@@ -53,6 +57,17 @@ class JobPostingController extends Controller
 
         $jobPosting = JobPosting::create($data);
 
+        FieldChangeLog::create([
+            'action' => 'job_posting_created',
+            'changed_by' => auth()->id(),
+            'job_posting_id' => $jobPosting->id,
+            'details' => 'Posted for '.($jobPosting->company?->company_name ?? 'a company').'.',
+        ]);
+
+        // Students and alumni get a "new job" notification, fanned out in the
+        // background so posting stays fast. Needs `php artisan queue:work`.
+        NotifyNewJobPosting::dispatch($jobPosting->id);
+
         return redirect()->route('jobs.show', $jobPosting)->with('status', 'Job posted.');
     }
 
@@ -67,7 +82,36 @@ class JobPostingController extends Controller
     {
         Gate::authorize('update', $jobPosting);
 
-        $jobPosting->update($request->validated());
+        $data = $request->validated();
+        $trackedFields = ['title', 'job_type', 'location', 'application_deadline', 'status'];
+        $changes = [];
+
+        foreach ($trackedFields as $field) {
+            $oldValue = $jobPosting->{$field};
+
+            // application_deadline is cast to Carbon; compare/store as a
+            // plain Y-m-d string so it matches what the date input submits.
+            if ($field === 'application_deadline') {
+                $oldValue = $oldValue?->format('Y-m-d');
+            }
+
+            if ((string) $oldValue !== (string) $data[$field]) {
+                $changes[] = [
+                    'action' => 'job_posting_update',
+                    'changed_by' => auth()->id(),
+                    'job_posting_id' => $jobPosting->id,
+                    'field_name' => $field,
+                    'old_value' => $oldValue,
+                    'new_value' => $data[$field],
+                ];
+            }
+        }
+
+        $jobPosting->update($data);
+
+        foreach ($changes as $change) {
+            FieldChangeLog::create($change);
+        }
 
         return redirect()->route('jobs.show', $jobPosting)->with('status', 'Job updated.');
     }
@@ -77,6 +121,20 @@ class JobPostingController extends Controller
         Gate::authorize('delete', $jobPosting);
 
         $jobPosting->delete();
+
+        // Only log removals of postings that were still live (deadline today
+        // or later). Clearing out an already-expired posting is routine
+        // cleanup, not something the Coordinator needs to audit.
+        $deadline = Carbon::parse($jobPosting->application_deadline);
+
+        if ($deadline->gte(today())) {
+            FieldChangeLog::create([
+                'action' => 'job_posting_deleted',
+                'changed_by' => auth()->id(),
+                'job_posting_id' => $jobPosting->id,
+                'details' => 'Removed before its '.$deadline->format('M j, Y').' deadline.',
+            ]);
+        }
 
         return redirect()->route('jobs.index')->with('status', 'Job removed.');
     }
