@@ -49,22 +49,28 @@
                     </div>
                 </div>
 
+                   <div class="col-12">
+                        <label class="form-label">Registered email (login)</label>
+                        <input type="email" name="email" value="{{ old('email', $company->user?->email) }}" class="form-control" required>
+                        <div class="form-text">This is the email the company logs in with, and where password-reset codes are sent. Changing it takes effect immediately.</div>
+                    </div>
+
                 <button type="submit" class="btn btn-jl-gold btn-lg mt-4">Save Changes</button>
             </div>
         </form>
 
         <div class="jl-card p-4" style="border: 1px solid rgba(180,85,63,0.3);">
-            <h2 class="h6 text-uppercase text-secondary mb-3">Danger Zone</h2>
-            <p class="mb-3">Removing this account disables their login. Job postings and application history are kept.</p>
-            <button type="button" class="btn btn-outline-danger" onclick="deleteCompanyAccount('{{ route('coordinator.accounts.company.destroy', $company) }}')">Delete Company Account</button>
+            <h2 class="h6 text-uppercase text-secondary mb-3">Archive Account</h2>
+            <p class="mb-3">Archiving this account disables their login. Job postings and application history are kept.</p>
+            <button type="button" class="btn btn-outline-danger" onclick="archiveCompanyAccount('{{ route('coordinator.accounts.company.destroy', $company) }}')">Archive Company Account</button>
         </div>
     </div>
 </div>
 
 @push('scripts')
 <script>
-function deleteCompanyAccount(url) {
-    if (!confirm('Remove this company account? This can be restored later if needed.')) {
+function archiveCompanyAccount(url) {
+    if (!confirm('Archive this company account? Their login will be disabled. Job postings and application history are kept.')) {
         return;
     }
 

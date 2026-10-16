@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\JobApplication;
 use App\Models\JobPosting;
+use App\Models\TracerStudyLink;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -41,6 +42,8 @@ class DashboardController extends Controller
             'interviewCount' => $interviewCount,
             'rejectedCount' => $rejectedCount,
             'totalForRange' => $pendingCount + $interviewCount + $rejectedCount,
+            // null when no tracer study link is active
+            'tracerStats' => TracerStudyLink::current()?->participation(),
         ]);
     }
 }

@@ -62,8 +62,8 @@
         </div>
     </div>
 
-    <div class="col-lg-4">
-        <div class="jl-card p-4 h-100">
+        <div class="col-lg-4 d-flex flex-column gap-3">
+        <div class="jl-card p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="h5 mb-0">Application Overview</h2>
                 <form method="GET">
@@ -107,11 +107,13 @@
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-1">
                         <span><i class="bi bi-circle-fill me-1" style="color: var(--jl-rose); font-size: 0.6rem;"></i>Rejected</span>
-                        <span>{{ $rejectedCount }} <span class="text-secondary small">({{ $rejectedPct }}%)</span></span>
+                         <span>{{ $rejectedCount }} <span class="text-secondary small">({{ $rejectedPct }}%)</span></span>
                     </div>
                 </div>
             </div>
         </div>
+
+        @include('partials.tracer-participation-card')
     </div>
 </div>
 

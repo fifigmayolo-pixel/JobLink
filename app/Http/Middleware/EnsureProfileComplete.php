@@ -25,20 +25,19 @@ class EnsureProfileComplete
             'profile.complete', 'profile.complete.store',
             'profile.complete.cities', 'profile.complete.barangays',
             'password.change', 'password.change.store',
-            'logout',
+            'logout','linky.chat',
         ];
 
         if ($user->role === 'alumni') {
+            // The tracer study gate itself lives in EnsureTracerStudyAccessed.
             $allowedRoutes[] = 'tracer-study.show';
+            $allowedRoutes[] = 'tracer-study.access';
         }
 
         if (in_array($request->route()?->getName(), $allowedRoutes)) {
             return $next($request);
         }
 
-        // Alumni see the tracer-study intro first; students go straight to the wizard
-        return $user->role === 'alumni'
-            ? redirect()->route('tracer-study.show')
-            : redirect()->route('profile.complete');
+        return redirect()->route('profile.complete');
     }
 }

@@ -59,7 +59,7 @@ class TracerStudyLinkController extends Controller
         if (! empty($alumniIds)) {
             $this->notifications->announcement(
                 'New Tracer Study Available',
-                "A new tracer study has been posted — please take a few minutes to fill it out. If you've already completed it, you can ignore this.",
+                'A new tracer study has been posted. You will be asked to open it the next time you use JobLink — please take a few minutes to fill it out.',
                 $alumniIds,
                 'tracer_study'
             );

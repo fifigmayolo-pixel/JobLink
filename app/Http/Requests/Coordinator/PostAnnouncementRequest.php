@@ -17,7 +17,7 @@ class PostAnnouncementRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'message' => ['required', 'string', 'max:2000'],
-            'audience' => ['required', Rule::in(['students_alumni', 'all'])],
+            'audience' => ['required', Rule::in(['students_alumni', 'companies', 'all'])],
         ];
     }
 }

@@ -25,6 +25,9 @@ class FieldChangeLog extends Model
         'job_posting_created' => 'Job Posting Created',
         'job_posting_update' => 'Job Posting Update',
         'job_posting_deleted' => 'Job Posting Deleted',
+        'job_posting_approved' => 'Job Posting Approved',
+        'job_posting_rejected' => 'Job Posting Rejected',
+        'job_posting_resubmitted' => 'Job Posting Resubmitted',
         'tracer_study_update' => 'Tracer Study Link Updated',
     ];
 
@@ -32,6 +35,9 @@ class FieldChangeLog extends Model
         'job_posting_created',
         'job_posting_update',
         'job_posting_deleted',
+        'job_posting_approved',
+        'job_posting_rejected',
+        'job_posting_resubmitted',
     ];
 
     protected $fillable = [

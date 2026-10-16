@@ -6,6 +6,8 @@ use App\Http\Requests\ProfileCompletionRequest;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Support\PhilippineLocations;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 class ProfileController extends Controller
 {
@@ -16,20 +18,30 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function storeCompletion(ProfileCompletionRequest $request)
+        public function storeCompletion(ProfileCompletionRequest $request)
     {
-        $data = $request->validated();
+        $user = $request->user();
+
+        // accept_terms is a checkbox, not a profile column.
+        $data = Arr::except($request->validated(), ['accept_terms']);
 
         if ($request->hasFile('profile_picture')) {
             $data['profile_picture'] = $request->file('profile_picture')
                 ->store('profile-pictures', 'public');
         }
 
-        $data['full_name'] = $request->user()->full_name; // set at registration, not re-typed here
-        $data['status'] = $request->user()->role;
+        $data['full_name'] = $user->full_name; // set at registration, not re-typed here
+        $data['status'] = $user->role;
         $data['profile_completed_at'] = now();
 
-        $request->user()->profile()->create($data);
+        DB::transaction(function () use ($user, $data) {
+            $user->profile()->create($data);
+
+            // The agreement happens on this form, so record it with the profile.
+            if (! $user->terms_accepted_at) {
+                $user->update(['terms_accepted_at' => now()]);
+            }
+        });
 
         return redirect()->route('dashboard')->with('status', 'Profile completed.');
     }

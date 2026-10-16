@@ -33,7 +33,7 @@
                 <i class="bi bi-building" style="font-size: 1.75rem; color: var(--jl-navy);"></i>
                 <h2 class="h6 mb-0">Company Accounts</h2>
             </div>
-            <p class="text-secondary small mb-0">View, edit, or remove registered companies.</p>
+            <p class="text-secondary small mb-0">View, edit, or archive registered companies.</p>
         </a>
     </div>
 
@@ -44,6 +44,16 @@
                 <h2 class="h6 mb-0">Create Company Account</h2>
             </div>
             <p class="text-secondary small mb-0">Employers who'll post jobs and review applicants.</p>
+        </a>
+    </div>
+
+    <div class="col-md-6">
+        <a href="{{ route('coordinator.accounts.coordinator.create') }}" class="jl-card p-4 d-block text-decoration-none h-100">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="bi bi-person-badge-fill" style="font-size: 1.75rem; color: var(--jl-navy);"></i>
+                <h2 class="h6 mb-0">Create Coordinator Account</h2>
+            </div>
+            <p class="text-secondary small mb-0">Add another Job Coordinator with full access.</p>
         </a>
     </div>
 </div>

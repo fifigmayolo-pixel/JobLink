@@ -8,14 +8,14 @@ use Illuminate\Support\Str;
 class AccountProvisioningService
 {
     /**
-     * Pre-registers a student/alumni record from Student ID + Full Name —
-     * used by both the Coordinator's quick-add form and the roster import.
-     * The password is random and never revealed to anyone; the account is
-     * unusable until the student self-activates and sets their own.
-     * activated_at stays null until that happens.
+     * Pre-registers a student/alumni record from Student ID + Full Name.
+     * The account remains inactive until the student self-activates.
      */
-    public function quickAddStudentOrAlumni(string $studentIdNumber, string $fullName, string $role): User
-    {
+    public function quickAddStudentOrAlumni(
+        string $studentIdNumber,
+        string $fullName,
+        string $role
+    ): User {
         return User::create([
             'role' => $role,
             'student_id_number' => $studentIdNumber,
@@ -26,8 +26,13 @@ class AccountProvisioningService
         ]);
     }
 
-    public function createCompanyWithTempPassword(array $companyData, int $createdBy): array
-    {
+    /**
+     * Creates a company account with a temporary password.
+     */
+    public function createCompanyWithTempPassword(
+        array $companyData,
+        int $createdBy
+    ): array {
         $user = User::create([
             'role' => 'company',
             'email' => $companyData['email'],
@@ -45,19 +50,53 @@ class AccountProvisioningService
             'created_by' => $createdBy,
         ]);
 
-        return ['user' => $user, 'company' => $company, 'temp_password' => $tempPassword];
+        return [
+            'user' => $user,
+            'company' => $company,
+            'temp_password' => $tempPassword,
+        ];
     }
 
+    /**
+     * Creates a Job Coordinator account with a temporary password.
+     */
+    public function createCoordinatorWithTempPassword(
+        string $fullName,
+        string $email
+    ): array {
+        $user = User::create([
+            'role' => 'job_coordinator',
+            'full_name' => $fullName,
+            'email' => $email,
+            'password' => $tempPassword = $this->generateTempPassword(),
+            'must_change_password' => true,
+            'activated_at' => now(),
+        ]);
+
+        return [
+            'user' => $user,
+            'temp_password' => $tempPassword,
+        ];
+    }
+
+    /**
+     * Regenerates a user's temporary password.
+     */
     public function regenerateTempPassword(User $user): string
     {
+        $tempPassword = $this->generateTempPassword();
+
         $user->update([
-            'password' => $tempPassword = $this->generateTempPassword(),
+            'password' => $tempPassword,
             'must_change_password' => true,
         ]);
 
         return $tempPassword;
     }
 
+    /**
+     * Generates a temporary password.
+     */
     private function generateTempPassword(): string
     {
         return Str::password(10, symbols: false);

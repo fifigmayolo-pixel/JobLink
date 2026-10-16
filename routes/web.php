@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\Auth\RegistrationRequestController;
 use App\Http\Controllers\Auth\ActivateAccountController;
 use App\Http\Controllers\Auth\TermsController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -8,8 +9,10 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Company\ApplicationController as CompanyApplicationController;
 use App\Http\Controllers\Company\MessageController as CompanyMessageController;
 use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
+use App\Http\Controllers\Coordinator\RegistrationReviewController;
 use App\Http\Controllers\Coordinator\AccountController as CoordinatorAccountController;
 use App\Http\Controllers\Coordinator\AnnouncementController;
+use App\Http\Controllers\Coordinator\JobApprovalController;
 use App\Http\Controllers\Coordinator\AuditLogController;
 use App\Http\Controllers\Coordinator\BulkUpdateController;
 use App\Http\Controllers\Coordinator\DashboardController as CoordinatorDashboardController;
@@ -26,6 +29,7 @@ use App\Http\Controllers\SavedJobController;
 use App\Http\Controllers\TracerStudyController;
 use App\Http\Controllers\UpdatePasswordController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LinkyController;
 
 Route::get('/', fn () => redirect()->route('login'));
 
@@ -33,6 +37,10 @@ Route::get('/', fn () => redirect()->route('login'));
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
     Route::post('/login', [LoginController::class, 'store']);
+    Route::get('/register', [RegistrationRequestController::class, 'show'])->name('register.show');
+    Route::post('/register', [RegistrationRequestController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('register.store');
 
     Route::get('/activate', [ActivateAccountController::class, 'showVerifyForm'])->name('activate.verify');
     Route::post('/activate', [ActivateAccountController::class, 'verify'])
@@ -59,6 +67,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/linky/chat', [LinkyController::class, 'chat'])->middleware('throttle:12,1')->name('linky.chat');
 
     Route::get('/password/change', [PasswordChangeController::class, 'show'])->name('password.change');
     Route::put('/password/change', [PasswordChangeController::class, 'update'])->name('password.change.store');
@@ -90,7 +99,7 @@ Route::middleware('auth')->group(function () {
 // Student & Alumni
 Route::middleware(['auth', 'role:student|alumni'])->group(function () {
     Route::get('/tracer-study', [TracerStudyController::class, 'show'])->name('tracer-study.show');
-
+    Route::post('/tracer-study/access', [TracerStudyController::class, 'access'])->name('tracer-study.access'); 
     Route::get('/profile/complete', [ProfileController::class, 'showCompletionForm'])->name('profile.complete');
     Route::post('/profile/complete', [ProfileController::class, 'storeCompletion'])->name('profile.complete.store');
     Route::get('/profile/complete/cities', [ProfileController::class, 'citiesForProvince'])->name('profile.complete.cities');
@@ -125,6 +134,9 @@ Route::middleware(['auth', 'role:job_coordinator'])->prefix('coordinator')->name
     Route::get('/dashboard', [CoordinatorDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [CoordinatorProfileController::class, 'show'])->name('profile.edit');
     Route::patch('/profile', [CoordinatorProfileController::class, 'update'])->name('profile.update');
+    Route::get('/job-approvals', [JobApprovalController::class, 'index'])->name('job-approvals.index');
+    Route::patch('/job-approvals/{jobPosting}/approve', [JobApprovalController::class, 'approve'])->name('job-approvals.approve');
+    Route::patch('/job-approvals/{jobPosting}/reject', [JobApprovalController::class, 'reject'])->name('job-approvals.reject');
 
     Route::get('/accounts', [CoordinatorAccountController::class, 'index'])->name('accounts.index');
 
@@ -132,13 +144,15 @@ Route::middleware(['auth', 'role:job_coordinator'])->prefix('coordinator')->name
     // /accounts/company/{company} wildcard, or "create" gets swallowed as a company ID.
     Route::get('/accounts/company/create', [CoordinatorAccountController::class, 'showCompanyForm'])->name('accounts.company.create');
     Route::post('/accounts/company', [CoordinatorAccountController::class, 'storeCompany'])->name('accounts.company.store');
+        Route::patch('/accounts/company/{company}/restore', [CoordinatorAccountController::class, 'restoreCompany'])->name('accounts.company.restore');
     Route::get('/accounts/company', [CoordinatorAccountController::class, 'companyIndex'])->name('accounts.company.index');
     Route::get('/accounts/company/{company}', [CoordinatorAccountController::class, 'showCompany'])->name('accounts.company.show');
     Route::get('/accounts/company/{company}/edit', [CoordinatorAccountController::class, 'editCompany'])->name('accounts.company.edit');
     Route::patch('/accounts/company/{company}', [CoordinatorAccountController::class, 'updateCompany'])->name('accounts.company.update');
     Route::delete('/accounts/company/{company}', [CoordinatorAccountController::class, 'destroyCompany'])->name('accounts.company.destroy');
     Route::patch('/accounts/company/{company}/temp-password', [CoordinatorAccountController::class, 'regenerateCompanyTempPassword'])->name('accounts.company.temp-password');
-
+    Route::get('/accounts/coordinator/create', [CoordinatorAccountController::class, 'showCoordinatorForm'])->name('accounts.coordinator.create');
+    Route::post('/accounts/coordinator', [CoordinatorAccountController::class, 'storeCoordinator'])->name('accounts.coordinator.store');
     
 
     Route::get('/roster/quick-add', [StudentRosterController::class, 'showQuickAddForm'])->name('roster.quick-add');
@@ -150,6 +164,10 @@ Route::middleware(['auth', 'role:job_coordinator'])->prefix('coordinator')->name
     Route::get('/records/{profile}', [RecordController::class, 'show'])->name('records.show');
     Route::patch('/records/{profile}/override', [RecordController::class, 'overrideLockedField'])->name('records.override');
     Route::delete('/records/{profile}', [RecordController::class, 'destroy'])->name('records.destroy');
+
+    Route::get('/registration-requests', [RegistrationReviewController::class, 'index'])->name('registration-requests.index');
+    Route::post('/registration-requests/{registrationRequest}/approve', [RegistrationReviewController::class, 'approve'])->name('registration-requests.approve');
+    Route::post('/registration-requests/{registrationRequest}/reject', [RegistrationReviewController::class, 'reject'])->name('registration-requests.reject');
 
     Route::post('/bulk-update', [BulkUpdateController::class, 'store'])->name('bulk-update.store');
 

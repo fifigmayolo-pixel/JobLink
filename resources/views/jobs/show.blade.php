@@ -7,6 +7,26 @@
     <div class="col-lg-9">
         <a href="{{ route('jobs.index') }}" class="btn btn-outline-secondary btn-sm">&larr; Back to all jobs</a>
 
+        @if($jobPosting->isPending())
+            <div class="alert alert-light jl-card mt-3 mb-0" style="border-left: 4px solid var(--jl-gold) !important;" role="alert">
+                <strong>Pending approval.</strong>
+                Students and alumni can't see this posting until the Job Coordinator approves it.
+                @role('job_coordinator')
+                    <a href="{{ route('coordinator.job-approvals.index') }}">Review it in Job Approvals</a>.
+                @endrole
+            </div>
+        @elseif($jobPosting->isRejected())
+            <div class="alert alert-light jl-card mt-3 mb-0" style="border-left: 4px solid var(--jl-rose) !important;" role="alert">
+                <strong>Not approved.</strong>
+                @if($jobPosting->rejection_reason)
+                    Reason: {{ $jobPosting->rejection_reason }}
+                @endif
+                @can('update', $jobPosting)
+                    <div class="small mt-1">Edit the posting and save it to resubmit it for review.</div>
+                @endcan
+            </div>
+        @endif
+
         <div class="jl-card p-4 p-md-5 mt-3">
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
                 <div class="d-flex align-items-center gap-3">

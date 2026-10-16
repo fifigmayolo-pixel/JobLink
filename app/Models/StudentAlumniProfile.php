@@ -54,7 +54,17 @@ class StudentAlumniProfile extends Model
      * The only programs this system offers — used for the Complete Profile
      * dropdown and its server-side validation.
      */
-    public const PROGRAMS = ['BSIT', 'BSHM', 'BSTM', 'BSBA'];
+        public const PROGRAMS = [
+        'BSIT',
+        'BSHM',
+        'BSTM',
+        'BSBA - Operations Management',
+        'BSBA - Financial Management',
+        'BEED',
+        'BSED - English',
+        'BSED - Filipino',
+        'BSED - Mathematics',
+    ];
 
     /**
      * Matches what's already used by the Records filter — confirmed by the

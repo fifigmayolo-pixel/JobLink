@@ -138,6 +138,7 @@
 
                 <p class="text-center mt-4">
                     <a href="{{ route('activate.verify') }}" class="small">First time logging in? Activate your account</a>
+                    <a href="{{ route('register.show') }}">No account yet? Request to register</a>
                 </p>
             </div>
         </div>

@@ -6,7 +6,7 @@
 <div class="row justify-content-center">
     <div class="col-lg-6">
         <h1 class="h2 mb-1">Post Announcement</h1>
-        <p class="text-secondary mb-4">Delivered as a notification to everyone in the audience you choose. Runs in the background for large audiences.</p>
+        <p class="text-secondary mb-4">Delivered as a notification and an email to everyone in the audience you choose. Runs in the background for large audiences.</p>
 
         <div class="jl-card p-4">
             <form method="POST" action="{{ route('coordinator.announcements.store') }}">
@@ -23,6 +23,7 @@
                     <label class="form-label">Audience</label>
                     <select name="audience" class="form-select" required>
                         <option value="students_alumni" @selected(old('audience', 'students_alumni') === 'students_alumni')>Students &amp; Alumni</option>
+                        <option value="companies" @selected(old('audience') === 'companies')>Companies</option>
                         <option value="all" @selected(old('audience') === 'all')>Everyone (all roles)</option>
                     </select>
                 </div>

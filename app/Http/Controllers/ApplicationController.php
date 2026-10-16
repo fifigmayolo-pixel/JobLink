@@ -29,6 +29,10 @@ class ApplicationController extends Controller
 
     public function store(StoreApplicationRequest $request, JobPosting $jobPosting)
     {
+        // Nobody can apply to a posting the Job Coordinator hasn't approved,
+        // even by posting to the URL directly.
+        abort_unless($jobPosting->isApproved(), 404);
+
         Gate::authorize('create', [JobApplication::class, $jobPosting]);
 
         $path = $request->file('resume')->store('resumes');

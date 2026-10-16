@@ -6,7 +6,7 @@
 <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5">
         <div class="text-center mb-4">
-            <img src="{{ asset('images/logo.png') }}" alt="JobLink" class="jl-logo mb-2" style="width: 52px; height: 52px;">
+            <img src="{{ asset('images/logo.png') }}" alt="JobLink" class="jl-logo mb-3" style="width: 120px; height: 120px;">
             <h1 class="h3 mb-1">Activate Your Account</h1>
             <p class="text-secondary">For students and alumni logging in for the first time.</p>
         </div>

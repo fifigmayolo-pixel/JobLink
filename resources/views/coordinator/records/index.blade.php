@@ -7,7 +7,7 @@
 <p class="text-secondary mb-4">View records, correct locked fields, and manage accounts.</p>
 
 <form method="GET" class="row g-2 mb-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Search by name or Student ID">
     </div>
     <div class="col-md-2">
@@ -17,10 +17,10 @@
             <option value="alumni" @selected(request('status') === 'alumni')>Alumni</option>
         </select>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-3">
         <select name="program" class="form-select">
             <option value="">All Programs</option>
-            @foreach(['BSHM', 'BSTM', 'BSIT', 'BSBA'] as $program)
+            @foreach(\App\Models\StudentAlumniProfile::PROGRAMS as $program)
                 <option value="{{ $program }}" @selected(request('program') === $program)>{{ $program }}</option>
             @endforeach
         </select>

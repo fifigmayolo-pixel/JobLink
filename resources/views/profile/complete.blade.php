@@ -135,10 +135,51 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-jl-gold btn-lg">Save and Continue</button>
+                       <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" id="acceptTerms" name="accept_terms" value="1" @checked(old('accept_terms'))>
+                <label class="form-check-label" for="acceptTerms">
+                    I have read and agree to the
+                    <a href="#" class="fw-semibold" data-bs-toggle="modal" data-bs-target="#termsModal">Terms &amp; Conditions</a>.
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-jl-gold btn-lg" id="saveProfileBtn">Save and Continue</button>
         </form>
     </div>
 </div>
+    
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="h5 modal-title" id="termsModalLabel">Terms &amp; Conditions</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+                        <div class="modal-body text-secondary small">
+                <div class="text-center mb-3">
+                    <img src="{{ asset('images/logo.png') }}" alt="JobLink" class="jl-logo mb-3" style="width: 120px; height: 120px;">
+                </div>
+                @include('partials.terms-content')
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-jl-navy" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const checkbox = document.getElementById('acceptTerms');
+    const button = document.getElementById('saveProfileBtn');
+
+    function sync() { button.disabled = !checkbox.checked; }
+    checkbox.addEventListener('change', sync);
+    sync();
+});
+</script>
+@endpush
 
 @push('scripts')
 <script>

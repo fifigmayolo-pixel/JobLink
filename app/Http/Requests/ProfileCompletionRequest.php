@@ -39,6 +39,15 @@ class ProfileCompletionRequest extends FormRequest
             'municipality_city' => ['required', Rule::in(PhilippineLocations::citiesForProvince($this->input('province')))],
             'barangay' => ['required', Rule::in(PhilippineLocations::barangaysForCity($this->input('province'), $this->input('municipality_city')))],
             'postal_code' => ['required', 'string', 'max:10'],
+            // Checkbox on the form: agreement to the Terms & Conditions.
+            'accept_terms' => ['accepted'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'accept_terms.accepted' => 'You must agree to the Terms & Conditions to continue.',
         ];
     }
 }

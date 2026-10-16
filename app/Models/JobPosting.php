@@ -10,7 +10,7 @@ class JobPosting extends Model
 {
     use HasFactory, SoftDeletes;
 
-        protected $fillable = [
+    protected $fillable = [
         'title',
         'job_type',
         'description',
@@ -22,6 +22,10 @@ class JobPosting extends Model
         'status',
         'posted_by',
         'company_id',
+        'approval_status',
+        'reviewed_by',
+        'reviewed_at',
+        'rejection_reason',
     ];
 
     protected function casts(): array
@@ -29,12 +33,21 @@ class JobPosting extends Model
         return [
             'date_posted' => 'date',
             'application_deadline' => 'date',
+            'reviewed_at' => 'datetime',
         ];
     }
 
     public function poster()
     {
         return $this->belongsTo(User::class, 'posted_by');
+    }
+
+    /**
+     * withTrashed(): the reviewing Coordinator may have been removed since.
+     */
+    public function reviewer()
+    {
+        return $this->belongsTo(User::class, 'reviewed_by')->withTrashed();
     }
 
     public function company()
@@ -61,6 +74,35 @@ class JobPosting extends Model
     {
         return $query->where('status', 'open')
             ->where('application_deadline', '>=', now()->toDateString());
+    }
+
+    /**
+     * Approval is separate from open/closed: a posting is only visible to
+     * students and alumni when it is BOTH approved and open.
+     */
+    public function scopeApproved($query)
+    {
+        return $query->where('approval_status', 'approved');
+    }
+
+    public function scopeAwaitingApproval($query)
+    {
+        return $query->where('approval_status', 'pending');
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->approval_status === 'approved';
+    }
+
+    public function isPending(): bool
+    {
+        return $this->approval_status === 'pending';
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->approval_status === 'rejected';
     }
 
     /**

@@ -24,7 +24,7 @@
                         <p class="text-secondary mb-0">{{ $company->user?->email }}</p>
                     </div>
                 </div>
-                <form method="POST" action="{{ route('coordinator.accounts.company.temp-password', $company) }}" onsubmit="return confirm('Generate a new temporary password?');">
+                <form method="POST" action="{{ route('coordinator.accounts.company.temp-password', $company) }}" onsubmit="return confirm('Generate a new temporary password and email it to the company?');">
                     @csrf
                     @method('PATCH')
                     <button type="submit" class="btn btn-outline-secondary btn-sm">Regenerate Temp Password</button>
@@ -33,7 +33,7 @@
 
             @if(session('tempPassword'))
                 <div class="alert alert-light jl-card mb-4" style="border-left: 4px solid var(--jl-gold) !important;">
-                    Temporary password — share this with them directly: <strong>{{ session('tempPassword') }}</strong>
+                                        Temporary password (also shown here in case the email doesn't arrive): <strong>{{ session('tempPassword') }}</strong>
                 </div>
             @endif
 

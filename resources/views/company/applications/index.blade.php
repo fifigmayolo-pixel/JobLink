@@ -22,9 +22,14 @@
         <div class="col-sm-6 col-lg-4">
             <div class="jl-card jl-card-hover h-100 p-4 d-flex flex-column">
                 <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
-                    <h2 class="h6 mb-0">{{ $application->applicant->profile?->full_name ?? $application->applicant->student_id_number }}</h2>
+                    <h2 class="h6 mb-0">{{ $application->applicantName() }}</h2>
                     <span class="badge rounded-pill jl-badge-{{ $application->status }} px-3 py-2">{{ ucfirst($application->status) }}</span>
                 </div>
+                @if($application->applicantRemoved())
+                    <div class="mb-2">
+                        <span class="badge rounded-pill" style="background: rgba(107,114,128,0.12); color: var(--jl-slate);">Account removed</span>
+                    </div>
+                @endif
                 <p class="text-secondary small mb-3 flex-grow-1">
                     {{ $application->jobPosting->title }} &middot; Applied {{ $application->date_applied->format('M j, Y') }}
                 </p>

@@ -16,7 +16,9 @@ class JobPostingController extends Controller
 {
     public function index(Request $request)
     {
+        // Only approved AND open postings appear on the Jobs screen.
         $jobPostings = JobPosting::query()
+            ->approved()
             ->open()
             ->with('company')
             ->when($request->search, fn ($q, $search) => $q->where('title', 'like', "%{$search}%"))
@@ -30,6 +32,9 @@ class JobPostingController extends Controller
 
     public function show(JobPosting $jobPosting)
     {
+        // 404 rather than 403, so an unapproved posting's existence isn't revealed.
+        abort_unless(Gate::allows('view', $jobPosting), 404);
+
         return view('jobs.show', compact('jobPosting'));
     }
 
@@ -46,10 +51,21 @@ class JobPostingController extends Controller
 
     public function store(StoreJobPostingRequest $request)
     {
+        $isCoordinator = auth()->user()->role === 'job_coordinator';
+
         $data = $request->validated();
         $data['posted_by'] = auth()->id();
         $data['date_posted'] = now()->toDateString();
         $data['status'] = 'open';
+
+        // A company's posting waits for Coordinator approval; the Coordinator's
+        // own postings are approved immediately (they are the approver).
+        $data['approval_status'] = $isCoordinator ? 'approved' : 'pending';
+
+        if ($isCoordinator) {
+            $data['reviewed_by'] = auth()->id();
+            $data['reviewed_at'] = now();
+        }
 
         if (auth()->user()->role === 'company') {
             $data['company_id'] = auth()->user()->company->id;
@@ -57,18 +73,28 @@ class JobPostingController extends Controller
 
         $jobPosting = JobPosting::create($data);
 
+        $companyName = $jobPosting->company?->company_name ?? 'a company';
+
         FieldChangeLog::create([
             'action' => 'job_posting_created',
             'changed_by' => auth()->id(),
             'job_posting_id' => $jobPosting->id,
-            'details' => 'Posted for '.($jobPosting->company?->company_name ?? 'a company').'.',
+            'details' => $isCoordinator
+                ? 'Posted for '.$companyName.'.'
+                : 'Submitted for approval by '.$companyName.'.',
         ]);
 
-        // Students and alumni get a "new job" notification, fanned out in the
-        // background so posting stays fast. Needs `php artisan queue:work`.
-        NotifyNewJobPosting::dispatch($jobPosting->id);
+        if ($isCoordinator) {
+            // Students and alumni get a "new job" notification, fanned out in the
+            // background so posting stays fast. Needs `php artisan queue:work`.
+            NotifyNewJobPosting::dispatch($jobPosting->id);
 
-        return redirect()->route('jobs.show', $jobPosting)->with('status', 'Job posted.');
+            return redirect()->route('jobs.show', $jobPosting)->with('status', 'Job posted.');
+        }
+
+        // Companies: the students' notification is sent later, when it is approved.
+        return redirect()->route('jobs.show', $jobPosting)
+            ->with('status', 'Job submitted for approval. You will be notified once the Job Coordinator reviews it.');
     }
 
     public function edit(JobPosting $jobPosting)
@@ -107,10 +133,34 @@ class JobPostingController extends Controller
             }
         }
 
+        // A company editing a REJECTED posting sends it back for review.
+        $resubmitting = auth()->user()->role === 'company' && $jobPosting->isRejected();
+
+        if ($resubmitting) {
+            $data = array_merge($data, [
+                'approval_status' => 'pending',
+                'rejection_reason' => null,
+                'reviewed_by' => null,
+                'reviewed_at' => null,
+            ]);
+        }
+
         $jobPosting->update($data);
 
         foreach ($changes as $change) {
             FieldChangeLog::create($change);
+        }
+
+        if ($resubmitting) {
+            FieldChangeLog::create([
+                'action' => 'job_posting_resubmitted',
+                'changed_by' => auth()->id(),
+                'job_posting_id' => $jobPosting->id,
+                'details' => 'Edited and resubmitted for approval.',
+            ]);
+
+            return redirect()->route('jobs.show', $jobPosting)
+                ->with('status', 'Job updated and resubmitted for approval.');
         }
 
         return redirect()->route('jobs.show', $jobPosting)->with('status', 'Job updated.');

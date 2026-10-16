@@ -24,6 +24,8 @@
             --jl-rose: #B4553F;
         }
 
+        
+
         body {
             background: var(--jl-cream);
             color: var(--jl-ink);
@@ -191,6 +193,8 @@
     @stack('styles')
 </head>
 <body>
+
+     @include('partials.page-loader')
     <div class="jl-shell">
         @auth
         <aside class="offcanvas-lg offcanvas-start jl-sidebar" tabindex="-1" id="jlSidebar">
@@ -232,6 +236,22 @@
                         <a class="jl-sidebar-link {{ request()->routeIs('coordinator.accounts.*') ? 'active' : '' }}" href="{{ route('coordinator.accounts.index') }}">
                             <i class="bi bi-person-badge"></i> Accounts
                         </a>
+                        @php $pendingJobApprovals = \App\Models\JobPosting::awaitingApproval()->count(); @endphp
+                        <a class="jl-sidebar-link {{ request()->routeIs('coordinator.job-approvals.*') ? 'active' : '' }}" href="{{ route('coordinator.job-approvals.index') }}">
+                            <i class="bi bi-patch-check"></i> Job Approvals
+                            @if($pendingJobApprovals > 0)
+                                <span class="badge rounded-pill ms-auto" style="background: var(--jl-gold); color: var(--jl-navy-deep);">{{ $pendingJobApprovals }}</span>
+                            @endif
+                        </a>
+
+                        @php $pendingRegistrations = \App\Models\RegistrationRequest::pending()->count(); @endphp
+                        <a class="jl-sidebar-link {{ request()->routeIs('coordinator.registration-requests.*') ? 'active' : '' }}" href="{{ route('coordinator.registration-requests.index') }}">
+                            <i class="bi bi-person-plus"></i> Registration Requests
+                            @if($pendingRegistrations > 0)
+                                <span class="badge rounded-pill ms-auto" style="background: var(--jl-gold); color: var(--jl-navy-deep);">{{ $pendingRegistrations }}</span>
+                            @endif
+                        </a>
+
                         <a class="jl-sidebar-link {{ request()->routeIs('coordinator.records.*') ? 'active' : '' }}" href="{{ route('coordinator.records.index') }}">
                             <i class="bi bi-folder2-open"></i> Records
                         </a>
@@ -352,6 +372,11 @@
         </div>
     </div>
 
+
+        @auth
+        @include('partials.linky-widget')
+    @endauth
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 </body>

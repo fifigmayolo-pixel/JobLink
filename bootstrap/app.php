@@ -17,9 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
     ]);
 
-    $middleware->web(append: [
+        $middleware->web(append: [
         \App\Http\Middleware\ForcePasswordChange::class,
         \App\Http\Middleware\EnsureTermsAccepted::class,
+        \App\Http\Middleware\EnsureTracerStudyAccessed::class,
         \App\Http\Middleware\EnsureProfileComplete::class,
     ]);
 })

@@ -47,4 +47,14 @@ class UserPolicy
     {
         return $user->role === 'job_coordinator';
     }
+
+
+
+        /**
+     * Creating other Job Coordinator accounts — Job Coordinator only.
+     */
+    public function createCoordinator(User $user): bool
+    {
+        return $user->role === 'job_coordinator';
+    }
 }
