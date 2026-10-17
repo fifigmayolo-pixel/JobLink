@@ -82,14 +82,13 @@
             modal.show();
         }, true);
 
-        okBtn.addEventListener('click', function () {
-            if (!pendingForm) return;
-            var form = pendingForm, submitter = pendingSubmitter;
-            pendingForm = null;
-            form.dataset.confirmed = '1';
-            modal.hide();
-            if (form.requestSubmit) { submitter ? form.requestSubmit(submitter) : form.requestSubmit(); }
-            else { form.submit(); }
+       okBtn.addEventListener('click', function () {
+    if (!pendingForm) return;
+    var form = pendingForm;
+    pendingForm = null;
+    modal.hide();
+    if (window.PageLoader) PageLoader.show();
+    form.submit();
         });
 
         el.addEventListener('hidden.bs.modal', function () { pendingForm = null; });
