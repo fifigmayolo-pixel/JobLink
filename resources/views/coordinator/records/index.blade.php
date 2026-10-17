@@ -90,10 +90,6 @@
         </div>
     @endforelse
 
-    <div class="mt-3">
-        {{ $profiles->onEachSide(1)->links() }}
-    </div>
-
     @if($hasStudents)
         <div class="jl-card p-4 mt-4" style="border: 2px solid var(--jl-gold);">
             <h2 class="h6 mb-3">Convert Selected to Alumni</h2>
@@ -133,18 +129,38 @@
     @endif
 </form>
 
+<div class="mt-3">{{ $profiles->onEachSide(1)->links() }}</div>
+
 @push('scripts')
 <script>
+const jlCsrfToken = '{{ csrf_token() }}';
+
 function deleteRecord(url) {
-    JLReason.submit({
-        action: url,
-        method: 'DELETE',
-        title: 'Remove this record?',
-        message: 'The account is removed from the list. Your reason is saved in the change history.',
-        label: 'Reason for removing this record',
-        button: 'Remove record',
-        variant: 'danger'
-    });
+    const reason = prompt('Reason for removing this record (required):');
+    if (reason === null) {
+        return;
+    }
+    if (reason.trim() === '') {
+        alert('A reason is required to remove this record.');
+        return;
+    }
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = url;
+    form.innerHTML = `
+        <input type="hidden" name="_token" value="${jlCsrfToken}">
+        <input type="hidden" name="_method" value="DELETE">
+    `;
+
+    const reasonInput = document.createElement('input');
+    reasonInput.type = 'hidden';
+    reasonInput.name = 'reason';
+    reasonInput.value = reason;
+    form.appendChild(reasonInput);
+
+    document.body.appendChild(form);
+    form.submit();
 }
 
 document.addEventListener('DOMContentLoaded', function () {

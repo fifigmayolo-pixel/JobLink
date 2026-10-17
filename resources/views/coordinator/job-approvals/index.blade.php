@@ -64,48 +64,6 @@
             <div class="d-flex gap-2 flex-wrap">
                 <a href="{{ route('jobs.show', $job) }}" class="btn btn-outline-secondary btn-sm">View details</a>
                 @if($job->approval_status === 'pending')
-                                    <form method="POST" action="{{ route('coordinator.job-approvals.approve', $job) }}"
-                    data-confirm="Students and alumni will be notified that this job is now live."
-                    data-confirm-title="Approve this posting?"
-                    data-confirm-button="Approve"
-                    data-confirm-icon="patch-check">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" class="btn btn-jl-gold btn-sm">Approve</button>
-              </form> 
-                    <form method="POST" action="{{ route('coordinator.job-approvals.reject', $job) }}"
-      data-reason="The company will see this reason, so make it clear and specific."
-      data-reason-title="Reject this posting?"
-      data-reason-label="Reason for rejection"
-      data-reason-button="Reject posting"
-      data-reason-variant="danger"
-      data-reason-icon="x-circle">
-    @csrf
-    @method('PATCH')
-    <input type="hidden" name="reason">
-    <button type="submit" class="btn btn-outline-danger btn-sm">Reject</button>
-</form>
-                @endif
-            </div>
-        </div>
-    </div>
-@empty
-    <div class="jl-card p-5 text-center">
-        <p class="mb-0 text-secondary">
-            @if($status === 'pending')
-                No postings are waiting for approval.
-            @else
-                No {{ $status }} postings.
-            @endif
-        </p>
-    </div>
-@endforelse
-
-{{ $jobPostings->links() }}
-
-            <div class="d-flex gap-2 flex-wrap">
-                <a href="{{ route('jobs.show', $job) }}" class="btn btn-outline-secondary btn-sm">View details</a>
-                @if($job->approval_status === 'pending')
                     <form method="POST" action="{{ route('coordinator.job-approvals.approve', $job) }}"
                           data-confirm="Students and alumni will be notified that this job is now live."
                           data-confirm-title="Approve this posting?"
@@ -130,5 +88,19 @@
                     </form>
                 @endif
             </div>
+        </div>
+    </div>
+@empty
+    <div class="jl-card p-5 text-center">
+        <p class="mb-0 text-secondary">
+            @if($status === 'pending')
+                No postings are waiting for approval.
+            @else
+                No {{ $status }} postings.
+            @endif
+        </p>
+    </div>
+@endforelse
 
-  @endsection
+{{ $jobPostings->links() }}
+@endsection
