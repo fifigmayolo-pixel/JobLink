@@ -19,8 +19,8 @@
 
 @forelse($jobPostings as $job)
     <div class="jl-card p-4 mb-3">
-        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-            <div class="d-flex align-items-start gap-3">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3">
+            <div class="d-flex align-items-start gap-3 flex-grow-1" style="min-width: 0;">
                 <div class="jl-company-logo" style="width: 48px; height: 48px;">
                     @if($job->company?->logo)
                         <img src="{{ \Illuminate\Support\Facades\Storage::url($job->company->logo) }}" alt="{{ $job->company->company_name }} logo">
@@ -30,7 +30,7 @@
                         </div>
                     @endif
                 </div>
-                <div>
+                <div style="min-width: 0;">
                     <h2 class="h6 mb-1">
                         <a href="{{ route('jobs.show', $job) }}" class="text-decoration-none">{{ $job->title }}</a>
                         @if($job->job_type)
@@ -61,7 +61,7 @@
                 </div>
             </div>
 
-            <div class="d-flex gap-2 flex-wrap">
+            <div class="d-flex gap-2 flex-wrap flex-shrink-0">
                 <a href="{{ route('jobs.show', $job) }}" class="btn btn-outline-secondary btn-sm">View details</a>
                 @if($job->approval_status === 'pending')
                     <form method="POST" action="{{ route('coordinator.job-approvals.approve', $job) }}"
