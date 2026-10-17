@@ -64,12 +64,27 @@
             <div class="d-flex gap-2 flex-wrap">
                 <a href="{{ route('jobs.show', $job) }}" class="btn btn-outline-secondary btn-sm">View details</a>
                 @if($job->approval_status === 'pending')
-                    <form method="POST" action="{{ route('coordinator.job-approvals.approve', $job) }}" onsubmit="return confirm('Approve this posting? Students and alumni will be notified.');">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" class="btn btn-jl-gold btn-sm">Approve</button>
-                    </form>
-                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="rejectPosting('{{ route('coordinator.job-approvals.reject', $job) }}')">Reject</button>
+                                    <form method="POST" action="{{ route('coordinator.job-approvals.approve', $job) }}"
+                    data-confirm="Students and alumni will be notified that this job is now live."
+                    data-confirm-title="Approve this posting?"
+                    data-confirm-button="Approve"
+                    data-confirm-icon="patch-check">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="btn btn-jl-gold btn-sm">Approve</button>
+              </form> 
+                    <form method="POST" action="{{ route('coordinator.job-approvals.reject', $job) }}"
+      data-reason="The company will see this reason, so make it clear and specific."
+      data-reason-title="Reject this posting?"
+      data-reason-label="Reason for rejection"
+      data-reason-button="Reject posting"
+      data-reason-variant="danger"
+      data-reason-icon="x-circle">
+    @csrf
+    @method('PATCH')
+    <input type="hidden" name="reason">
+    <button type="submit" class="btn btn-outline-danger btn-sm">Reject</button>
+</form>
                 @endif
             </div>
         </div>
@@ -110,15 +125,4 @@ function rejectPosting(url) {
         <input type="hidden" name="_method" value="PATCH">
     `;
 
-    const reasonInput = document.createElement('input');
-    reasonInput.type = 'hidden';
-    reasonInput.name = 'reason';
-    reasonInput.value = reason;
-    form.appendChild(reasonInput);
-
-    document.body.appendChild(form);
-    form.submit();
-}
-</script>
-@endpush
-@endsection
+  @endsection

@@ -138,65 +138,15 @@
 
 @push('scripts')
 <script>
-const jlCsrfToken = '{{ csrf_token() }}';
-
 function deleteRecord(url) {
-    const reason = prompt('Reason for removing this record (required):');
-    if (reason === null) {
-        return;
-    }
-    if (reason.trim() === '') {
-        alert('A reason is required to remove this record.');
-        return;
-    }
-
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = url;
-    form.innerHTML = `
-        <input type="hidden" name="_token" value="${jlCsrfToken}">
-        <input type="hidden" name="_method" value="DELETE">
-    `;
-
-    const reasonInput = document.createElement('input');
-    reasonInput.type = 'hidden';
-    reasonInput.name = 'reason';
-    reasonInput.value = reason;
-    form.appendChild(reasonInput);
-
-    document.body.appendChild(form);
-    form.submit();
+    JLReason.submit({
+        action: url,
+        method: 'DELETE',
+        title: 'Remove this record?',
+        message: 'The account is removed from the list. Your reason is saved in the change history.',
+        label: 'Reason for removing this record',
+        button: 'Remove record',
+        variant: 'danger'
+    });
 }
-
-document.addEventListener('DOMContentLoaded', function () {
-    const selectAll = document.getElementById('selectAll');
-    const toAlumniBtn = document.getElementById('convertToAlumniBtn');
-    const toAlumniCount = document.getElementById('toAlumniCount');
-    const toStudentBtn = document.getElementById('convertToStudentBtn');
-    const toStudentCount = document.getElementById('toStudentCount');
-
-    function updateCounts() {
-        const studentChecked = document.querySelectorAll('.bulk-checkbox[data-status="student"]:checked').length;
-        const alumniChecked = document.querySelectorAll('.bulk-checkbox[data-status="alumni"]:checked').length;
-
-        if (toAlumniCount) toAlumniCount.textContent = studentChecked;
-        if (toAlumniBtn) toAlumniBtn.disabled = studentChecked === 0;
-
-        if (toStudentCount) toStudentCount.textContent = alumniChecked;
-        if (toStudentBtn) toStudentBtn.disabled = alumniChecked === 0;
-    }
-
-    document.querySelectorAll('.bulk-checkbox').forEach(cb => cb.addEventListener('change', updateCounts));
-
-    if (selectAll) {
-        selectAll.addEventListener('change', function () {
-            document.querySelectorAll('.bulk-checkbox').forEach(cb => cb.checked = selectAll.checked);
-            updateCounts();
-        });
-    }
-
-    updateCounts();
-});
-</script>
-@endpush
 @endsection
