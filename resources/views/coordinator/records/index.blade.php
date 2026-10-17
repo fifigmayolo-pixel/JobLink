@@ -149,4 +149,36 @@ function deleteRecord(url) {
         variant: 'danger'
     });
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const selectAll = document.getElementById('selectAll');
+    const toAlumniBtn = document.getElementById('convertToAlumniBtn');
+    const toAlumniCount = document.getElementById('toAlumniCount');
+    const toStudentBtn = document.getElementById('convertToStudentBtn');
+    const toStudentCount = document.getElementById('toStudentCount');
+
+    function updateCounts() {
+        const studentChecked = document.querySelectorAll('.bulk-checkbox[data-status="student"]:checked').length;
+        const alumniChecked = document.querySelectorAll('.bulk-checkbox[data-status="alumni"]:checked').length;
+
+        if (toAlumniCount) toAlumniCount.textContent = studentChecked;
+        if (toAlumniBtn) toAlumniBtn.disabled = studentChecked === 0;
+
+        if (toStudentCount) toStudentCount.textContent = alumniChecked;
+        if (toStudentBtn) toStudentBtn.disabled = alumniChecked === 0;
+    }
+
+    document.querySelectorAll('.bulk-checkbox').forEach(cb => cb.addEventListener('change', updateCounts));
+
+    if (selectAll) {
+        selectAll.addEventListener('change', function () {
+            document.querySelectorAll('.bulk-checkbox').forEach(cb => cb.checked = selectAll.checked);
+            updateCounts();
+        });
+    }
+
+    updateCounts();
+});
+</script>
+@endpush
 @endsection
