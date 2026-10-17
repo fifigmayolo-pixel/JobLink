@@ -9,7 +9,7 @@
         <p class="text-secondary mb-4">A few details before you can browse and apply for jobs.</p>
         <hr class="jl-rule">
 
-        <form method="POST" action="{{ route('profile.complete.store') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('profile.complete.store', [], false) }}" enctype="multipart/form-data">
             @csrf
 
             <h2 class="h5 mb-3">Personal Information</h2>
@@ -192,6 +192,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const oldCity = @json(old('municipality_city'));
     const oldBarangay = @json(old('barangay'));
 
+    // Relative URLs (path only) so they always use the page's own https origin
+    const CITIES_URL = '{{ route('profile.complete.cities', [], false) }}';
+    const BARANGAYS_URL = '{{ route('profile.complete.barangays', [], false) }}';
+
+    const cache = {};      // remembers answers so picking the same place again is instant
+    let cityRequest = 0;   // used to ignore answers that arrive after the user changed their pick
+    let barangayRequest = 0;
+
     function resetSelect(select, placeholder) {
         select.innerHTML = '';
         const opt = document.createElement('option');
@@ -212,8 +220,37 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    function loadCities(province, selectedCity) {
-        resetSelect(citySelect, 'Loading…');
+    async function getList(url) {
+        if (cache[url]) return cache[url];
+
+        const controller = new AbortController();
+        const timer = setTimeout(function () { controller.abort(); }, 15000);
+
+        try {
+            const res = await fetch(url, {
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin',
+                signal: controller.signal,
+            });
+            if (! res.ok) throw new Error('HTTP ' + res.status);
+
+            const data = await res.json();
+            cache[url] = data;
+            return data;
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
+    function showError(select, message) {
+        resetSelect(select, message);
+        select.dataset.failed = '1';
+    }
+
+    async function loadCities(province, selectedCity) {
+        const mine = ++cityRequest;
+        barangayRequest++;
+        delete citySelect.dataset.failed;
         resetSelect(barangaySelect, 'Select municipality/city first…');
 
         if (! province) {
@@ -221,32 +258,47 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        fetch('{{ route('profile.complete.cities') }}?province=' + encodeURIComponent(province))
-            .then(res => res.json())
-            .then(function (cities) {
-                resetSelect(citySelect, 'Select municipality/city…');
-                fillSelect(citySelect, cities, selectedCity);
+        resetSelect(citySelect, 'Loading…');
 
-                if (selectedCity && cities.includes(selectedCity)) {
-                    loadBarangays(province, selectedCity, oldBarangay);
-                }
-            });
+        try {
+            const cities = await getList(CITIES_URL + '?province=' + encodeURIComponent(province));
+            if (mine !== cityRequest) return;
+
+            resetSelect(citySelect, 'Select municipality/city…');
+            fillSelect(citySelect, cities, selectedCity);
+
+            if (selectedCity && cities.includes(selectedCity)) {
+                loadBarangays(province, selectedCity, oldBarangay);
+            }
+        } catch (e) {
+            console.error('Could not load cities', e);
+            if (mine === cityRequest) showError(citySelect, "Couldn't load. Click to retry.");
+        }
     }
 
-    function loadBarangays(province, city, selectedBarangay) {
-        resetSelect(barangaySelect, 'Loading…');
+    async function loadBarangays(province, city, selectedBarangay) {
+        const mine = ++barangayRequest;
+        delete barangaySelect.dataset.failed;
 
         if (! province || ! city) {
             resetSelect(barangaySelect, 'Select municipality/city first…');
             return;
         }
 
-        fetch('{{ route('profile.complete.barangays') }}?province=' + encodeURIComponent(province) + '&city=' + encodeURIComponent(city))
-            .then(res => res.json())
-            .then(function (barangays) {
-                resetSelect(barangaySelect, 'Select barangay…');
-                fillSelect(barangaySelect, barangays, selectedBarangay);
-            });
+        resetSelect(barangaySelect, 'Loading…');
+
+        try {
+            const barangays = await getList(
+                BARANGAYS_URL + '?province=' + encodeURIComponent(province) + '&city=' + encodeURIComponent(city)
+            );
+            if (mine !== barangayRequest) return;
+
+            resetSelect(barangaySelect, 'Select barangay…');
+            fillSelect(barangaySelect, barangays, selectedBarangay);
+        } catch (e) {
+            console.error('Could not load barangays', e);
+            if (mine === barangayRequest) showError(barangaySelect, "Couldn't load. Click to retry.");
+        }
     }
 
     provinceSelect.addEventListener('change', function () {
@@ -255,6 +307,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     citySelect.addEventListener('change', function () {
         loadBarangays(provinceSelect.value, this.value, null);
+    });
+
+    // If a request failed, clicking the dropdown tries again
+    citySelect.addEventListener('mousedown', function () {
+        if (this.dataset.failed) loadCities(provinceSelect.value, null);
+    });
+    barangaySelect.addEventListener('mousedown', function () {
+        if (this.dataset.failed) loadBarangays(provinceSelect.value, citySelect.value, null);
     });
 
     // Re-populate the cascade if the form is redisplayed after a validation error elsewhere
