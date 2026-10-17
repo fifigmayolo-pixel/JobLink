@@ -103,26 +103,32 @@
 
 {{ $jobPostings->links() }}
 
-@push('scripts')
-<script>
-const jlCsrfToken = '{{ csrf_token() }}';
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ route('jobs.show', $job) }}" class="btn btn-outline-secondary btn-sm">View details</a>
+                @if($job->approval_status === 'pending')
+                    <form method="POST" action="{{ route('coordinator.job-approvals.approve', $job) }}"
+                          data-confirm="Students and alumni will be notified that this job is now live."
+                          data-confirm-title="Approve this posting?"
+                          data-confirm-button="Approve"
+                          data-confirm-icon="patch-check">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="btn btn-jl-gold btn-sm">Approve</button>
+                    </form>
 
-function rejectPosting(url) {
-    const reason = prompt('Reason for rejecting this posting (required — the company will see it):');
-    if (reason === null) {
-        return;
-    }
-    if (reason.trim() === '') {
-        alert('A reason is required to reject a posting.');
-        return;
-    }
-
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = url;
-    form.innerHTML = `
-        <input type="hidden" name="_token" value="${jlCsrfToken}">
-        <input type="hidden" name="_method" value="PATCH">
-    `;
+                    <form method="POST" action="{{ route('coordinator.job-approvals.reject', $job) }}"
+                          data-reason="The company will see this reason, so make it clear and specific."
+                          data-reason-title="Reject this posting?"
+                          data-reason-label="Reason for rejection"
+                          data-reason-button="Reject posting"
+                          data-reason-variant="danger"
+                          data-reason-icon="x-circle">
+                        @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="reason">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Reject</button>
+                    </form>
+                @endif
+            </div>
 
   @endsection

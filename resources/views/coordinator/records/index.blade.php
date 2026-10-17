@@ -90,11 +90,9 @@
         </div>
     @endforelse
 
-    @if ($profiles->hasPages())
     <div class="mt-3">
         {{ $profiles->onEachSide(1)->links() }}
     </div>
-@endif
 
     @if($hasStudents)
         <div class="jl-card p-4 mt-4" style="border: 2px solid var(--jl-gold);">
@@ -134,7 +132,6 @@
         </div>
     @endif
 </form>
-
 
 @push('scripts')
 <script>
