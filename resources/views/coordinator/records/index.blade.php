@@ -90,6 +90,12 @@
         </div>
     @endforelse
 
+    @if ($profiles->hasPages())
+    <div class="mt-3">
+        {{ $profiles->onEachSide(1)->links() }}
+    </div>
+@endif
+
     @if($hasStudents)
         <div class="jl-card p-4 mt-4" style="border: 2px solid var(--jl-gold);">
             <h2 class="h6 mb-3">Convert Selected to Alumni</h2>
@@ -129,7 +135,6 @@
     @endif
 </form>
 
-{{ $profiles->links() }}
 
 @push('scripts')
 <script>

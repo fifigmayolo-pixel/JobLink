@@ -11,6 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+    $middleware->trustProxies(at: '*');
+
+
     $middleware->alias([
         'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
@@ -24,6 +27,20 @@ return Application::configure(basePath: dirname(__DIR__))
         \App\Http\Middleware\EnsureProfileComplete::class,
     ]);
 })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
-    })->create();
+    
+->withExceptions(
+    function (Exceptions $exceptions): void {
+        $exceptions->render(function (
+            \Symfony\Component\Mailer\Exception\TransportExceptionInterface $e,
+            \Illuminate\Http\Request $request
+        ) {
+            if ($request->expectsJson()) {
+                return null;
+            }
+
+            return back()->withErrors([
+                'mail' => 'The email could not be sent right now. Please try again in a few minutes.'
+            ]);
+        });
+    }
+)->create();

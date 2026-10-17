@@ -27,9 +27,13 @@ class RecordController extends Controller
                         ->orWhereHas('user', fn ($u) => $u->where('student_id_number', 'like', "%{$search}%"));
                 });
             })
+            
             ->when($request->program, fn ($q, $program) => $q->where('course_program', $program))
             ->when($request->year_graduated, fn ($q, $yearGraduated) => $q->where('year_graduated', $yearGraduated))
-            ->paginate(25);
+            ->orderBy('full_name')
+            ->paginate(25)
+            ->withQueryString();
+
 
         return view('coordinator.records.index', compact('profiles'));
     }

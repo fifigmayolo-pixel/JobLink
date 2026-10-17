@@ -1,15 +1,17 @@
 {{-- resources/views/partials/page-loader.blade.php --}}
 {{-- Include right after <body> in layouts/app.blade.php:
-     @include('partials.page-loader') --}}
+     @include('partials.page-loader')
 
-<div id="page-loader" class="is-active" role="status" aria-live="polite" aria-label="Loading">
+     Hidden by default. It only appears when you click a link or submit a form
+     AND the next page takes longer than SHOW_DELAY ms to respond, so fast
+     page changes never flash the overlay. --}}
+
+<div id="page-loader" role="status" aria-live="polite" aria-label="Loading">
     <div class="pl-stage">
-        <img src="{{ asset('images/logo.png') }}" alt="" class="pl-logo">
+        <img src="{{ asset('images/logo.png') }}" alt="" class="pl-logo" width="120" height="120" decoding="async">
         <div class="pl-shadow"></div>
     </div>
 </div>
-
-<noscript><style>#page-loader{display:none !important;}</style></noscript>
 
 <style>
     #page-loader {
@@ -24,11 +26,13 @@
         backdrop-filter: blur(3px);
         opacity: 0;
         visibility: hidden;
-        transition: opacity .25s ease, visibility .25s ease;
+        pointer-events: none;
+        transition: opacity .18s ease, visibility .18s ease;
     }
     #page-loader.is-active {
         opacity: 1;
         visibility: visible;
+        pointer-events: auto;
     }
 
     #page-loader .pl-stage {
@@ -77,21 +81,22 @@
         var loader = document.getElementById('page-loader');
         if (!loader) return;
 
-        var failsafe;
+        var SHOW_DELAY = 150;     // ms to wait before the overlay appears
+        var FAILSAFE   = 15000;   // ms; never get stuck (e.g. file downloads)
+        var showTimer, failsafe;
 
         function show() {
-            loader.classList.add('is-active');
+            clearTimeout(showTimer);
             clearTimeout(failsafe);
-            failsafe = setTimeout(hide, 15000); // never get stuck (e.g. file downloads)
+            showTimer = setTimeout(function () { loader.classList.add('is-active'); }, SHOW_DELAY);
+            failsafe = setTimeout(hide, FAILSAFE);
         }
 
         function hide() {
-            loader.classList.remove('is-active');
+            clearTimeout(showTimer);
             clearTimeout(failsafe);
+            loader.classList.remove('is-active');
         }
-
-        // First page load: overlay starts visible, fades out when the page is ready
-        window.addEventListener('load', function () { setTimeout(hide, 150); });
 
         // Back/forward button restores the page from cache with the loader still on
         window.addEventListener('pageshow', function (e) { if (e.persisted) hide(); });

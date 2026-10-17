@@ -24,12 +24,16 @@
                         <p class="text-secondary mb-0">{{ $company->user?->email }}</p>
                     </div>
                 </div>
-                <form method="POST" action="{{ route('coordinator.accounts.company.temp-password', $company) }}" onsubmit="return confirm('Generate a new temporary password and email it to the company?');">
+          <form method="POST" action="{{ route('coordinator.accounts.company.temp-password', $company) }}"
+                    data-confirm="A new temporary password will be generated and emailed to {{ $company->company_name }}. Their current password will no longer work."
+                    data-confirm-title="Email a new temporary password?"
+                    data-confirm-button="Generate and email"
+                    data-confirm-icon="key">
                     @csrf
                     @method('PATCH')
                     <button type="submit" class="btn btn-outline-secondary btn-sm">Regenerate Temp Password</button>
                 </form>
-            </div>
+                            </div>
 
             @if(session('tempPassword'))
                 <div class="alert alert-light jl-card mb-4" style="border-left: 4px solid var(--jl-gold) !important;">

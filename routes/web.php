@@ -36,7 +36,7 @@ Route::get('/', fn () => redirect()->route('login'));
 // Auth
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
-    Route::post('/login', [LoginController::class, 'store']);
+    Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:login');
     Route::get('/register', [RegistrationRequestController::class, 'show'])->name('register.show');
     Route::post('/register', [RegistrationRequestController::class, 'store'])
         ->middleware('throttle:5,1')
@@ -150,7 +150,10 @@ Route::middleware(['auth', 'role:job_coordinator'])->prefix('coordinator')->name
     Route::get('/accounts/company/{company}/edit', [CoordinatorAccountController::class, 'editCompany'])->name('accounts.company.edit');
     Route::patch('/accounts/company/{company}', [CoordinatorAccountController::class, 'updateCompany'])->name('accounts.company.update');
     Route::delete('/accounts/company/{company}', [CoordinatorAccountController::class, 'destroyCompany'])->name('accounts.company.destroy');
-    Route::patch('/accounts/company/{company}/temp-password', [CoordinatorAccountController::class, 'regenerateCompanyTempPassword'])->name('accounts.company.temp-password');
+    
+    Route::patch('/accounts/company/{company}/temp-password', [CoordinatorAccountController::class, 'regenerateCompanyTempPassword'])
+    ->middleware('throttle:5,1')
+    ->name('accounts.company.temp-password');
     Route::get('/accounts/coordinator/create', [CoordinatorAccountController::class, 'showCoordinatorForm'])->name('accounts.coordinator.create');
     Route::post('/accounts/coordinator', [CoordinatorAccountController::class, 'storeCoordinator'])->name('accounts.coordinator.store');
     

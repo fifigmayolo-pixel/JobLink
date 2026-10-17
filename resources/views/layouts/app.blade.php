@@ -188,6 +188,17 @@
         @media (prefers-reduced-motion: reduce) {
             * { animation: none !important; transition: none !important; }
         }
+
+        
+        .pagination {
+            --bs-pagination-color: var(--jl-navy);
+            --bs-pagination-hover-color: var(--jl-navy-deep);
+            --bs-pagination-focus-color: var(--jl-navy-deep);
+            --bs-pagination-active-bg: var(--jl-navy);
+            --bs-pagination-active-border-color: var(--jl-navy);
+            --bs-pagination-focus-box-shadow: 0 0 0 .2rem rgba(201,162,39,.35);
+        }
+
     </style>
 
     @stack('styles')
@@ -376,7 +387,7 @@
         @auth
         @include('partials.linky-widget')
     @endauth
-    
+    @include('partials.confirm-modal')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 </body>
