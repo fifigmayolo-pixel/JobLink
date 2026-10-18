@@ -139,9 +139,11 @@
             <div class="form-check mb-4">
                 <input class="form-check-input" type="checkbox" id="acceptTerms" name="accept_terms" value="1" autocomplete="off" @checked(old('accept_terms'))>
                 <label class="form-check-label" for="acceptTerms">
-                    I have read and agree to the
-                    <a href="#" class="fw-semibold" data-bs-toggle="modal" data-bs-target="#termsModal">Terms &amp; Conditions</a>.
-                </label>
+                I have read and agree to the
+                   <a href="#" class="fw-semibold" data-bs-toggle="modal" data-bs-target="#termsModal">Terms &amp; Conditions</a>
+                       and the
+                <a href="{{ route('privacy') }}" class="fw-semibold" target="_blank" rel="noopener">Privacy Policy</a>.
+            </label>
             </div>
 
             <button type="submit" class="btn btn-jl-gold btn-lg" id="saveProfileBtn">Save and Continue</button>

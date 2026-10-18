@@ -377,7 +377,10 @@
 
             @unless(request()->routeIs('login'))
                 <footer class="jl-footer">
-                    <small class="text-secondary">JobLink · Pangasinan State University, Alaminos City Campus</small>
+                    <small class="text-secondary">
+                        JobLink · Pangasinan State University, Alaminos City Campus ·
+                        <a href="{{ route('privacy') }}" class="text-secondary">Privacy Policy</a>
+                    </small>
                 </footer>
             @endunless
         </div>

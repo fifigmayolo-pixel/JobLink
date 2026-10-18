@@ -28,7 +28,8 @@ class EnsureTracerStudyAccessed
             'tracer-study.show', 'tracer-study.access',
             'terms.show', 'terms.accept',
             'password.change', 'password.change.store',
-            'logout','linky.chat',
+            'logout', 'linky.chat',
+            'privacy',
         ];
 
         if (in_array($request->route()?->getName(), $allowedRoutes, true)) {

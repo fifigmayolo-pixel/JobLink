@@ -25,7 +25,8 @@ class EnsureProfileComplete
             'profile.complete', 'profile.complete.store',
             'profile.complete.cities', 'profile.complete.barangays',
             'password.change', 'password.change.store',
-            'logout','linky.chat',
+            'logout', 'linky.chat',
+            'privacy',
         ];
 
         if ($user->role === 'alumni') {

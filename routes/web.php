@@ -33,6 +33,8 @@ use App\Http\Controllers\LinkyController;
 
 Route::get('/', fn () => redirect()->route('login'));
 
+Route::view('/privacy', 'legal.privacy')->name('privacy');
+
 // Auth
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');

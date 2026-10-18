@@ -63,7 +63,12 @@
                         @error('applicant_type')
                             <div class="text-danger small mt-1">{{ $message }}</div>
                         @enderror
-                    </div>
+                             </div>
+
+                    <p class="form-text mb-3">
+                        We use this information only to review your request and set up your JobLink account.
+                        See our <a href="{{ route('privacy') }}" target="_blank" rel="noopener">Privacy Policy</a>.
+                    </p>
 
                     <button type="submit" class="btn btn-jl-gold w-100 btn-lg">Submit Request</button>
                 </form>
