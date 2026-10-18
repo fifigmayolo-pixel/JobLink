@@ -27,9 +27,11 @@
             </form>
         </div>
 
-        <p class="text-center mt-3">
-            <a href="{{ route('login') }}" class="small">&larr; Back to log in</a>
-        </p>
+       <p class="text-center mt-4">
+    <a href="{{ route('login') }}" class="text-decoration-none d-inline-flex align-items-center gap-2" style="font-size: 1.1rem;">
+        <i class="bi bi-arrow-left"></i> Back to login
+    </a>
+</p>
     </div>
 </div>
 @endsection

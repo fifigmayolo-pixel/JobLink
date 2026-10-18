@@ -63,7 +63,7 @@
                         @error('applicant_type')
                             <div class="text-danger small mt-1">{{ $message }}</div>
                         @enderror
-                             </div>
+                    </div>
 
                     <p class="form-text mb-3">
                         We use this information only to review your request and set up your JobLink account.
@@ -74,8 +74,10 @@
                 </form>
             </div>
 
-            <p class="text-center mt-3">
-                <a href="{{ route('login') }}" class="small">&larr; Back to log in</a>
+            <p class="text-center mt-4">
+                <a href="{{ route('login') }}" class="text-decoration-none d-inline-flex align-items-center gap-2" style="font-size: 1.1rem;">
+                    <i class="bi bi-arrow-left"></i> Back to login
+                </a>
             </p>
         @endif
     </div>
