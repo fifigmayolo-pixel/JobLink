@@ -50,7 +50,9 @@
             JobLink is hosted on Railway. Emails are sent through an email delivery service.
             Linky answers your questions using Google's Gemini API, so the messages you type to
             Linky are sent to Google for processing. Please do not type passwords, ID numbers or
-            other sensitive details into Linky.
+            other sensitive details into Linky. Page fonts, styling and icons are loaded from
+            Google Fonts and the jsDelivr content network, which can see your IP address when your
+            browser fetches those files.
         </p>
 
         <h2 class="h5 mt-4">5. How long we keep it</h2>
@@ -67,7 +69,20 @@
             log out on shared computers.
         </p>
 
-        <h2 class="h5 mt-4">7. Your rights</h2>
+        <h2 class="h5 mt-4">7. Cookies and automatic logout</h2>
+        <p>
+            JobLink uses only the cookies it needs to work: a session cookie that keeps you logged
+            in and a security cookie that protects forms. We do not use advertising or tracking
+            cookies. See our <a href="{{ route('cookies') }}">Cookie Policy</a> for details.
+        </p>
+        <p>
+            For your security, JobLink logs you out automatically after a period of inactivity
+            ({{ \App\Support\IdleTimeout::DEFAULT_MINUTES }} minutes, or
+            {{ \App\Support\IdleTimeout::COORDINATOR_MINUTES }} minutes for the Job Coordinator) and
+            warns you shortly before it happens.
+        </p>
+
+        <h2 class="h5 mt-4">8. Your rights</h2>
         <p>
             Under the Data Privacy Act you may ask to access your information, correct it, object
             to its processing, request that it be erased or blocked, receive a copy of it, and
@@ -75,14 +90,12 @@
             You may also file a complaint with the National Privacy Commission (privacy.gov.ph).
         </p>
 
-        <h2 class="h5 mt-4">8. Contact</h2>
+        <h2 class="h5 mt-4">9. Contact</h2>
         <p class="mb-0">
             Job Coordinator office: [EMAIL OR OFFICE LOCATION]<br>
             Data Protection Officer: [NAME AND EMAIL]
         </p>
     </div>
-
-    
 
 </div>
 
