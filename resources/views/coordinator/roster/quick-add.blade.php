@@ -2,13 +2,14 @@
 
 @section('title', 'Add Student/Alumni')
 
-     @section('content')
-        <a href="{{ route('coordinator.accounts.index') }}"
-        class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 mb-3">
-            <i class="bi bi-arrow-left"></i>
-            Back to Accounts
-        </a>
-        <div class="row justify-content-center">
+@section('content')
+<a href="{{ route('coordinator.accounts.index') }}"
+   class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 mb-3">
+    <i class="bi bi-arrow-left"></i>
+    Back to Accounts
+</a>
+
+<div class="row justify-content-center">
     <div class="col-lg-6">
         <h1 class="h2 mb-1">Add Student/Alumni</h1>
         <p class="text-secondary mb-4">Straight from the master list — Student ID and name only. They'll fill in the rest when they activate.</p>
@@ -18,7 +19,7 @@
                 @csrf
                 <div class="mb-3">
                     <label class="form-label">Student ID</label>
-                    <input type="text" name="student_id_number" value="{{ old('student_id_number') }}" class="form-control" required autofocus>
+                    <input type="text" name="student_id_number" value="{{ old('student_id_number') }}" class="form-control" data-student-id maxlength="14" required autofocus>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Full name</label>

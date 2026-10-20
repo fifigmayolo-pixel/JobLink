@@ -17,10 +17,12 @@ Anything not written in this file is something Linky does not know. Lines contai
 - Students and alumni log in with their Student ID and password. Companies and the Job Coordinator log in with their email and password.
 - Forgot password: click "Forgot password?" on the login page. Students and alumni enter their Student ID; companies and coordinators enter their login email. A 6-digit code is emailed to the registered email. The code works for 15 minutes, allows 5 tries, and can be re-sent. After entering it, choose a new password.
 - Change password (when logged in): open the profile menu at the top right and choose Change Password.
+- For security, JobLink logs users out automatically after 30 minutes of inactivity (15 minutes for the Job Coordinator). A warning appears one minute before, with a "Stay logged in" button.
 
 ## Getting an account (students and alumni)
 - If the person is already on the school's master list: on the login page click "First time logging in? Activate your account", enter the Student ID and full name exactly as on record, then choose a password.
-- If the person has no account yet: on the login page click "No account yet? Request to register". Fill in Student ID, full name, email address, and whether they are a Student or Alumni. The Job Coordinator reviews the request. If approved, an email arrives with the activation steps. If rejected, an email explains why and a new request can be submitted.
+- If the person has no account yet: on the login page click "No account yet? Request to register". Fill in Student ID, full name, email address, and whether they are a Student or Alumni. The Job Coordinator reviews the request. If approved, an email arrives with the activation steps. If rejected, an email explains why, and a new request can be submitted 24 hours after the rejection.
+- If a request for the same Student ID or email address is already waiting for review, a new one cannot be sent until the Job Coordinator has reviewed it.
 - If activation says no matching record was found, check that the Student ID and full name are exactly as registered, or contact the Job Coordinator's office.
 - After activating: alumni first see the Tracer Study screen, then everyone completes their profile.
 
@@ -41,15 +43,22 @@ Anything not written in this file is something Linky does not know. Lines contai
 - Companies can message applicants. Messages and status updates appear under Notifications (the bell icon) and are also emailed to the personal email on the profile.
 - Only jobs approved by the Job Coordinator are visible.
 
+## Posting a job (companies and the Job Coordinator)
+- Both companies and the Job Coordinator can post jobs, using Post a Job.
+- The form asks for: Job title, Job type (Full-time or Part-time), Location, Application deadline, Description, Qualifications and Requirements. Every field is required.
+- When the Job Coordinator posts a job, they also choose which company the job is for from a list of company accounts. Companies posting for themselves do not see this field.
+- Whether a job posted by the Job Coordinator needs approval before students and alumni can see it: [FILL IN]
+
 ## Companies (employers)
 - Company accounts are created by the Job Coordinator. A temporary password is emailed; the company must choose its own password at first login.
-- To post a job, use Post a Job. New postings wait for the Job Coordinator's approval before students and alumni can see them. The company is notified when a posting is approved, or rejected with a reason.
+- To post a job, use Post a Job (see "Posting a job" above). New postings wait for the Job Coordinator's approval before students and alumni can see them. The company is notified when a posting is approved, or rejected with a reason.
 - Applicants: open Applicants in the sidebar, review an application and resume, write a message, and choose Invite to Interview or Reject. The applicant is notified in JobLink and by email.
 - A company can edit its details and logo under Company Profile. To change the company's login email, ask the Job Coordinator.
 
 ## Job Coordinator (administrator)
 - Dashboard: system statistics, recent job postings, application overview, and Tracer Study participation.
 - Accounts: add a student or alumni, import a roster from Excel, create a company account, or create another Job Coordinator account. Company Accounts lets the coordinator view, edit, archive and restore companies, and regenerate a temporary password (it is emailed to the company).
+- Post a Job: the Job Coordinator can post a job on behalf of a company by choosing the company in the form (see "Posting a job" above).
 - Registration Requests: review requests from students and alumni. Approve creates the account and emails them; Reject can include a reason that is emailed.
 - Job Approvals: approve or reject job postings.
 - Records: search and filter students and alumni, correct locked fields, and convert students to alumni (or back) in bulk.

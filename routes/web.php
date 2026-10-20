@@ -34,33 +34,37 @@ use App\Http\Controllers\LinkyController;
 Route::get('/', fn () => redirect()->route('login'));
 
 Route::view('/privacy', 'legal.privacy')->name('privacy');
+Route::view('/cookies', 'legal.cookies')->name('cookies');
 
 // Auth
+// Every numeric throttle has its own prefix (3rd value) so the counters
+// are not shared between routes.
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:login');
+
     Route::get('/register', [RegistrationRequestController::class, 'show'])->name('register.show');
     Route::post('/register', [RegistrationRequestController::class, 'store'])
-        ->middleware('throttle:5,1')
+        ->middleware(['throttle:5,1,register-minute', 'throttle:100,1440,register-daily'])
         ->name('register.store');
 
     Route::get('/activate', [ActivateAccountController::class, 'showVerifyForm'])->name('activate.verify');
     Route::post('/activate', [ActivateAccountController::class, 'verify'])
-        ->middleware('throttle:8,1')
+        ->middleware('throttle:8,1,activate-verify')
         ->name('activate.verify.store');
     Route::get('/activate/password', [ActivateAccountController::class, 'showPasswordForm'])->name('activate.password');
     Route::post('/activate/password', [ActivateAccountController::class, 'setPassword'])->name('activate.password.store');
 
     Route::get('/forgot-password', [ForgotPasswordController::class, 'showFindAccountForm'])->name('password.forgot');
     Route::post('/forgot-password', [ForgotPasswordController::class, 'findAccount'])
-        ->middleware('throttle:8,1')
+        ->middleware('throttle:8,1,forgot-find')
         ->name('password.forgot.store');
     Route::get('/forgot-password/verify', [ForgotPasswordController::class, 'showVerifyForm'])->name('password.forgot.verify');
     Route::post('/forgot-password/verify', [ForgotPasswordController::class, 'verifyCode'])
-        ->middleware('throttle:8,1')
+        ->middleware('throttle:8,1,forgot-verify')
         ->name('password.forgot.verify.store');
     Route::post('/forgot-password/verify/resend', [ForgotPasswordController::class, 'resendCode'])
-        ->middleware('throttle:5,1')
+        ->middleware('throttle:5,1,forgot-resend')
         ->name('password.forgot.verify.resend');
     Route::get('/forgot-password/reset', [ForgotPasswordController::class, 'showResetForm'])->name('password.forgot.reset');
     Route::post('/forgot-password/reset', [ForgotPasswordController::class, 'resetPassword'])->name('password.forgot.reset.store');
@@ -69,7 +73,12 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::post('/linky/chat', [LinkyController::class, 'chat'])->middleware('throttle:12,1')->name('linky.chat');
+    Route::post('/linky/chat', [LinkyController::class, 'chat'])->middleware('throttle:12,1,linky')->name('linky.chat');
+
+    // Called by public/js/idle-logout.js to keep the session alive while the user is active.
+    Route::post('/session/keep-alive', fn () => response()->noContent())
+        ->middleware('throttle:30,1,keepalive')
+        ->name('session.keep-alive');
 
     Route::get('/password/change', [PasswordChangeController::class, 'show'])->name('password.change');
     Route::put('/password/change', [PasswordChangeController::class, 'update'])->name('password.change.store');
@@ -101,7 +110,7 @@ Route::middleware('auth')->group(function () {
 // Student & Alumni
 Route::middleware(['auth', 'role:student|alumni'])->group(function () {
     Route::get('/tracer-study', [TracerStudyController::class, 'show'])->name('tracer-study.show');
-    Route::post('/tracer-study/access', [TracerStudyController::class, 'access'])->name('tracer-study.access'); 
+    Route::post('/tracer-study/access', [TracerStudyController::class, 'access'])->name('tracer-study.access');
     Route::get('/profile/complete', [ProfileController::class, 'showCompletionForm'])->name('profile.complete');
     Route::post('/profile/complete', [ProfileController::class, 'storeCompletion'])->name('profile.complete.store');
     Route::get('/profile/complete/cities', [ProfileController::class, 'citiesForProvince'])->name('profile.complete.cities');
@@ -146,19 +155,18 @@ Route::middleware(['auth', 'role:job_coordinator'])->prefix('coordinator')->name
     // /accounts/company/{company} wildcard, or "create" gets swallowed as a company ID.
     Route::get('/accounts/company/create', [CoordinatorAccountController::class, 'showCompanyForm'])->name('accounts.company.create');
     Route::post('/accounts/company', [CoordinatorAccountController::class, 'storeCompany'])->name('accounts.company.store');
-        Route::patch('/accounts/company/{company}/restore', [CoordinatorAccountController::class, 'restoreCompany'])->name('accounts.company.restore');
+    Route::patch('/accounts/company/{company}/restore', [CoordinatorAccountController::class, 'restoreCompany'])->name('accounts.company.restore');
     Route::get('/accounts/company', [CoordinatorAccountController::class, 'companyIndex'])->name('accounts.company.index');
     Route::get('/accounts/company/{company}', [CoordinatorAccountController::class, 'showCompany'])->name('accounts.company.show');
     Route::get('/accounts/company/{company}/edit', [CoordinatorAccountController::class, 'editCompany'])->name('accounts.company.edit');
     Route::patch('/accounts/company/{company}', [CoordinatorAccountController::class, 'updateCompany'])->name('accounts.company.update');
     Route::delete('/accounts/company/{company}', [CoordinatorAccountController::class, 'destroyCompany'])->name('accounts.company.destroy');
-    
+
     Route::patch('/accounts/company/{company}/temp-password', [CoordinatorAccountController::class, 'regenerateCompanyTempPassword'])
-    ->middleware('throttle:5,1')
-    ->name('accounts.company.temp-password');
+        ->middleware('throttle:5,1,company-temp-password')
+        ->name('accounts.company.temp-password');
     Route::get('/accounts/coordinator/create', [CoordinatorAccountController::class, 'showCoordinatorForm'])->name('accounts.coordinator.create');
     Route::post('/accounts/coordinator', [CoordinatorAccountController::class, 'storeCoordinator'])->name('accounts.coordinator.store');
-    
 
     Route::get('/roster/quick-add', [StudentRosterController::class, 'showQuickAddForm'])->name('roster.quick-add');
     Route::post('/roster/quick-add', [StudentRosterController::class, 'quickAdd'])->name('roster.quick-add.store');

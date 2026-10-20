@@ -16,7 +16,7 @@
                 @csrf
                 <div class="mb-3">
                     <label class="form-label">Student ID</label>
-                    <input type="text" name="student_id_number" value="{{ old('student_id_number') }}" class="form-control" required autofocus>
+                    <input type="text" name="student_id_number" value="{{ old('student_id_number') }}" class="form-control" data-student-id maxlength="14" required autofocus>
                 </div>
                 <div class="mb-4">
                     <label class="form-label">Full name</label>
@@ -27,11 +27,11 @@
             </form>
         </div>
 
-       <p class="text-center mt-4">
-    <a href="{{ route('login') }}" class="text-decoration-none d-inline-flex align-items-center gap-2" style="font-size: 1.1rem;">
-        <i class="bi bi-arrow-left"></i> Back to login
-    </a>
-</p>
+        <p class="text-center mt-4">
+            <a href="{{ route('login') }}" class="text-decoration-none d-inline-flex align-items-center gap-2" style="font-size: 1.1rem;">
+                <i class="bi bi-arrow-left"></i> Back to login
+            </a>
+        </p>
     </div>
 </div>
 @endsection

@@ -12,6 +12,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
+
+       @include('partials.cookie-notice')
+
+       
     <style>
         :root {
             --jl-navy: #0F2A5C;
@@ -391,10 +395,12 @@
         @include('partials.linky-widget')
     @endauth
     @include('partials.confirm-modal')
-    @include('partials.confirm-modal')
     @include('partials.reason-modal')
+    @include('partials.idle-warning-modal')
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    @stack('scripts')
+    <script src="{{ asset('js/student-id-input.js') }}"></script>
+    <script src="{{ asset('js/idle-logout.js') }}"></script>
+@stack('scripts')
 </body>
 </html>

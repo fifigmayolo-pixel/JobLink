@@ -27,9 +27,9 @@
 
                     <div class="mb-3">
                         <label class="form-label">Student ID</label>
-                        <input type="text" name="student_id_number" value="{{ old('student_id_number') }}" class="form-control @error('student_id_number') is-invalid @enderror" maxlength="50" required autofocus>
+                        <input type="text" name="student_id_number" value="{{ old('student_id_number') }}" class="form-control @error('student_id_number') is-invalid @enderror" data-student-id maxlength="14" required autofocus>
                         @error('student_id_number')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
 
@@ -48,6 +48,13 @@
                         @error('email')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
+                    </div>
+
+                    {{-- Honeypot: hidden from people, filled in by simple bots. Keep it out of the tab order. --}}
+                    <div style="position: absolute; left: -9999px; height: 0; overflow: hidden;" aria-hidden="true">
+                        <label>Leave this field empty
+                            <input type="text" name="website" value="" tabindex="-1" autocomplete="off">
+                        </label>
                     </div>
 
                     <div class="mb-4">
