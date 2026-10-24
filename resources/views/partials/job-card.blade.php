@@ -36,14 +36,22 @@
     $jobTypeLabel = $jobTypeLabels[$job->job_type] ?? \Illuminate\Support\Str::headline($job->job_type ?? '');
 @endphp
 
-<div class="jl-card jl-card-hover jl-job-card h-100 p-3 d-flex flex-column"
+{{-- No h-100 here: it's a literal `height:100%`, which doesn't qualify for
+     flexbox's "stretch to the tallest card in the row" behavior (only
+     height:auto does). Leaving height unset lets that happen automatically
+     now that this card is a direct child of the flex-wrap row. --}}
+<div class="jl-card jl-card-hover jl-job-card p-3 d-flex flex-column"
      style="--accent: {{ $accent['base'] }}; --accent-soft: {{ $accent['soft'] }}; --accent-text: {{ $accent['text'] }}; --accent-deep: {{ $accent['deep'] }};">
 
     <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
         <div class="d-flex align-items-center gap-2">
-            <div class="jl-logo-badge {{ $job->company?->logo ? '' : 'jl-logo-badge-fallback' }}">
+            <div class="jl-logo-badge {{ $job->company?->logo ? '' : 'jl-logo-badge-fallback' }}" data-fallback-initial="{{ \App\Support\CompanyAccent::initial($job->company?->company_name) }}">
                 @if($job->company?->logo)
-                    <img src="{{ \Illuminate\Support\Facades\Storage::url($job->company->logo) }}" alt="{{ $job->company->company_name }} logo">
+                    {{-- If the stored logo path 404s (e.g. missing on this deploy's
+                         storage disk), swap to the colored initial badge instead of
+                         showing the browser's broken-image icon + alt text. --}}
+                    <img src="{{ \Illuminate\Support\Facades\Storage::url($job->company->logo) }}" alt="{{ $job->company->company_name }} logo"
+                         onerror="this.closest('.jl-logo-badge').classList.add('jl-logo-badge-fallback'); this.closest('.jl-logo-badge').textContent = this.closest('.jl-logo-badge').dataset.fallbackInitial;">
                 @else
                     {{ \App\Support\CompanyAccent::initial($job->company?->company_name) }}
                 @endif
