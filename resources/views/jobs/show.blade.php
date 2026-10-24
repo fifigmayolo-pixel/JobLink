@@ -48,9 +48,11 @@
                 <div class="jl-card jl-detail-header p-4 p-md-5">
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="jl-logo-badge jl-logo-badge-lg {{ $jobPosting->company?->logo ? '' : 'jl-logo-badge-fallback' }}">
+                            <div class="jl-logo-badge jl-logo-badge-lg {{ $jobPosting->company?->logo ? '' : 'jl-logo-badge-fallback' }}" data-fallback-initial="{{ \App\Support\CompanyAccent::initial($jobPosting->company?->company_name) }}">
                                 @if($jobPosting->company?->logo)
-                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($jobPosting->company->logo) }}" alt="{{ $jobPosting->company->company_name }} logo">
+                                    {{-- Same self-healing fallback as the job card — see its comment. --}}
+                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($jobPosting->company->logo) }}" alt="{{ $jobPosting->company->company_name }} logo"
+                                         onerror="this.closest('.jl-logo-badge').classList.add('jl-logo-badge-fallback'); this.closest('.jl-logo-badge').textContent = this.closest('.jl-logo-badge').dataset.fallbackInitial;">
                                 @else
                                     {{ \App\Support\CompanyAccent::initial($jobPosting->company?->company_name) }}
                                 @endif
