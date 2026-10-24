@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreJobPostingRequest;
 use App\Http\Requests\UpdateJobPostingRequest;
 use App\Jobs\NotifyNewJobPosting;
+use App\Jobs\NotifyTaggedCompany;
 use App\Models\Company;
 use App\Models\JobPosting;
 use Illuminate\Support\Carbon;
@@ -88,6 +89,14 @@ class JobPostingController extends Controller
             // Students and alumni get a "new job" notification, fanned out in the
             // background so posting stays fast. Needs `php artisan queue:work`.
             NotifyNewJobPosting::dispatch($jobPosting->id);
+
+            // The Coordinator tagged a specific company when posting this one
+            // (the "Company" select on the create form) — let that company
+            // know, via an in-app notification and an email to their
+            // registered login address.
+            if ($jobPosting->company_id) {
+                NotifyTaggedCompany::dispatch($jobPosting->id);
+            }
 
             return redirect()->route('jobs.show', $jobPosting)->with('status', 'Job posted.');
         }

@@ -33,6 +33,7 @@
                         'new_job_posting' => 'bi-briefcase-fill',
                         'job_posting_approved' => 'bi-check-circle-fill',
                         'job_posting_rejected' => 'bi-x-circle-fill',
+                        'job_posting_tagged' => 'bi-send-check-fill',
                         default => 'bi-building',
                     };
                     $linkedJob = $notification->jobPosting;

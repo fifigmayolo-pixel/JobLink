@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'JobLink') · PSU Alaminos City</title>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -37,7 +35,7 @@
         }
 
         h1, h2, h3, h4, .display-font {
-            font-family: 'Fraunces', serif;
+            font-family: 'Lora', Georgia, serif;
             font-weight: 600;
             color: var(--jl-navy);
             letter-spacing: -0.01em;
@@ -53,7 +51,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Fraunces', serif;
+            font-family: 'Lora', Georgia, serif;
             font-weight: 700;
             font-size: 0.85rem;
             color: var(--jl-gold);
@@ -81,6 +79,159 @@
     color: var(--jl-slate);
     font-size: 1.5rem;
 }
+
+/* ============================================================
+   Job cards & job detail — paste inside the <style> block in
+   resources/views/layouts/app.blade.php, right after the existing
+   .jl-company-logo-placeholder rule.
+
+   These work alongside .jl-company-logo (used in the Edit Job and
+   Company Profile views, left untouched) — they don't replace it.
+   Colors come from inline CSS custom properties (--accent, etc.) set
+   per-card/per-page by App\Support\CompanyAccent, so one company is
+   always the same color everywhere without any manual picking.
+   ============================================================ */
+
+/* Logo badge. Default state: a plain white tile, same convention as your
+   existing .jl-company-logo, so a real uploaded logo (even one with a
+   transparent PNG background) always sits on white — never tinted. */
+.jl-logo-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 0.65rem;
+    background: #fff;
+    border: 1px solid rgba(15, 42, 92, 0.1);
+    color: var(--jl-slate);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lora', Georgia, serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    overflow: hidden; /* clips the logo image to the rounded corners */
+    flex-shrink: 0;
+}
+.jl-logo-badge img { width: 100%; height: 100%; object-fit: cover; }
+.jl-logo-badge-lg { width: 72px; height: 72px; border-radius: 0.85rem; font-size: 1.75rem; }
+
+/* Added only when the company has NO uploaded logo (see the Blade files —
+   this class is appended alongside .jl-logo-badge in the no-logo branch).
+   That's the one case where the badge itself becomes the colored avatar,
+   showing the company's initial on its accent color. */
+.jl-logo-badge-fallback {
+    background: var(--accent, var(--jl-navy));
+    border-color: var(--accent, var(--jl-navy));
+    color: #fff;
+}
+
+/* Job card on the listing/saved-jobs pages: colored left accent border,
+   and capped at a fixed max width so it stays compact like the reference
+   design instead of stretching to fill its grid column on wide screens
+   (Bootstrap's col-lg-4 etc. size the COLUMN, not the card itself).
+   Selector is ".jl-card.jl-job-card" (not just ".jl-job-card") so it beats
+   the existing ".jl-card { border: 1px solid ... }" rule on specificity
+   instead of depending on which one happens to come later in the file. */
+.jl-card.jl-job-card {
+    border-left: 4px solid var(--accent, var(--jl-gold));
+    max-width: 340px;
+    width: 100%;
+}
+
+/* Pills: job type + urgency */
+.jl-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.8rem;
+    border-radius: 50rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.jl-pill-neutral { background: rgba(15,42,92,0.08); color: var(--jl-navy); }
+.jl-pill-urgent { background: rgba(201,162,39,0.18); color: #8A6C16; }
+
+/* Available if you ever want a pill that matches the company accent instead
+   (not used by default — the job-type pill stays neutral so it doesn't get
+   confused with the company's own color). */
+.jl-pill-accent { background: var(--accent-soft, rgba(15,42,92,0.08)); color: var(--accent-text, var(--jl-navy)); }
+
+.jl-icon-btn { width: 2.25rem; height: 2.25rem; display: inline-flex; align-items: center; justify-content: center; padding: 0; border-radius: 0.5rem; flex-shrink: 0; }
+
+/* Already-saved state for the bookmark button: filled icon on a tinted
+   background in the company's accent color, so it reads as "on" at a
+   glance instead of looking identical to the un-saved outline button. */
+.jl-icon-btn-saved {
+    background: var(--accent-soft, rgba(201,162,39,0.18));
+    border-color: var(--accent, var(--jl-gold));
+    color: var(--accent-text, #8A6C16);
+}
+.jl-icon-btn-saved:hover {
+    background: var(--accent-soft, rgba(201,162,39,0.18));
+    border-color: var(--accent, var(--jl-gold));
+    color: var(--accent-text, #8A6C16);
+}
+
+/* Job detail page — same specificity fix as .jl-card.jl-job-card above */
+.jl-card.jl-detail-header { border-left: 5px solid var(--accent, var(--jl-gold)); }
+
+.jl-stat-box {
+    background: var(--jl-cream);
+    border-radius: 0.65rem;
+    padding: 0.7rem 0.9rem;
+    height: 100%;
+}
+.jl-stat-box-urgent { background: var(--accent-soft, rgba(201,162,39,0.18)); }
+.jl-stat-label { font-size: 0.7rem; color: var(--jl-slate); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 0.15rem; }
+.jl-stat-value { font-weight: 700; color: var(--jl-navy); font-size: 0.95rem; }
+
+.jl-section-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--accent-soft, rgba(15,42,92,0.08));
+    color: var(--accent-text, var(--jl-navy));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.95rem;
+}
+
+/* Bullet lists in the description/qualifications/requirements sections */
+.jl-dot-list { list-style: none; padding-left: 0; margin-bottom: 0; }
+.jl-dot-list li { position: relative; padding-left: 1.3rem; margin-bottom: 0.5rem; }
+.jl-dot-list li:last-child { margin-bottom: 0; }
+.jl-dot-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent, var(--jl-gold));
+}
+
+/* Sidebar "Interested in this role?" card stays in view while scrolling */
+.jl-sidebar-sticky { position: sticky; top: 1.5rem; }
+@media (max-width: 991.98px) { .jl-sidebar-sticky { position: static; } }
+
+/* Accent-colored button, used for Apply + modal confirm, colored per company */
+.btn-jl-accent {
+    background: var(--accent, var(--jl-gold));
+    border-color: var(--accent, var(--jl-gold));
+    color: #fff;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-jl-accent:hover {
+    background: var(--accent-deep, var(--jl-navy-deep));
+    border-color: var(--accent-deep, var(--jl-navy-deep));
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
         /* ===== Shell: sidebar + main column ===== */
         .jl-shell { display: flex; min-height: 100vh; }
 
@@ -96,7 +247,7 @@
             align-items: center;
             gap: 0.65rem;
             padding: 1.5rem 1.35rem 1rem;
-            font-family: 'Fraunces', serif;
+            font-family: 'Lora', Georgia, serif;
             font-weight: 600;
             font-size: 1.25rem;
             color: #fff;
@@ -214,7 +365,7 @@
         @auth
         <aside class="offcanvas-lg offcanvas-start jl-sidebar" tabindex="-1" id="jlSidebar">
             <div class="offcanvas-header d-lg-none">
-                <span class="d-flex align-items-center gap-2 text-white fw-semibold" style="font-family: 'Fraunces', serif;">
+                <span class="d-flex align-items-center gap-2 text-white fw-semibold" style="font-family: 'Lora', Georgia, serif;">
                     <img src="{{ asset('images/logo.png') }}" alt="JobLink" class="jl-logo"> JobLink
                 </span>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#jlSidebar" aria-label="Close"></button>

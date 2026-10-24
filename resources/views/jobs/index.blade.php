@@ -3,6 +3,12 @@
 @section('title', 'Browse Jobs')
 
 @section('content')
+@php
+    // One query for the whole page instead of one per card — used by
+    // partials.job-card to show a filled "Saved" icon instead of the
+    // outline "Save" icon for jobs this user already bookmarked.
+    $savedJobIds = auth()->check() ? auth()->user()->savedJobs()->pluck('job_posting_id')->all() : [];
+@endphp
 <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
     <div>
         <h1 class="h2 mb-1">Open Positions</h1>
@@ -32,42 +38,21 @@
     </div>
 </form>
 
-<hr class="jl-rule">
+<p class="text-secondary small mb-3">{{ $jobPostings->total() }} open position{{ $jobPostings->total() === 1 ? '' : 's' }}</p>
 
-<div class="row g-3">
+{{--
+    Deliberately NOT Bootstrap's row/col grid. A col-lg-4 column is sized
+    to a third of the row no matter how wide its content is, so once the
+    card itself got a fixed max-width, it just sat in the corner of an
+    oversized column — the big gap you saw. Flex-wrap instead sizes each
+    card to itself and lets them sit side by side with a plain gap.
+--}}
+<div class="d-flex flex-wrap gap-3">
     @forelse($jobPostings as $job)
-        <div class="col-sm-6 col-lg-4">
-                        <div class="jl-card jl-card-hover h-100 p-4 d-flex flex-column">
-                <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="jl-company-logo" style="width: 40px; height: 40px;">
-                            @if($job->company?->logo)
-                                <img src="{{ \Illuminate\Support\Facades\Storage::url($job->company->logo) }}" alt="{{ $job->company->company_name }} logo">
-                            @else
-                                <div class="jl-company-logo-placeholder" style="font-size: 1.1rem;">
-                                    <i class="bi bi-building"></i>
-                                </div>
-                            @endif
-                        </div>
-                        <h2 class="h5 mb-0">{{ $job->title }}</h2>
-                    </div>
-                    @if($job->job_type)
-                        <span class="badge rounded-pill flex-shrink-0" style="background: rgba(15,42,92,0.08); color: var(--jl-navy); font-weight: 600;">
-                            {{ $job->job_type === 'full_time' ? 'Full-time' : 'Part-time' }}
-                        </span>
-                    @endif
-                </div>
-                <p class="text-secondary small mb-3">{{ $job->company?->company_name ?? 'Company' }} &middot; {{ $job->location }}</p>
-                <p class="mb-3 flex-grow-1">{{ \Illuminate\Support\Str::limit($job->description, 110) }}</p>
-                <p class="text-secondary small mb-3">Deadline {{ $job->application_deadline->format('M j, Y') }}</p>
-                <a href="{{ route('jobs.show', $job) }}" class="btn btn-jl-navy btn-sm w-100">View</a>
-            </div>
-        </div>
+        @include('partials.job-card', ['job' => $job, 'savedJobIds' => $savedJobIds])
     @empty
-        <div class="col-12">
-            <div class="jl-card p-5 text-center">
-                <p class="mb-0 text-secondary">No open positions match your search right now. Check back soon.</p>
-            </div>
+        <div class="jl-card p-5 text-center w-100">
+            <p class="mb-0 text-secondary">No open positions match your search right now. Check back soon.</p>
         </div>
     @endforelse
 </div>
