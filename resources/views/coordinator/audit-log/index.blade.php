@@ -71,16 +71,19 @@
 
         @if($log->field_name)
             <p class="mb-1"><strong>Field:</strong> {{ $log->field_name }}</p>
-            <p class="mb-1"><strong>Old value:</strong> {{ $log->old_value ?? '—' }}</p>
-            <p class="mb-1"><strong>New value:</strong> {{ $log->new_value ?? '—' }}</p>
+            {{-- text-break: a long unbroken value (a URL, typically) otherwise
+                 never wraps and pushes the card — and the whole page — wider,
+                 forcing a horizontal scrollbar instead of staying inside the card. --}}
+            <p class="mb-1 text-break"><strong>Old value:</strong> {{ $log->old_value ?? '—' }}</p>
+            <p class="mb-1 text-break"><strong>New value:</strong> {{ $log->new_value ?? '—' }}</p>
         @endif
 
         @if($log->reason)
-            <p class="mb-1"><strong>Reason:</strong> {{ $log->reason }}</p>
+            <p class="mb-1 text-break"><strong>Reason:</strong> {{ $log->reason }}</p>
         @endif
 
         @if($log->details)
-            <p class="mb-1"><strong>Details:</strong> {{ $log->details }}</p>
+            <p class="mb-1 text-break"><strong>Details:</strong> {{ $log->details }}</p>
         @endif
 
         <p class="text-secondary small mb-0 mt-2">By {{ $log->editor?->full_name ?? $log->editor?->email ?? 'Unknown' }}</p>
