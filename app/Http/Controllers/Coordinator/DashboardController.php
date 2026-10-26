@@ -31,8 +31,11 @@ class DashboardController extends Controller
         $rejectedCount = (int) $statusCounts->get('rejected', 0);
 
         return view('coordinator.dashboard', [
-            'totalStudents' => User::students()->count(),
-            'totalAlumni' => User::alumni()->count(),
+            // Only accounts that have actually been activated — a pre-registered
+            // roster row isn't a "student" yet from the dashboard's point of
+            // view until the person has logged in and claimed it.
+            'totalStudents' => User::students()->whereNotNull('activated_at')->count(),
+            'totalAlumni' => User::alumni()->whereNotNull('activated_at')->count(),
             'totalCompanies' => Company::count(),
             'totalJobsPosted' => JobPosting::count(),
             'totalApplications' => JobApplication::count(),
