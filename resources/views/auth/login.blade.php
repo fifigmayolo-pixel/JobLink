@@ -60,6 +60,20 @@
     .jl-login-form-wrap .form-label { font-size: 1rem; }
     .jl-login-form-wrap .form-control-lg { font-size: 1.05rem; }
 
+    /* The login page's own status/error banner — kept inside the form
+       panel's own max-width instead of the full-bleed alert the shared
+       layout normally renders (that one is suppressed on this route; see
+       layouts/app.blade.php), so it never collides with the split hero. */
+    .jl-login-alert {
+        border-radius: 0.65rem;
+        padding: 0.9rem 1.1rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.92rem;
+    }
+    .jl-login-alert-error { background: rgba(180,85,63,0.08); border: 1px solid rgba(180,85,63,0.25); color: var(--jl-rose); }
+    .jl-login-alert-error strong { color: var(--jl-rose); }
+    .jl-login-alert-status { background: rgba(201,162,39,0.10); border: 1px solid rgba(201,162,39,0.3); color: #8A6C16; }
+
     @media (max-width: 991.98px) {
         .jl-login-split { min-height: auto; }
         .jl-login-left { flex: 1 1 100%; padding: 2.5rem 1.75rem; }
@@ -115,6 +129,23 @@
                     <h1 class="h2 mb-2">Welcome to JobLink</h1>
                     <p class="text-secondary fs-5 mb-0">PSU Alaminos City career placement portal</p>
                 </div>
+
+                @if(session('status'))
+                    <div class="jl-login-alert jl-login-alert-status" role="alert">
+                        {{ session('status') }}
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="jl-login-alert jl-login-alert-error" role="alert">
+                        <strong>Please check the following:</strong>
+                        <ul class="mb-0 mt-1 ps-3">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
                 <form method="POST" action="{{ route('login') }}">
                     @csrf

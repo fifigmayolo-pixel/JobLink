@@ -510,22 +510,29 @@
             @endauth
 
             <main class="jl-content">
-                @if(session('status'))
-                    <div class="alert alert-light jl-card mb-4" style="border-left: 4px solid var(--jl-gold) !important;" role="alert">
-                        {{ session('status') }}
-                    </div>
-                @endif
+                               {{-- Excluded on /login, same as the footer below: the login
+                     page breaks fully out of this <main> padding for its
+                     full-bleed split layout (see .jl-login-breakout), so
+                     this boxed alert would sit awkwardly across that seam.
+                     The login view renders its own matching banner instead. --}}
+                @unless(request()->routeIs('login'))
+                    @if(session('status'))
+                        <div class="alert alert-light jl-card mb-4" style="border-left: 4px solid var(--jl-gold) !important;" role="alert">
+                            {{ session('status') }}
+                        </div>
+                    @endif
 
-                @if($errors->any())
-                    <div class="alert alert-light jl-card mb-4" style="border-left: 4px solid var(--jl-rose) !important;" role="alert">
-                        <strong>Please check the following:</strong>
-                        <ul class="mb-0 mt-1">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+                    @if($errors->any())
+                        <div class="alert alert-light jl-card mb-4" style="border-left: 4px solid var(--jl-rose) !important;" role="alert">
+                            <strong>Please check the following:</strong>
+                            <ul class="mb-0 mt-1">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                @endunless
 
                 @yield('content')
             </main>
