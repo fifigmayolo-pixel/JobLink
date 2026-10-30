@@ -9,7 +9,7 @@
        class="btn btn-outline-secondary btn-sm mb-3 js-privacy-back">&larr; Back</a>
 
     <h1 class="h2 mb-1">Privacy Policy</h1>
-    <p class="text-secondary mb-4">Last updated: [DATE]</p>
+    <p class="text-secondary mb-4">Last updated: October 30, 2026</p>
 
     <div class="jl-card p-4 p-md-5">
         <p>

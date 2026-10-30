@@ -515,7 +515,7 @@
                      full-bleed split layout (see .jl-login-breakout), so
                      this boxed alert would sit awkwardly across that seam.
                      The login view renders its own matching banner instead. --}}
-                @unless(request()->routeIs('login'))
+                @unless(request()->routeIs('login') || request()->routeIs('landing'))
                     @if(session('status'))
                         <div class="alert alert-light jl-card mb-4" style="border-left: 4px solid var(--jl-gold) !important;" role="alert">
                             {{ session('status') }}
@@ -537,7 +537,7 @@
                 @yield('content')
             </main>
 
-            @unless(request()->routeIs('login'))
+            @unless(request()->routeIs('login') || request()->routeIs('landing'))
                 <footer class="jl-footer">
                     <small class="text-secondary">
                         JobLink · Pangasinan State University, Alaminos City Campus ·

@@ -31,7 +31,10 @@ use App\Http\Controllers\UpdatePasswordController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LinkyController;
 
-Route::get('/', fn () => redirect()->route('login'));
+// Guests see the marketing landing page; anyone already logged in goes
+// straight to their dashboard instead (same as the old behavior, where
+// hitting "/" effectively always ended at /login or past it).
+Route::get('/', fn () => auth()->check() ? redirect()->route('dashboard') : view('landing'))->name('landing');
 
 Route::view('/privacy', 'legal.privacy')->name('privacy');
 Route::view('/cookies', 'legal.cookies')->name('cookies');
