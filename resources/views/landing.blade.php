@@ -202,7 +202,7 @@
         <header>
             <div class="jl-landing-container jl-landing-header-inner">
                 <a href="{{ route('landing') }}" class="jl-landing-logo">
-                    <img src="{{ asset('Images/logo.png') }}" alt="" aria-hidden="true">JobLink
+                    <img src="{{ asset('images/logo.png') }}" alt="" aria-hidden="true">JobLink
                 </a>
                 <nav class="jl-landing-nav">
                     <a href="#features">Features</a>
@@ -297,7 +297,7 @@
         <div class="jl-landing-video-card">
             <div class="jl-landing-video-frame">
                 <video id="promoVideo" autoplay loop muted playsinline preload="auto"
-                       poster="{{ asset('Images/campus-photo.jpg') }}" aria-label="JobLink promo video">
+                       poster="{{ asset('images/campus-photo.jpg') }}" aria-label="JobLink promo video">
                     <source src="{{ asset('videos/joblink-promo.mp4') }}" type="video/mp4">
                     Your browser can&rsquo;t play embedded video.
                 </video>
