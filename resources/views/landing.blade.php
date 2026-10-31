@@ -269,7 +269,7 @@
                         {{-- Nothing approved and open right now: keep the hero looking finished. --}}
                         <div class="jl-landing-preview-card">
                             <div class="jl-landing-preview-card-head">
-                                <span class="jl-landing-preview-logo" aria-hidden="true"><img src="{{ asset('Images/logo.png') }}" alt=""></span>
+                                <span class="jl-landing-preview-logo" aria-hidden="true"><img src="{{ asset('images/logo.png') }}" alt=""></span>
                                 <div>
                                     <h4>New openings are on the way</h4>
                                     <p>Partner companies post here once approved.</p>
