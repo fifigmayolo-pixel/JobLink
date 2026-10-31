@@ -30,11 +30,12 @@ use App\Http\Controllers\TracerStudyController;
 use App\Http\Controllers\UpdatePasswordController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LinkyController;
+use App\Http\Controllers\LandingController;
 
 // Guests see the marketing landing page; anyone already logged in goes
 // straight to their dashboard instead (same as the old behavior, where
 // hitting "/" effectively always ended at /login or past it).
-Route::get('/', fn () => auth()->check() ? redirect()->route('dashboard') : view('landing'))->name('landing');
+Route::get('/', LandingController::class)->name('landing');
 
 Route::view('/privacy', 'legal.privacy')->name('privacy');
 Route::view('/cookies', 'legal.cookies')->name('cookies');

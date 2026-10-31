@@ -37,7 +37,7 @@ class LandingController extends Controller
                 ->latest('id')
                 ->limit(5)
                 ->get()
-                ->map(function (JobPosting $job) use ($typeLabels) {
+                ->map(function ($job) use ($typeLabels) {
                     $name = $job->company?->company_name;
                     $accent = CompanyAccent::for($job->company?->id, $name);
 
