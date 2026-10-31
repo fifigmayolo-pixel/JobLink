@@ -20,7 +20,7 @@
                         <label class="form-label">Logo</label>
                         @if($company->logo)
                             <div class="mb-2">
-                                <img src="{{ \Illuminate\Support\Facades\Storage::url($company->logo) }}" alt="Company logo" style="width: 80px; height: 80px; object-fit: cover; border-radius: 0.5rem;">
+                                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($company->logo) }}" alt="Company logo" style="width: 80px; height: 80px; object-fit: cover; border-radius: 0.5rem;">
                             </div>
                         @endif
                         <input type="file" name="logo" class="form-control" accept="image/*">

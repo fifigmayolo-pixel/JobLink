@@ -46,7 +46,7 @@
         <div class="d-flex align-items-center gap-3">
             <div class="jl-company-logo" style="width: 48px; height: 48px;">
                 @if($company->logo)
-                    <img src="{{ \Illuminate\Support\Facades\Storage::url($company->logo) }}" alt="{{ $company->company_name }} logo">
+                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($company->logo) }}" alt="{{ $company->company_name }} logo">
                 @else
                     <div class="jl-company-logo-placeholder" style="font-size: 1.25rem;">
                         <i class="bi bi-building"></i>

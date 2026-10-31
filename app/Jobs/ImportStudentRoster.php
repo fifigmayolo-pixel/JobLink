@@ -25,7 +25,7 @@ class ImportStudentRoster implements ShouldQueue
     public function handle(): void
     {
         $import = new StudentRosterImport($this->role);
-        Excel::import($import, $this->filePath, 'local');
+        Excel::import($import, $this->filePath, config('filesystems.default'));
 
         $failures = $import->failures();
 
@@ -48,6 +48,6 @@ class ImportStudentRoster implements ShouldQueue
                 )->implode('; '),
         ]);
 
-        Storage::disk('local')->delete($this->filePath);
+        Storage::delete($this->filePath);
     }
 }

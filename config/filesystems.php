@@ -1,5 +1,15 @@
 <?php
 
+/*
+| Production (Vercel) keeps uploads in Supabase Storage through its S3-compatible API.
+| Local development (XAMPP) is unchanged: leave FILESYSTEM_DISK and PUBLIC_DISK_DRIVER
+| unset in your local .env and the app keeps using storage/app/private and storage/app/public.
+|
+|   FILESYSTEM_DISK=s3      -> default disk = private bucket (resumes, roster spreadsheets)
+|   PUBLIC_DISK_DRIVER=s3   -> "public" disk = public bucket (company logos, profile pictures)
+*/
+$publicDiskOnS3 = env('PUBLIC_DISK_DRIVER', 'local') === 's3';
+
 return [
 
     /*
@@ -38,15 +48,32 @@ return [
             'report' => false,
         ],
 
-        'public' => [
-            'driver' => 'local',
-            'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
-            'visibility' => 'public',
-            'throw' => false,
-            'report' => false,
-        ],
+        // Public files. Local folder by default; the public Supabase bucket when
+        // PUBLIC_DISK_DRIVER=s3. AWS_PUBLIC_URL is the bucket's public base URL.
+        'public' => $publicDiskOnS3
+            ? [
+                'driver' => 's3',
+                'key' => env('AWS_ACCESS_KEY_ID'),
+                'secret' => env('AWS_SECRET_ACCESS_KEY'),
+                'region' => env('AWS_DEFAULT_REGION'),
+                'bucket' => env('AWS_PUBLIC_BUCKET'),
+                'url' => env('AWS_PUBLIC_URL'),
+                'endpoint' => env('AWS_ENDPOINT'),
+                'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
+                'throw' => true,
+                'report' => false,
+            ]
+            : [
+                'driver' => 'local',
+                'root' => storage_path('app/public'),
+                'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+                'visibility' => 'public',
+                'throw' => false,
+                'report' => false,
+            ],
 
+        // Private files (resumes, roster spreadsheets) when FILESYSTEM_DISK=s3.
+        // This must point at the PRIVATE Supabase bucket. Supabase needs path-style URLs.
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -55,8 +82,8 @@ return [
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
-            'throw' => false,
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
+            'throw' => true,
             'report' => false,
         ],
 

@@ -50,7 +50,7 @@
                     {{-- If the stored logo path 404s (e.g. missing on this deploy's
                          storage disk), swap to the colored initial badge instead of
                          showing the browser's broken-image icon + alt text. --}}
-                    <img src="{{ \Illuminate\Support\Facades\Storage::url($job->company->logo) }}" alt="{{ $job->company->company_name }} logo"
+                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($job->company->logo) }}" alt="{{ $job->company->company_name }} logo"
                          onerror="this.closest('.jl-logo-badge').classList.add('jl-logo-badge-fallback'); this.closest('.jl-logo-badge').textContent = this.closest('.jl-logo-badge').dataset.fallbackInitial;">
                 @else
                     {{ \App\Support\CompanyAccent::initial($job->company?->company_name) }}

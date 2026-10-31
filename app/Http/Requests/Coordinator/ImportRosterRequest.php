@@ -15,7 +15,7 @@ class ImportRosterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'roster' => ['required', 'file', 'mimes:xlsx,xls', 'max:10240'],
+            'roster' => ['required', 'file', 'mimes:xlsx,xls', 'max:4096'],
             'role' => ['required', Rule::in(['student', 'alumni'])],
         ];
     }

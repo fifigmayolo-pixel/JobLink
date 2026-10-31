@@ -46,7 +46,7 @@ class LandingController extends Controller
                         'title' => $job->title,
                         'company' => $name ?? 'Partner company',
                         'initial' => CompanyAccent::initial($name),
-                        'logo' => $job->company?->logo ? Storage::url($job->company->logo) : null,
+                        'logo' => $job->company?->logo ? Storage::disk('public')->url($job->company->logo) : null,
                         'location' => $job->location,
                         'type' => $typeLabels[$job->job_type] ?? Str::headline($job->job_type ?? ''),
                         'deadline' => $job->application_deadline->toDateString(),

@@ -20,7 +20,7 @@ class StoreApplicationRequest extends FormRequest
                 'file',
                 'mimes:pdf',
                 'mimetypes:application/pdf',
-                'max:5120', // 5 MB
+                'max:4096', // 4 MB (Vercel's request limit is 4.5 MB)
             ],
         ];
     }
@@ -28,7 +28,7 @@ class StoreApplicationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'resume.max' => 'The resume field must not be greater than 5 MB.',
+            'resume.max' => 'The resume field must not be greater than 4 MB.',
         ];
     }
 

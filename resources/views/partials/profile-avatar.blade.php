@@ -4,7 +4,7 @@
 @endphp
 
 @if($imagePath)
-    <img src="{{ \Illuminate\Support\Facades\Storage::url($imagePath) }}"
+    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($imagePath) }}"
          alt="{{ $label ?? '' }}"
          style="width: {{ $size }}px; height: {{ $size }}px; object-fit: cover; border-radius: 0.75rem;">
 @else
