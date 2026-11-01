@@ -411,6 +411,30 @@
                     <h3>Stay in the loop</h3>
                     <p>Messages and updates from companies reach you in JobLink and by email.</p>
                 </div>
+
+                            <div class="jl-landing-card">
+                    <div aria-hidden="true" class="jl-landing-card-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F2A5C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"></path></svg>
+                    </div>
+                    <h3>Save jobs for later</h3>
+                    <p>Bookmark the openings you like and come back to them when you&rsquo;re ready to apply.</p>
+                </div>
+                <div class="jl-landing-card">
+                    <div aria-hidden="true" class="jl-landing-card-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F2A5C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H10l-6 4z"></path></svg>
+                    </div>
+                    <h3>Ask Linky anything</h3>
+                    <p>Linky, the built-in JobLink assistant, answers questions about how to use the portal.</p>
+                </div>
+                <div class="jl-landing-card">
+                    <div aria-hidden="true" class="jl-landing-card-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F2A5C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"></path><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"></path></svg>
+                    </div>
+                    <h3>Tracer Study for alumni</h3>
+                    <p>Alumni share where their careers have led, so the campus can follow their journey after graduation.</p>
+                </div>
+
+
             </div>
         </div>
     </section>
