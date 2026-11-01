@@ -11,7 +11,7 @@
         <div class="row justify-content-center">
         <div class="col-lg-6">
             <h1 class="h2 mb-1">Create Company Account</h1>
-        <p class="text-secondary mb-4">A temporary password is generated — hand it over so they can log in and set their own.</p>
+        <p class="text-secondary mb-4">A temporary password is generated and emailed to the address below, so they can log in and set their own.</p>
 
         <div class="jl-card p-4">
             <form method="POST" action="{{ route('coordinator.accounts.company.store') }}">
@@ -44,9 +44,9 @@
             </form>
 
             @if(session('tempPassword'))
-                <div class="alert alert-light jl-card mt-4" style="border-left: 4px solid var(--jl-gold) !important;">
-                    Temporary password — share this with them directly: <strong>{{ session('tempPassword') }}</strong>
-                </div>
+             <div class="alert alert-light jl-card mt-4" style="border-left: 4px solid var(--jl-gold) !important;">
+        Temporary password (also emailed to them, in case it doesn't arrive): <strong>{{ session('tempPassword') }}</strong>
+          </div>
             @endif
         </div>
     </div>

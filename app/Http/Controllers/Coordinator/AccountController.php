@@ -38,22 +38,41 @@ class AccountController extends Controller
     }
 
     public function storeCompany(CreateCompanyAccountRequest $request)
-    {
-        Gate::authorize('createCompany', User::class);
+{
+    Gate::authorize('createCompany', User::class);
 
-        $result = $this->provisioning->createCompanyWithTempPassword($request->validated(), auth()->id());
+    $result = $this->provisioning->createCompanyWithTempPassword($request->validated(), auth()->id());
 
-        FieldChangeLog::create([
-            'action' => 'company_account_created',
-            'user_id' => $result['user']->id,
-            'changed_by' => auth()->id(),
-            'details' => 'Company: '.$result['company']->company_name,
+    FieldChangeLog::create([
+        'action' => 'company_account_created',
+        'user_id' => $result['user']->id,
+        'changed_by' => auth()->id(),
+        'details' => 'Company: '.$result['company']->company_name,
+    ]);
 
-            
-        ]);
+    $email = $result['user']->email;
+    $emailed = false;
 
-        return back()->with(['status' => 'Company account created.', 'tempPassword' => $result['temp_password']]);
+    try {
+        // Sent right away, not queued, so the password never sits in the jobs table.
+        Mail::to($email)->send(new CompanyTempPasswordMail(
+            companyName: $result['company']->company_name,
+            loginEmail: $email,
+            tempPassword: $result['temp_password'],
+            loginUrl: route('login'),
+        ));
+        $emailed = true;
+    } catch (\Throwable $e) {
+        report($e);
     }
+
+    return back()->with([
+        'status' => $emailed
+            ? "Company account created. A temporary password was emailed to {$email}."
+            : 'Company account created, but the email could not be sent. Share the temporary password below with them directly.',
+        'tempPassword' => $result['temp_password'],
+    ]);
+}
 
         public function showCoordinatorForm()
     {
