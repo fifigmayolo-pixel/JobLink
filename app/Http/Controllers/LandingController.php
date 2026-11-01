@@ -50,6 +50,7 @@ class LandingController extends Controller
                         'location' => $job->location,
                         'type' => $typeLabels[$job->job_type] ?? Str::headline($job->job_type ?? ''),
                         'deadline' => $job->application_deadline->toDateString(),
+                        'posted' => $job->date_posted?->toDateString(),
                         'accentSoft' => $accent['soft'],
                         'accentText' => $accent['text'],
                     ];

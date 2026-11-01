@@ -85,11 +85,59 @@
     .jl-landing-preview-card-head + .jl-landing-preview-apply { margin-top: 16px; }
     .jl-landing-preview-apply:hover { background: var(--jl-gold-soft); color: var(--jl-navy-deep); }
 
-    /* Rotating job card: slides share one grid cell so the card keeps the
+    /* Rotating job card. Slides share one grid cell so the card keeps the
        height of the tallest slide and nothing jumps when it changes. */
+    .jl-landing-rotator {
+        position: relative; overflow: hidden; padding-top: 30px;
+        box-shadow: 0 18px 40px rgba(8,27,61,0.35);
+        transition: transform .25s ease, box-shadow .25s ease;
+    }
+    .jl-landing-rotator:hover { transform: translateY(-3px); box-shadow: 0 24px 48px rgba(8,27,61,0.42); }
+    .jl-landing-rotator::before {
+        content: ""; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+        background: linear-gradient(90deg, var(--jl-gold), var(--jl-gold-soft), var(--jl-gold));
+    }
+    .jl-landing-live {
+        display: flex; align-items: center; margin-bottom: 16px; color: var(--jl-navy);
+        font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .jl-landing-live-dot {
+        width: 8px; height: 8px; border-radius: 50%; background: #22A06B; margin-right: 8px;
+        animation: jl-pulse 1.8s infinite;
+    }
+    @keyframes jl-pulse {
+        0% { box-shadow: 0 0 0 0 rgba(34,160,107,0.5); }
+        70% { box-shadow: 0 0 0 8px rgba(34,160,107,0); }
+        100% { box-shadow: 0 0 0 0 rgba(34,160,107,0); }
+    }
     .jl-landing-rotator-stage { display: grid; }
-    .jl-landing-slide { grid-area: 1 / 1; opacity: 0; visibility: hidden; transition: opacity .4s ease, visibility 0s .4s; }
-    .jl-landing-slide.is-active { opacity: 1; visibility: visible; transition: opacity .4s ease; }
+    .jl-landing-slide {
+        grid-area: 1 / 1; opacity: 0; visibility: hidden; transform: translateY(8px);
+        transition: opacity .45s ease, transform .45s ease, visibility 0s .45s;
+    }
+    .jl-landing-slide.is-active {
+        opacity: 1; visibility: visible; transform: none;
+        transition: opacity .45s ease, transform .45s ease;
+    }
+    .jl-landing-rotator .jl-landing-preview-logo { box-shadow: 0 0 0 3px var(--accent-soft, #E8EDF7); }
+    .jl-landing-rotator .jl-landing-preview-card-head h4 { font-size: 21px; line-height: 1.25; }
+    .jl-landing-rotator .jl-landing-preview-card-head p strong { color: var(--accent-text, var(--jl-navy)); }
+    .jl-landing-slide-loc { display: flex; align-items: center; gap: 6px; margin: 12px 0 0; font-size: 14px; color: #4B5563; }
+    .jl-landing-rotator .jl-landing-preview-pills { margin: 14px 0 18px; }
+    .jl-landing-rotator .jl-landing-preview-pills span {
+        display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; font-weight: 500;
+    }
+    .jl-landing-rotator .jl-landing-preview-pills .jl-landing-pill-new { background: #DDF4E7; color: #14683F; font-weight: 700; }
+    .jl-landing-rotator .jl-landing-preview-pills .jl-landing-pill-urgent { background: #FDECC8; color: #8A5A00; font-weight: 700; }
+    .jl-landing-rotator .jl-landing-preview-apply {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        background: linear-gradient(135deg, var(--jl-gold), var(--jl-gold-soft));
+        box-shadow: 0 6px 16px rgba(201,162,39,0.35);
+        transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .jl-landing-rotator .jl-landing-preview-apply:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(201,162,39,0.45); }
+    .jl-landing-rotator .jl-landing-preview-apply svg { transition: transform .15s ease; }
+    .jl-landing-rotator .jl-landing-preview-apply:hover svg { transform: translateX(3px); }
     .jl-landing-rotator-foot {
         display: flex; align-items: center; justify-content: space-between;
         margin-top: 12px; padding-top: 8px; border-top: 1px solid #EEF1F6;
@@ -102,8 +150,15 @@
     .jl-landing-dot.is-active { background-color: var(--jl-navy); }
     .jl-landing-rotator-toggle { border: 0; background: none; color: #4B5563; font-size: 13px; padding: 4px 6px; border-radius: 6px; }
     .jl-landing-rotator-toggle:hover { color: var(--jl-navy); text-decoration: underline; }
+    /* Thin bar along the bottom that fills over the 5 seconds until the next job. */
+    .jl-landing-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(15,42,92,0.08); }
+    .jl-landing-progress span { display: block; height: 100%; width: 0; background: var(--jl-gold); }
+    .jl-landing-progress.is-running span { animation: jl-progress 5s linear forwards; }
+    @keyframes jl-progress { from { width: 0; } to { width: 100%; } }
     @media (prefers-reduced-motion: reduce) {
-        .jl-landing-slide, .jl-landing-slide.is-active { transition: none; }
+        .jl-landing-slide, .jl-landing-slide.is-active { transition: none; transform: none; }
+        .jl-landing-live-dot, .jl-landing-progress.is-running span { animation: none; }
+        .jl-landing-rotator, .jl-landing-rotator:hover { transform: none; }
     }
     .jl-landing-preview-card-head h4 { margin: 0; font-family: 'Lora', Georgia, serif; font-weight: 700; font-size: 19px; color: var(--jl-navy); }
     .jl-landing-preview-card-head p { margin: 0; font-size: 14px; color: #4B5563; }
@@ -229,12 +284,18 @@
                     @php $featuredJobs = $featuredJobs ?? []; @endphp
                     @if(count($featuredJobs))
                         {{-- Real postings (approved + open), supplied by LandingController. --}}
-                        <div class="jl-landing-preview-card" id="jobRotator" role="group" aria-roledescription="carousel" aria-label="Latest open positions">
+                        <div class="jl-landing-preview-card jl-landing-rotator" id="jobRotator" role="group" aria-roledescription="carousel" aria-label="Latest open positions">
+                            <div class="jl-landing-live"><span class="jl-landing-live-dot" aria-hidden="true"></span>Now hiring</div>
                             <div class="jl-landing-rotator-stage" aria-live="off">
                                 @foreach($featuredJobs as $i => $j)
-                                    <article class="jl-landing-slide {{ $i === 0 ? 'is-active' : '' }}" role="group" aria-roledescription="slide" aria-label="{{ $i + 1 }} of {{ count($featuredJobs) }}">
+                                    @php
+                                        $daysLeft = (int) now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($j['deadline'])->startOfDay(), false);
+                                        $isUrgent = $daysLeft >= 0 && $daysLeft <= 14;
+                                        $isNew = ! empty($j['posted']) && \Carbon\Carbon::parse($j['posted'])->gte(now()->subDays(7)->startOfDay());
+                                    @endphp
+                                    <article class="jl-landing-slide {{ $i === 0 ? 'is-active' : '' }}" role="group" aria-roledescription="slide" aria-label="{{ $i + 1 }} of {{ count($featuredJobs) }}" style="--accent-soft: {{ $j['accentSoft'] }}; --accent-text: {{ $j['accentText'] }};">
                                         <div class="jl-landing-preview-card-head">
-                                            <span class="jl-landing-preview-logo" data-initial="{{ $j['initial'] }}" style="--accent-soft: {{ $j['accentSoft'] }}; --accent-text: {{ $j['accentText'] }};">
+                                            <span class="jl-landing-preview-logo" data-initial="{{ $j['initial'] }}">
                                                 @if($j['logo'])
                                                     <img src="{{ $j['logo'] }}" alt="" onerror="this.parentNode.textContent = this.parentNode.dataset.initial;">
                                                 @else
@@ -243,14 +304,17 @@
                                             </span>
                                             <div>
                                                 <h4>{{ $j['title'] }}</h4>
-                                                <p>{{ $j['company'] }} &middot; {{ $j['location'] }}</p>
+                                                <p><strong>{{ $j['company'] }}</strong></p>
                                             </div>
                                         </div>
+                                        <p class="jl-landing-slide-loc"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.2-6-10a6 6 0 0 1 12 0c0 4.8-6 10-6 10z"></path><circle cx="12" cy="11" r="2"></circle></svg>{{ $j['location'] }}</p>
                                         <div class="jl-landing-preview-pills">
-                                            @if($j['type'])<span>{{ $j['type'] }}</span>@endif
-                                            <span>Deadline {{ \Carbon\Carbon::parse($j['deadline'])->format('M j, Y') }}</span>
+                                            @if($isNew)<span class="jl-landing-pill-new">New</span>@endif
+                                            @if($isUrgent)<span class="jl-landing-pill-urgent">{{ $daysLeft === 0 ? 'Closes today' : $daysLeft.' '.\Illuminate\Support\Str::plural('day', $daysLeft).' left' }}</span>@endif
+                                            @if($j['type'])<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg>{{ $j['type'] }}</span>@endif
+                                            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Deadline {{ \Carbon\Carbon::parse($j['deadline'])->format('M j, Y') }}</span>
                                         </div>
-                                        <a href="{{ route('jobs.show', $j['id']) }}" class="jl-landing-preview-apply">View job</a>
+                                        <a href="{{ route('jobs.show', $j['id']) }}" class="jl-landing-preview-apply">View job <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
                                     </article>
                                 @endforeach
                             </div>
@@ -263,6 +327,7 @@
                                     </div>
                                     <button type="button" class="jl-landing-rotator-toggle" aria-label="Pause rotation">Pause</button>
                                 </div>
+                                <div class="jl-landing-progress" aria-hidden="true"><span></span></div>
                             @endif
                         </div>
                     @else
@@ -437,6 +502,7 @@
     var slides = root.querySelectorAll('.jl-landing-slide');
     var dots = root.querySelectorAll('.jl-landing-dot');
     var toggle = root.querySelector('.jl-landing-rotator-toggle');
+    var bar = root.querySelector('.jl-landing-progress');
     if (slides.length < 2 || !toggle) { return; }
 
     var INTERVAL = 5000;
@@ -444,15 +510,23 @@
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var userPaused = reduce; // reduced-motion visitors start paused; dots still work
 
+    // The modulo makes it endless: after the last job it goes straight back to the first.
     function show(i) {
         current = (i + slides.length) % slides.length;
         slides.forEach(function (el, n) { el.classList.toggle('is-active', n === current); });
         dots.forEach(function (el, n) { el.classList.toggle('is-active', n === current); });
     }
-    function stop() { clearInterval(timer); timer = null; }
+    function runBar(on) {
+        if (!bar) { return; }
+        bar.classList.remove('is-running');
+        if (on) { void bar.offsetWidth; bar.classList.add('is-running'); } // reflow restarts the animation
+    }
+    function stop() { clearInterval(timer); timer = null; runBar(false); }
     function start() {
         stop();
-        if (!userPaused && !hovering) { timer = setInterval(function () { show(current + 1); }, INTERVAL); }
+        if (userPaused || hovering) { return; }
+        runBar(true);
+        timer = setInterval(function () { show(current + 1); runBar(true); }, INTERVAL);
     }
     function label() {
         toggle.textContent = userPaused ? 'Play' : 'Pause';
