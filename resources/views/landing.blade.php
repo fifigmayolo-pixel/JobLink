@@ -449,7 +449,7 @@
                 <div class="jl-landing-card">
                     <div aria-hidden="true" class="jl-landing-step-num">1</div>
                     <h3>Get your account</h3>
-                    <p>On the school&rsquo;s master list? Activate with your Student ID. New here? Request an account and the Job Coordinator will review it.</p>
+                   <p>On the school&rsquo;s master list? Activate with your Student ID and full name, then set your password. New here? Request an account and the Job Coordinator will review it.</p>
                 </div>
                 <div class="jl-landing-card">
                     <div aria-hidden="true" class="jl-landing-step-num">2</div>
