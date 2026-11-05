@@ -10,10 +10,28 @@
         </a>
 
         <div class="jl-card p-4 p-md-5 mt-3">
+            @php
+                $company = $application->jobPosting->company;
+                $accent = \App\Support\CompanyAccent::for($company?->id, $company?->company_name);
+                $initial = \App\Support\CompanyAccent::initial($company?->company_name);
+            @endphp
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
-                <div>
-                    <h1 class="h4 mb-1">{{ $application->jobPosting->title }}</h1>
-                    <p class="text-secondary mb-0">{{ $application->jobPosting->company->company_name }}</p>
+                <div class="d-flex align-items-center gap-3">
+                    {{-- Company logo; falls back to the company's colored initial if there is no logo or it fails to load. --}}
+                    <div data-initial="{{ $initial }}"
+                         style="width: 56px; height: 56px; border-radius: 12px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.4rem; background: {{ $accent['soft'] }}; color: {{ $accent['text'] }}; box-shadow: 0 0 0 3px {{ $accent['soft'] }};">
+                        @if($company?->logo)
+                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($company->logo) }}" alt="{{ $company->company_name }} logo"
+                                 style="width: 100%; height: 100%; object-fit: cover;"
+                                 onerror="this.parentNode.textContent = this.parentNode.dataset.initial;">
+                        @else
+                            {{ $initial }}
+                        @endif
+                    </div>
+                    <div>
+                        <h1 class="h4 mb-1">{{ $application->jobPosting->title }}</h1>
+                        <p class="text-secondary mb-0">{{ $company?->company_name ?? 'Company' }}</p>
+                    </div>
                 </div>
                 <span class="badge rounded-pill jl-badge-{{ $application->status }} px-3 py-2">{{ ucfirst($application->status) }}</span>
             </div>
