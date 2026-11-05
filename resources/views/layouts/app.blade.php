@@ -313,6 +313,7 @@
         .jl-card-hover:hover { box-shadow: 0 8px 20px rgba(15,42,92,0.1); transform: translateY(-2px); }
 
         .jl-badge-pending { background: rgba(107,114,128,0.12); color: var(--jl-slate); }
+        .jl-badge-withdrawn { background: rgba(107,114,128,0.15); color: #4B5563; }
         .jl-badge-interview { background: rgba(201,162,39,0.15); color: #8A6C16; }
         .jl-badge-rejected { background: rgba(180,85,63,0.12); color: var(--jl-rose); }
 

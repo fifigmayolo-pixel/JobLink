@@ -124,6 +124,7 @@ Route::middleware(['auth', 'role:student|alumni'])->group(function () {
 
     Route::get('/my-applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::get('/my-applications/{application}', [ApplicationController::class, 'show'])->name('applications.show');
+    Route::patch('/my-applications/{application}/withdraw', [ApplicationController::class, 'withdraw'])->name('applications.withdraw');
     Route::get('/my-applications/{application}/resume', [ApplicationController::class, 'downloadResume'])->name('applications.resume');
     Route::post('/jobs/{jobPosting}/apply', [ApplicationController::class, 'store'])->name('applications.store');
 

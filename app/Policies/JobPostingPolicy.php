@@ -2,53 +2,31 @@
 
 namespace App\Policies;
 
+use App\Models\JobApplication;
 use App\Models\JobPosting;
 use App\Models\User;
 
-class JobPostingPolicy
+class JobApplicationPolicy
 {
-    public function create(User $user): bool
+    public function view(User $user, JobApplication $application): bool
     {
-        return in_array($user->role, ['job_coordinator', 'company']);
+        return $application->applicant_id === $user->id || $this->review($user, $application);
     }
 
-    /**
-     * Approved postings are visible to any signed-in user. Until then only the
-     * Job Coordinator and the company that owns the posting can see it, so
-     * students and alumni can never reach an unapproved posting by URL.
-     */
-    public function view(User $user, JobPosting $jobPosting): bool
+    public function review(User $user, JobApplication $application): bool
     {
-        if ($jobPosting->approval_status === 'approved') {
-            return true;
-        }
-
-        if ($user->role === 'job_coordinator') {
-            return true;
-        }
-
         return $user->role === 'company'
-            && ($jobPosting->posted_by === $user->id
-                || ($user->company?->id !== null && $jobPosting->company_id === $user->company->id));
+            && $user->company
+            && $application->jobPosting->company_id === $user->company->id;
     }
 
-    /**
-     * Approving / rejecting postings. Works with a class (the review queue
-     * page) or a single posting (approve / reject actions).
-     */
-    public function review(User $user, ?JobPosting $jobPosting = null): bool
+    public function create(User $user, JobPosting $jobPosting): bool
     {
-        return $user->role === 'job_coordinator';
+        return in_array($user->role, ['student', 'alumni']) && $jobPosting->status === 'open';
     }
 
-    public function update(User $user, JobPosting $jobPosting): bool
+    public function withdraw(User $user, JobApplication $application): bool
     {
-        return $user->role === 'job_coordinator'
-            || $jobPosting->posted_by === $user->id;
-    }
-
-    public function delete(User $user, JobPosting $jobPosting): bool
-    {
-        return $this->update($user, $jobPosting);
+        return $application->applicant_id === $user->id && $application->status === 'pending';
     }
 }
