@@ -47,9 +47,33 @@ class ApplicationController extends Controller
         return back()->with('status', 'Application submitted.');
     }
 
+    public function withdraw(JobApplication $application)
+    {
+        // Only the applicant, and only while it is still Pending.
+        Gate::authorize('withdraw', $application);
+
+        $resumePath = $application->resume_path;
+
+        $application->update(['status' => 'withdrawn']);
+
+        // The student no longer wants the company to have it, so delete the file.
+        // The row stays (as Withdrawn) for the company's and Coordinator's records.
+        try {
+            Storage::delete($resumePath);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('applications.show', $application)
+            ->with('status', 'Application withdrawn. You can apply again if the job is still open.');
+    }
+
     public function downloadResume(JobApplication $application)
     {
         Gate::authorize('view', $application);
+
+        // The file is deleted when an application is withdrawn.
+        abort_if($application->isWithdrawn(), 404);
 
         return Storage::response($application->resume_path);
     }

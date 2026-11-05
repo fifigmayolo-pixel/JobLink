@@ -24,4 +24,12 @@ class JobApplicationPolicy
     {
         return in_array($user->role, ['student', 'alumni']) && $jobPosting->status === 'open';
     }
+
+    /**
+     * Only the applicant, and only while the company hasn't acted on it yet.
+     */
+    public function withdraw(User $user, JobApplication $application): bool
+    {
+        return $application->applicant_id === $user->id && $application->status === 'pending';
+    }
 }

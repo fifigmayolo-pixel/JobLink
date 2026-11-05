@@ -35,8 +35,10 @@ class StoreApplicationRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
+            // A withdrawn application doesn't count, so the student can apply again.
             $alreadyApplied = JobApplication::where('job_posting_id', $this->route('jobPosting')->id)
                 ->where('applicant_id', $this->user()->id)
+                ->where('status', '!=', 'withdrawn')
                 ->exists();
 
             if ($alreadyApplied) {

@@ -50,6 +50,14 @@ class JobApplication extends Model
     }
 
     /**
+     * True once the applicant has withdrawn it (their resume file is deleted then).
+     */
+    public function isWithdrawn(): bool
+    {
+        return $this->status === 'withdrawn';
+    }
+
+    /**
      * Display name for the applicant, safe even if the account is gone.
      */
     public function applicantName(): string

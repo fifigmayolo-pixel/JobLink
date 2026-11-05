@@ -37,12 +37,17 @@ class ApplicationController extends Controller
     {
         Gate::authorize('review', $application);
 
+        // The file is deleted when the applicant withdraws.
+        abort_if($application->isWithdrawn(), 404);
+
         return Storage::response($application->resume_path);
     }
 
     public function updateStatus(UpdateApplicationStatusRequest $request, JobApplication $application)
     {
         Gate::authorize('review', $application);
+
+        abort_if($application->isWithdrawn(), 403, 'This application was withdrawn by the applicant.');
 
         $application->update(['status' => $request->validated('status')]);
 

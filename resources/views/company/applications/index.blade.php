@@ -12,6 +12,7 @@
         <option value="pending" @selected(request('status') === 'pending')>Pending</option>
         <option value="interview" @selected(request('status') === 'interview')>Interview</option>
         <option value="rejected" @selected(request('status') === 'rejected')>Rejected</option>
+        <option value="withdrawn" @selected(request('status') === 'withdrawn')>Withdrawn</option>
     </select>
 </form>
 

@@ -17,7 +17,9 @@ class MessageController extends Controller
     {
         Gate::authorize('review', $application);
 
-                $data = $request->validate([
+        abort_if($application->isWithdrawn(), 403, 'This application was withdrawn by the applicant.');
+
+        $data = $request->validate([
             'message' => ['required', 'string', 'max:2000'],
             'status' => ['required', Rule::in(['interview', 'rejected'])],
         ], [

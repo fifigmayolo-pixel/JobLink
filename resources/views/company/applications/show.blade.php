@@ -24,10 +24,17 @@
                 </div>
             @endif
 
-            <a href="{{ route('company.applications.resume', $application) }}" class="btn btn-outline-secondary mb-4" target="_blank">
-                <i class="bi bi-file-earmark-pdf"></i> View Resume (PDF)
-            </a>
+            @unless($application->isWithdrawn())
+                <a href="{{ route('company.applications.resume', $application) }}" class="btn btn-outline-secondary mb-4" target="_blank">
+                    <i class="bi bi-file-earmark-pdf"></i> View Resume (PDF)
+                </a>
+            @endunless
 
+            @if($application->isWithdrawn())
+                <div class="alert alert-light jl-card mb-0" style="border-left: 4px solid var(--jl-slate) !important;">
+                    The applicant withdrew this application on {{ $application->updated_at->format('M j, Y') }}. Their resume was removed, and messages can no longer be sent.
+                </div>
+            @else
             <hr class="jl-rule">
 
             <h2 class="h6 text-uppercase text-secondary mb-3">Send a Message</h2>
@@ -61,6 +68,7 @@
                     <p class="small text-danger mt-2 mb-0">{{ $message }}</p>
                 @enderror
             </form>
+            @endif
         </div>
     </div>
 </div>
@@ -69,6 +77,8 @@
 <script>
 (function () {
     const form = document.getElementById('messageForm');
+    // No form on withdrawn applications, so there is nothing to wire up.
+    if (!form) { return; }
     const input = document.getElementById('statusInput');
     const hint = document.getElementById('statusHint');
     const buttons = document.querySelectorAll('.js-status-btn');
