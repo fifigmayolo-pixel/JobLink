@@ -69,11 +69,7 @@
                 </div>
             </form>
 
-            <form method="POST" action="{{ route('coordinator.records.destroy', $profile) }}" onsubmit="return confirm('Remove this record? This can be restored later if needed.');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-outline-danger btn-sm">Remove Record</button>
-            </form>
+            
         </div>
     </div>
 </div>
