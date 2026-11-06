@@ -7,23 +7,26 @@ use App\Models\JobPosting;
 class SavedJobController extends Controller
 {
     public function index()
-    {
-        $savedJobs = auth()->user()->savedJobs()
-            ->with('jobPosting.company')
-            ->latest()
-            ->paginate(15);
+{
+    $savedJobs = auth()->user()->savedJobs()
+        ->whereHas('jobPosting', fn ($q) => $q->fromActiveCompanies())
+        ->with('jobPosting.company')
+        ->latest()
+        ->paginate(15);
 
-        return view('saved-jobs.index', compact('savedJobs'));
-    }
+    return view('saved-jobs.index', compact('savedJobs'));
+}
 
-    public function store(JobPosting $jobPosting)
-    {
-        auth()->user()->savedJobs()->firstOrCreate([
-            'job_posting_id' => $jobPosting->id,
-        ]);
+public function store(JobPosting $jobPosting)
+{
+    abort_unless($jobPosting->companyIsActive(), 404);
 
-        return back()->with('status', 'Job saved.');
-    }
+    auth()->user()->savedJobs()->firstOrCreate([
+        'job_posting_id' => $jobPosting->id,
+    ]);
+
+    return back()->with('status', 'Job saved.');
+}
 
     public function destroy(JobPosting $jobPosting)
     {

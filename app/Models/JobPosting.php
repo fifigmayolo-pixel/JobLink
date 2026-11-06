@@ -89,6 +89,38 @@ class JobPosting extends Model
     {
         return $query->where('approval_status', 'pending');
     }
+    
+        /**
+     * A posting only counts as live while its company's login is not archived.
+     * Archiving soft-deletes the User, and whereHas respects that, so nothing
+     * on the job rows changes: archive hides them, restore brings them back,
+     * and the deadline check in scopeOpen still hides the expired ones.
+     */
+    public function scopeFromActiveCompanies($query)
+    {
+    return $query->where(function ($q) {
+        $q->whereNull('company_id')
+            ->orHas('company.user');
+    });
+     }
+
+    /**
+     * Everything a student/alumni is allowed to see in one call:
+     * approved + open (status and deadline) + company not archived.
+     */
+    public function scopeListed($query)
+    {
+        return $query->approved()->open()->fromActiveCompanies();
+    }
+
+    /**
+     * For single-job checks (show page, apply, save) where you already
+     * have the model and just need a yes/no.
+     */
+    public function companyIsActive(): bool
+    {
+    return $this->company_id === null || $this->company?->user !== null;
+    }
 
     public function isApproved(): bool
     {

@@ -16,28 +16,34 @@ use App\Models\FieldChangeLog;
 class JobPostingController extends Controller
 {
     public function index(Request $request)
-    {
-        // Only approved AND open postings appear on the Jobs screen.
-        $jobPostings = JobPosting::query()
-            ->approved()
-            ->open()
-            ->with('company')
-            ->when($request->search, fn ($q, $search) => $q->where('title', 'like', "%{$search}%"))
-            ->when($request->location, fn ($q, $location) => $q->where('location', 'like', "%{$location}%"))
-            ->when($request->job_type, fn ($q, $jobType) => $q->where('job_type', $jobType))
-            ->latest('date_posted')
-            ->paginate(15);
+{
+    // Only approved, open postings from active companies appear.
+    $jobPostings = JobPosting::query()
+        ->listed()
+        ->with('company')
+        ->when($request->search, fn ($q, $search) => $q->where('title', 'like', "%{$search}%"))
+        ->when($request->location, fn ($q, $location) => $q->where('location', 'like', "%{$location}%"))
+        ->when($request->job_type, fn ($q, $jobType) => $q->where('job_type', $jobType))
+        ->latest('date_posted')
+        ->paginate(15);
 
-        return view('jobs.index', compact('jobPostings'));
-    }
+    return view('jobs.index', compact('jobPostings'));
+}
 
     public function show(JobPosting $jobPosting)
-    {
-        // 404 rather than 403, so an unapproved posting's existence isn't revealed.
-        abort_unless(Gate::allows('view', $jobPosting), 404);
+{
+    // 404 rather than 403, so an unapproved posting's existence isn't revealed.
+    abort_unless(Gate::allows('view', $jobPosting), 404);
 
-        return view('jobs.show', compact('jobPosting'));
-    }
+    // Hide archived companies' jobs from everyone except the Coordinator.
+    abort_if(
+        ! $jobPosting->companyIsActive()
+        && auth()->user()->role !== 'job_coordinator',
+        404
+    );
+
+    return view('jobs.show', compact('jobPosting'));
+}
 
     public function create()
     {

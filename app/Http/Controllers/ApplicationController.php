@@ -31,7 +31,7 @@ class ApplicationController extends Controller
     {
         // Nobody can apply to a posting the Job Coordinator hasn't approved,
         // even by posting to the URL directly.
-        abort_unless($jobPosting->isApproved(), 404);
+        abort_unless($jobPosting->isApproved() && $jobPosting->companyIsActive(), 404);
 
         Gate::authorize('create', [JobApplication::class, $jobPosting]);
 

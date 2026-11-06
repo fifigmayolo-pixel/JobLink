@@ -41,7 +41,15 @@
                 @endcan
             </div>
         @endif
+         
 
+            @unless($jobPosting->companyIsActive())
+                <div class="alert alert-light jl-card mt-3 mb-0" style="border-left: 4px solid var(--jl-rose) !important;" role="alert">
+                    <strong>Company account archived.</strong>
+                    This posting is hidden from students and alumni. It will reappear if the account is restored and the deadline hasn't passed.
+                </div>
+            @endunless
+    
         <div class="row g-4 mt-1">
             {{-- Main column --}}
             <div class="col-lg-8">

@@ -24,6 +24,7 @@ class JobApprovalController extends Controller
             : 'pending';
 
         $jobPostings = JobPosting::query()
+            ->fromActiveCompanies()
             ->with(['company', 'poster', 'reviewer'])
             ->where('approval_status', $status)
             ->latest()
@@ -31,6 +32,7 @@ class JobApprovalController extends Controller
             ->withQueryString();
 
         $counts = JobPosting::query()
+            ->fromActiveCompanies()
             ->selectRaw('approval_status, count(*) as total')
             ->groupBy('approval_status')
             ->pluck('total', 'approval_status');
@@ -42,6 +44,7 @@ class JobApprovalController extends Controller
     {
         Gate::authorize('review', $jobPosting);
 
+        abort_unless($jobPosting->companyIsActive(), 404);
         // Conditional update: if two Coordinators click at once, only one wins,
         // so the company and students are never notified twice.
         $updated = JobPosting::query()
@@ -53,6 +56,8 @@ class JobApprovalController extends Controller
                 'reviewed_at' => now(),
                 'rejection_reason' => null,
             ]);
+ 
+              
 
         if (! $updated) {
             return back()->with('status', 'That posting has already been reviewed.');

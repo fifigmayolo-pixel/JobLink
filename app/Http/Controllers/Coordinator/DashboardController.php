@@ -36,10 +36,10 @@ class DashboardController extends Controller
             // view until the person has logged in and claimed it.
             'totalStudents' => User::students()->whereNotNull('activated_at')->count(),
             'totalAlumni' => User::alumni()->whereNotNull('activated_at')->count(),
-            'totalCompanies' => Company::count(),
-            'totalJobsPosted' => JobPosting::count(),
+            'totalCompanies' => Company::whereHas('user')->count(),
+            'totalJobsPosted' => JobPosting::fromActiveCompanies()->count(),
             'totalApplications' => JobApplication::count(),
-            'recentJobPostings' => JobPosting::with('company')->latest('date_posted')->take(5)->get(),
+            'recentJobPostings' => JobPosting::fromActiveCompanies()->with('company')->latest('date_posted')->take(5)->get(),
             'applicationRange' => $range,
             'pendingCount' => $pendingCount,
             'interviewCount' => $interviewCount,

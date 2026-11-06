@@ -405,7 +405,7 @@
                         <a class="jl-sidebar-link {{ request()->routeIs('coordinator.accounts.*') ? 'active' : '' }}" href="{{ route('coordinator.accounts.index') }}">
                             <i class="bi bi-person-badge"></i> Accounts
                         </a>
-                        @php $pendingJobApprovals = \App\Models\JobPosting::awaitingApproval()->count(); @endphp
+                        @php $pendingJobApprovals = \App\Models\JobPosting::awaitingApproval()->fromActiveCompanies()->count(); @endphp
                         <a class="jl-sidebar-link {{ request()->routeIs('coordinator.job-approvals.*') ? 'active' : '' }}" href="{{ route('coordinator.job-approvals.index') }}">
                             <i class="bi bi-patch-check"></i> Job Approvals
                             @if($pendingJobApprovals > 0)

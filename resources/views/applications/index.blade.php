@@ -54,3 +54,4 @@
     {{ $applications->links() }}
 </div>
 @endsection
+
