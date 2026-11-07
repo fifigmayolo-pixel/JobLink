@@ -66,7 +66,11 @@
 
         <div class="d-flex gap-2">
             @if($tab === 'archived')
-                <form method="POST" action="{{ route('coordinator.accounts.company.restore', $company) }}" class="js-restore-form" data-confirm="Restore {{ $company->company_name }}? They will be able to log in again.">
+                <form method="POST" action="{{ route('coordinator.accounts.company.restore', $company) }}"
+                      data-confirm="They will be able to log in again, and their job postings that haven't expired will show again."
+                      data-confirm-title="Restore {{ $company->company_name }}?"
+                      data-confirm-button="Restore"
+                      data-confirm-icon="arrow-counterclockwise">
                     @csrf
                     @method('PATCH')
                     <button type="submit" class="btn btn-jl-gold btn-sm">Restore</button>
@@ -74,7 +78,17 @@
             @else
                 <a href="{{ route('coordinator.accounts.company.show', $company) }}" class="btn btn-outline-secondary btn-sm">View</a>
                 <a href="{{ route('coordinator.accounts.company.edit', $company) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
-                <button type="button" class="btn btn-outline-danger btn-sm" onclick="archiveCompanyAccount('{{ route('coordinator.accounts.company.destroy', $company) }}')">Archive</button>
+
+                <form method="POST" action="{{ route('coordinator.accounts.company.destroy', $company) }}"
+                      data-confirm="Their login will be disabled and their job postings will be hidden. Everything comes back if you restore the account."
+                      data-confirm-title="Archive {{ $company->company_name }}?"
+                      data-confirm-button="Archive"
+                      data-confirm-variant="danger"
+                      data-confirm-icon="exclamation-triangle">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Archive</button>
+                </form>
             @endif
         </div>
     </div>
@@ -87,32 +101,4 @@
 @endforelse
 
 {{ $companies->links() }}
-
-@push('scripts')
-<script>
-function archiveCompanyAccount(url) {
-    if (!confirm('Archive this company account? Their login will be disabled. You can restore it later from the Archived tab. Job postings and application history are kept.')) {
-        return;
-    }
-
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = url;
-    form.innerHTML = `
-        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="_method" value="DELETE">
-    `;
-    document.body.appendChild(form);
-    form.submit();
-}
-
-document.querySelectorAll('.js-restore-form').forEach(function (form) {
-    form.addEventListener('submit', function (e) {
-        if (!confirm(form.dataset.confirm)) {
-            e.preventDefault();
-        }
-    });
-});
-</script>
-@endpush
 @endsection
