@@ -65,26 +65,18 @@
                 <button type="button" class="btn btn-outline-danger btn-lg" onclick="deleteJobPosting('{{ route('jobs.destroy', $jobPosting) }}')">Remove</button>
             </div>
         </form>
+
+ <form method="POST" id="deleteJobForm" action="{{ route('jobs.destroy', $jobPosting) }}"
+                 data-confirm="This job will no longer appear to students and alumni."
+                 data-confirm-title="Remove this job posting?"
+                 data-confirm-button="Remove"
+                 data-confirm-icon="exclamation-triangle">
+               @csrf
+               @method('DELETE')
+           </form>
+
     </div>
 </div>
 
-@push('scripts')
-<script>
-function deleteJobPosting(url) {
-    if (!confirm('Remove this job posting?')) {
-        return;
-    }
 
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = url;
-    form.innerHTML = `
-        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="_method" value="DELETE">
-    `;
-    document.body.appendChild(form);
-    form.submit();
-}
-</script>
-@endpush
 @endsection

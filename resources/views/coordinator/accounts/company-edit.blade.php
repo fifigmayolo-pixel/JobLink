@@ -60,30 +60,21 @@
         </form>
 
         <div class="jl-card p-4" style="border: 1px solid rgba(180,85,63,0.3);">
-            <h2 class="h6 text-uppercase text-secondary mb-3">Archive Account</h2>
-            <p class="mb-3">Archiving this account disables their login. Job postings and application history are kept.</p>
-            <button type="button" class="btn btn-outline-danger" onclick="archiveCompanyAccount('{{ route('coordinator.accounts.company.destroy', $company) }}')">Archive Company Account</button>
-        </div>
+    <h2 class="h6 text-uppercase text-secondary mb-3">Archive Account</h2>
+    <p class="mb-3">Archiving this account disables their login and hides their job postings from students and alumni. Application history is kept. Restoring the account brings back any postings that haven't expired.</p>
+
+    <form method="POST" action="{{ route('coordinator.accounts.company.destroy', $company) }}"
+          data-confirm="Their login will be disabled and their job postings will be hidden. Everything comes back if you restore the account."
+          data-confirm-title="Archive this company account?"
+          data-confirm-button="Archive"
+          data-confirm-icon="exclamation-triangle">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-outline-danger">Archive Company Account</button>
+    </form>
+</div>
     </div>
 </div>
 
-@push('scripts')
-<script>
-function archiveCompanyAccount(url) {
-    if (!confirm('Archive this company account? Their login will be disabled. Job postings and application history are kept.')) {
-        return;
-    }
 
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = url;
-    form.innerHTML = `
-        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="_method" value="DELETE">
-    `;
-    document.body.appendChild(form);
-    form.submit();
-}
-</script>
-@endpush
 @endsection
