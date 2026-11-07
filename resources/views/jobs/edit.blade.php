@@ -6,14 +6,14 @@
 <div class="row justify-content-center">
     <div class="col-lg-8">
         <h1 class="h2 mb-1">Edit Job</h1>
-        <p class="text-secondary mb-4">{{ $jobPosting->company->company_name }}</p>
+        <p class="text-secondary mb-4">{{ $jobPosting->company?->company_name ?? 'No company tagged' }}</p>
         <hr class="jl-rule">
 
         <form method="POST" action="{{ route('jobs.update', $jobPosting) }}">
             @csrf
             @method('PATCH')
 
-                        <div class="mb-3">
+            <div class="mb-3">
                 <label class="form-label">Job title</label>
                 <input type="text" name="title" value="{{ old('title', $jobPosting->title) }}" class="form-control" required>
             </div>
@@ -60,23 +60,24 @@
                 <textarea name="requirements" rows="3" class="form-control" required>{{ old('requirements', $jobPosting->requirements) }}</textarea>
             </div>
 
-                        <div class="d-flex gap-2">
+            <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-jl-gold btn-lg">Save Changes</button>
-                <button type="button" class="btn btn-outline-danger btn-lg" onclick="deleteJobPosting('{{ route('jobs.destroy', $jobPosting) }}')">Remove</button>
+
+                {{-- Submits the separate delete form below (a form can't sit inside this PATCH form). --}}
+                <button type="submit" form="deleteJobForm" class="btn btn-outline-danger btn-lg">Remove</button>
             </div>
         </form>
 
- <form method="POST" id="deleteJobForm" action="{{ route('jobs.destroy', $jobPosting) }}"
-                 data-confirm="This job will no longer appear to students and alumni."
-                 data-confirm-title="Remove this job posting?"
-                 data-confirm-button="Remove"
-                 data-confirm-icon="exclamation-triangle">
-               @csrf
-               @method('DELETE')
-           </form>
-
+        {{-- Delete form: kept outside the PATCH form. The styled confirm modal reads the data-confirm attributes. --}}
+        <form method="POST" id="deleteJobForm" action="{{ route('jobs.destroy', $jobPosting) }}"
+              data-confirm="This job will no longer appear to students and alumni."
+              data-confirm-title="Remove this job posting?"
+              data-confirm-button="Remove"
+              data-confirm-variant="danger"
+              data-confirm-icon="exclamation-triangle">
+            @csrf
+            @method('DELETE')
+        </form>
     </div>
 </div>
-
-
 @endsection

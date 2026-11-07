@@ -47,34 +47,32 @@
                         <label class="form-label">Address</label>
                         <input type="text" name="address" value="{{ old('address', $company->address) }}" class="form-control" required>
                     </div>
-                </div>
-
-                   <div class="col-12">
+                    <div class="col-12">
                         <label class="form-label">Registered email (login)</label>
                         <input type="email" name="email" value="{{ old('email', $company->user?->email) }}" class="form-control" required>
                         <div class="form-text">This is the email the company logs in with, and where password-reset codes are sent. Changing it takes effect immediately.</div>
                     </div>
+                </div>
 
                 <button type="submit" class="btn btn-jl-gold btn-lg mt-4">Save Changes</button>
             </div>
         </form>
 
         <div class="jl-card p-4" style="border: 1px solid rgba(180,85,63,0.3);">
-    <h2 class="h6 text-uppercase text-secondary mb-3">Archive Account</h2>
-    <p class="mb-3">Archiving this account disables their login and hides their job postings from students and alumni. Application history is kept. Restoring the account brings back any postings that haven't expired.</p>
+            <h2 class="h6 text-uppercase text-secondary mb-3">Archive Account</h2>
+            <p class="mb-3">Archiving this account disables their login and hides their job postings from students and alumni. Application history is kept. Restoring the account brings back any postings that haven't expired.</p>
 
-    <form method="POST" action="{{ route('coordinator.accounts.company.destroy', $company) }}"
-          data-confirm="Their login will be disabled and their job postings will be hidden. Everything comes back if you restore the account."
-          data-confirm-title="Archive this company account?"
-          data-confirm-button="Archive"
-          data-confirm-icon="exclamation-triangle">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="btn btn-outline-danger">Archive Company Account</button>
-    </form>
-</div>
+            <form method="POST" action="{{ route('coordinator.accounts.company.destroy', $company) }}"
+                  data-confirm="Their login will be disabled and their job postings will be hidden. Everything comes back if you restore the account."
+                  data-confirm-title="Archive this company account?"
+                  data-confirm-button="Archive"
+                  data-confirm-variant="danger"
+                  data-confirm-icon="exclamation-triangle">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-outline-danger">Archive Company Account</button>
+            </form>
+        </div>
     </div>
 </div>
-
-
 @endsection
