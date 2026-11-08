@@ -32,4 +32,15 @@ class JobApplicationPolicy
     {
         return $application->applicant_id === $user->id && $application->status === 'pending';
     }
+
+    /**
+     * Remove from "My Applications". Only the applicant, and only once the
+     * application has ended (rejected or withdrawn). Pending and interview
+     * applications are still active, so they can't be removed.
+     */
+    public function hide(User $user, JobApplication $application): bool
+    {
+        return $application->applicant_id === $user->id
+            && in_array($application->status, ['rejected', 'withdrawn'], true);
+    }
 }

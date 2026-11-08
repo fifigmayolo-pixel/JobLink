@@ -5,7 +5,25 @@
 @section('content')
 <h1 class="h2 mb-1">My Applications</h1>
 <p class="text-secondary mb-4">Track the status of everything you've applied to.</p>
+
+<div class="d-flex flex-wrap gap-2 mb-3">
+    <a href="{{ route('applications.index') }}"
+       class="btn btn-sm {{ $tab === 'active' ? 'btn-jl-navy' : 'btn-outline-secondary' }}">
+        Active
+        <span class="badge rounded-pill ms-1" style="background: {{ $tab === 'active' ? 'rgba(255,255,255,0.2)' : 'rgba(107,114,128,0.15)' }}; color: inherit;">{{ $activeCount }}</span>
+    </a>
+    <a href="{{ route('applications.index', ['tab' => 'past']) }}"
+       class="btn btn-sm {{ $tab === 'past' ? 'btn-jl-navy' : 'btn-outline-secondary' }}">
+        Past
+        <span class="badge rounded-pill ms-1" style="background: {{ $tab === 'past' ? 'rgba(255,255,255,0.2)' : 'rgba(107,114,128,0.15)' }}; color: inherit;">{{ $pastCount }}</span>
+    </a>
+</div>
+
 <hr class="jl-rule">
+
+@if($tab === 'past' && $applications->isNotEmpty())
+    <p class="text-secondary small mb-3">Rejected and withdrawn applications. Remove the ones you no longer want in your list; the company keeps its own record.</p>
+@endif
 
 <div class="row g-3">
     @forelse($applications as $application)
@@ -37,14 +55,42 @@
                     </div>
                     <span class="badge rounded-pill jl-badge-{{ $application->status }} px-3 py-2 flex-shrink-0">{{ ucfirst($application->status) }}</span>
                 </div>
-                <p class="text-secondary small mb-3 flex-grow-1">Applied {{ $application->date_applied->format('M j, Y') }}</p>
-                <a href="{{ route('applications.show', $application) }}" class="btn btn-jl-navy btn-sm w-100">View Application</a>
+
+                <p class="text-secondary small mb-3 flex-grow-1">
+                    Applied {{ $application->date_applied->format('M j, Y') }}
+                    @if($application->isRejected())
+                        &middot; Resume removed
+                    @endif
+                </p>
+
+                <div class="d-flex gap-2">
+                    <a href="{{ route('applications.show', $application) }}" class="btn btn-jl-navy btn-sm flex-grow-1">View Application</a>
+
+                    {{-- Past tab only: rejected/withdrawn applications can be cleared from the list. --}}
+                    @if($tab === 'past')
+                        <form method="POST" action="{{ route('applications.hide', $application) }}"
+                              data-confirm="It will be cleared from your list. The company keeps its own record of the application."
+                              data-confirm-title="Remove from your list?"
+                              data-confirm-button="Remove"
+                              data-confirm-icon="eye-slash">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-outline-secondary btn-sm" aria-label="Remove from my list">
+                                <i class="bi bi-x-lg"></i> Remove
+                            </button>
+                        </form>
+                    @endif
+                </div>
             </div>
         </div>
     @empty
         <div class="col-12">
             <div class="jl-card p-5 text-center">
-                <p class="mb-0 text-secondary">You haven't applied to anything yet. Browse <a href="{{ route('jobs.index') }}">open positions</a> to get started.</p>
+                @if($tab === 'past')
+                    <p class="mb-0 text-secondary">No past applications. Rejected and withdrawn applications show up here.</p>
+                @else
+                    <p class="mb-0 text-secondary">You have no active applications. Browse <a href="{{ route('jobs.index') }}">open positions</a> to get started.</p>
+                @endif
             </div>
         </div>
     @endforelse
@@ -54,4 +100,3 @@
     {{ $applications->links() }}
 </div>
 @endsection
-

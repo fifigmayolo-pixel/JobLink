@@ -16,14 +16,24 @@ class ApplicationController extends Controller
 
     public function index(Request $request)
     {
-        $applications = JobApplication::query()
-            ->whereHas('jobPosting', fn ($q) => $q->where('company_id', auth()->user()->company->id))
+        $tab = $request->query('tab') === 'past' ? 'past' : 'active';
+        $companyId = auth()->user()->company->id;
+
+        $own = fn () => JobApplication::query()
+            ->whereHas('jobPosting', fn ($q) => $q->where('company_id', $companyId));
+
+        $activeCount = $own()->inProgress()->count();
+        $pastCount = $own()->finished()->count();
+
+        $applications = $own()
+            ->when($tab === 'past', fn ($q) => $q->finished(), fn ($q) => $q->inProgress())
             ->with(['applicant.profile', 'jobPosting'])
             ->when($request->status, fn ($q, $status) => $q->where('status', $status))
             ->latest('date_applied')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
-        return view('company.applications.index', compact('applications'));
+        return view('company.applications.index', compact('applications', 'tab', 'activeCount', 'pastCount'));
     }
 
     public function show(JobApplication $application)
@@ -37,8 +47,8 @@ class ApplicationController extends Controller
     {
         Gate::authorize('review', $application);
 
-        // The file is deleted when the applicant withdraws.
-        abort_if($application->isWithdrawn(), 404);
+        // The file is deleted when the applicant withdraws or the company rejects.
+        abort_if($application->resumeRemoved(), 404);
 
         return Storage::response($application->resume_path);
     }
@@ -48,7 +58,10 @@ class ApplicationController extends Controller
         Gate::authorize('review', $application);
 
         abort_if($application->isWithdrawn(), 403, 'This application was withdrawn by the applicant.');
+        abort_if($application->isRejected(), 403, 'This application was already rejected and its resume deleted.');
 
+        // Setting the status to "rejected" also deletes the resume file
+        // (see the "updated" event in JobApplication::booted()).
         $application->update(['status' => $request->validated('status')]);
 
         if (in_array($application->status, ['interview', 'rejected'])) {

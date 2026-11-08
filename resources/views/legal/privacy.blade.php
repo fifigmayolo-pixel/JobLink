@@ -57,9 +57,12 @@
 
         <h2 class="h5 mt-4">5. How long we keep it</h2>
         <p>
-            We keep your information while your account is active. Records the Job Coordinator
-            removes are hidden from the system but may stay in the audit history for
-            [RETENTION PERIOD].
+            We keep your information while your account is active. A resume you upload is deleted when
+       you withdraw the application or when the company rejects it. The application record itself
+       (the job, the date and the final status) is kept for reporting. Resumes for pending and
+       interview applications are kept so the company can finish its review. Records the Job
+       Coordinator removes are hidden from the system but may stay in the audit history for
+       [RETENTION PERIOD].
         </p>
 
         <h2 class="h5 mt-4">6. How we protect it</h2>

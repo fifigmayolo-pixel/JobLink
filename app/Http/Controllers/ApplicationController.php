@@ -5,19 +5,32 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreApplicationRequest;
 use App\Models\JobApplication;
 use App\Models\JobPosting;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class ApplicationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $applications = auth()->user()->applications()
+        $tab = $request->query('tab') === 'past' ? 'past' : 'active';
+
+        // This applicant's own list, minus anything they removed from it.
+        $mine = fn () => JobApplication::query()
+            ->where('applicant_id', auth()->id())
+            ->visibleToApplicant();
+
+        $activeCount = $mine()->inProgress()->count();
+        $pastCount = $mine()->finished()->count();
+
+        $applications = $mine()
+            ->when($tab === 'past', fn ($q) => $q->finished(), fn ($q) => $q->inProgress())
             ->with('jobPosting.company')
             ->latest('date_applied')
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
-        return view('applications.index', compact('applications'));
+        return view('applications.index', compact('applications', 'tab', 'activeCount', 'pastCount'));
     }
 
     public function show(JobApplication $application)
@@ -30,7 +43,8 @@ class ApplicationController extends Controller
     public function store(StoreApplicationRequest $request, JobPosting $jobPosting)
     {
         // Nobody can apply to a posting the Job Coordinator hasn't approved,
-        // even by posting to the URL directly.
+        // or one whose company account is archived, even by posting to the
+        // URL directly.
         abort_unless($jobPosting->isApproved() && $jobPosting->companyIsActive(), 404);
 
         Gate::authorize('create', [JobApplication::class, $jobPosting]);
@@ -68,12 +82,29 @@ class ApplicationController extends Controller
             ->with('status', 'Application withdrawn. You can apply again if the job is still open.');
     }
 
+    /**
+     * Remove a finished (rejected or withdrawn) application from the student's
+     * own list. Nothing is deleted: the company and the Coordinator keep the row.
+     */
+    public function hide(JobApplication $application)
+    {
+        Gate::authorize('hide', $application);
+
+        // Timestamps off on purpose: the withdrawn/rejected dates shown on both
+        // sides are read from updated_at, and hiding must not change them.
+        $application->timestamps = false;
+        $application->update(['hidden_by_applicant_at' => now()]);
+
+        return redirect()->route('applications.index', ['tab' => 'past'])
+            ->with('status', 'Application removed from your list.');
+    }
+
     public function downloadResume(JobApplication $application)
     {
         Gate::authorize('view', $application);
 
-        // The file is deleted when an application is withdrawn.
-        abort_if($application->isWithdrawn(), 404);
+        // The file is deleted when an application is withdrawn or rejected.
+        abort_if($application->resumeRemoved(), 404);
 
         return Storage::response($application->resume_path);
     }
