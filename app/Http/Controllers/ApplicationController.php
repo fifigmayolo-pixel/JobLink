@@ -103,8 +103,9 @@ class ApplicationController extends Controller
     {
         Gate::authorize('view', $application);
 
-        // The file is deleted when an application is withdrawn or rejected.
-        abort_if($application->resumeRemoved(), 404);
+        // The file is deleted when an application is withdrawn.
+        abort_if($application->isWithdrawn(), 404);
+        abort_unless($application->resume_path && Storage::exists($application->resume_path), 404);
 
         return Storage::response($application->resume_path);
     }

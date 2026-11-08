@@ -47,8 +47,9 @@ class ApplicationController extends Controller
     {
         Gate::authorize('review', $application);
 
-        // The file is deleted when the applicant withdraws or the company rejects.
-        abort_if($application->resumeRemoved(), 404);
+        // The file is deleted when the applicant withdraws.
+        abort_if($application->isWithdrawn(), 404);
+        abort_unless($application->resume_path && Storage::exists($application->resume_path), 404);
 
         return Storage::response($application->resume_path);
     }
@@ -58,10 +59,7 @@ class ApplicationController extends Controller
         Gate::authorize('review', $application);
 
         abort_if($application->isWithdrawn(), 403, 'This application was withdrawn by the applicant.');
-        abort_if($application->isRejected(), 403, 'This application was already rejected and its resume deleted.');
 
-        // Setting the status to "rejected" also deletes the resume file
-        // (see the "updated" event in JobApplication::booted()).
         $application->update(['status' => $request->validated('status')]);
 
         if (in_array($application->status, ['interview', 'rejected'])) {

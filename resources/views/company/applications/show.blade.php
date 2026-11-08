@@ -20,12 +20,12 @@
 
             @if($application->applicantRemoved())
                 <div class="alert alert-light jl-card mb-4" style="border-left: 4px solid var(--jl-rose) !important;" role="alert">
-                    This applicant's account has been removed, so status updates and messages will not reach them. Their application is kept for your records.
+                    This applicant's account has been removed, so status updates and messages will not reach them. Their application and resume are kept for your records.
                 </div>
             @endif
 
-            {{-- Withdrawn and rejected applications have no resume file left to open. --}}
-            @unless($application->resumeRemoved())
+            {{-- A withdrawn application has no resume file left to open. --}}
+            @unless($application->isWithdrawn())
                 <a href="{{ route('company.applications.resume', $application) }}" class="btn btn-outline-secondary mb-4" target="_blank">
                     <i class="bi bi-file-earmark-pdf"></i> View Resume (PDF)
                 </a>
@@ -34,10 +34,6 @@
             @if($application->isWithdrawn())
                 <div class="alert alert-light jl-card mb-0" style="border-left: 4px solid var(--jl-slate) !important;">
                     The applicant withdrew this application on {{ $application->updated_at->format('M j, Y') }}. Their resume was removed, and messages can no longer be sent.
-                </div>
-            @elseif($application->isRejected())
-                <div class="alert alert-light jl-card mb-0" style="border-left: 4px solid var(--jl-rose) !important;">
-                    This application was rejected on {{ $application->updated_at->format('M j, Y') }}. The resume was permanently deleted, and messages can no longer be sent.
                 </div>
             @else
             <hr class="jl-rule">
@@ -82,7 +78,7 @@
 <script>
 (function () {
     const form = document.getElementById('messageForm');
-    // No form on withdrawn or rejected applications, so there is nothing to wire up.
+    // No form on withdrawn applications, so there is nothing to wire up.
     if (!form) { return; }
     const input = document.getElementById('statusInput');
     const hint = document.getElementById('statusHint');
@@ -91,28 +87,13 @@
     const selectedClass = { interview: 'btn-jl-gold', rejected: 'btn-secondary' };
     const hints = {
         interview: 'The applicant will be invited to an interview when you click Send Message.',
-        rejected: 'The application will be marked as rejected and the resume deleted when you click Send Message.',
+        rejected: 'The application will be marked as rejected when you click Send Message.',
     };
 
     function setHint(text, isError) {
         hint.textContent = text;
         hint.classList.toggle('text-danger', isError);
         hint.classList.toggle('text-secondary', !isError);
-    }
-
-    // Rejecting deletes the resume for good, so ask first. partials/confirm-modal
-    // intercepts any form that has data-confirm, so these attributes exist only
-    // while "Reject" is the selected choice.
-    function syncConfirm() {
-        if (input.value === 'rejected') {
-            form.setAttribute('data-confirm', "The applicant will be notified of the rejection and their resume will be permanently deleted. This can't be undone.");
-            form.dataset.confirmTitle = 'Reject this applicant?';
-            form.dataset.confirmButton = 'Reject and delete resume';
-            form.dataset.confirmVariant = 'danger';
-            form.dataset.confirmIcon = 'exclamation-triangle';
-        } else {
-            form.removeAttribute('data-confirm');
-        }
     }
 
     function render() {
@@ -123,7 +104,6 @@
             btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
         });
         setHint(hints[input.value] || '', false);
-        syncConfirm();
     }
 
     buttons.forEach(function (btn) {

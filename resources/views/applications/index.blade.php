@@ -56,12 +56,7 @@
                     <span class="badge rounded-pill jl-badge-{{ $application->status }} px-3 py-2 flex-shrink-0">{{ ucfirst($application->status) }}</span>
                 </div>
 
-                <p class="text-secondary small mb-3 flex-grow-1">
-                    Applied {{ $application->date_applied->format('M j, Y') }}
-                    @if($application->isRejected())
-                        &middot; Resume removed
-                    @endif
-                </p>
+                <p class="text-secondary small mb-3 flex-grow-1">Applied {{ $application->date_applied->format('M j, Y') }}</p>
 
                 <div class="d-flex gap-2">
                     <a href="{{ route('applications.show', $application) }}" class="btn btn-jl-navy btn-sm flex-grow-1">View Application</a>

@@ -51,7 +51,7 @@
                 @endif
                 <p class="text-secondary small mb-3 flex-grow-1">
                     {{ $application->jobPosting->title }} &middot; Applied {{ $application->date_applied->format('M j, Y') }}
-                    @if($application->resumeRemoved())
+                    @if($application->isWithdrawn())
                         &middot; Resume removed
                     @endif
                 </p>

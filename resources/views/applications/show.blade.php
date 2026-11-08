@@ -43,11 +43,6 @@
                 <div class="alert alert-light jl-card mb-0" style="border-left: 4px solid var(--jl-slate) !important;">
                     You withdrew this application on {{ $application->updated_at->format('M j, Y') }}. Your resume was removed. If the job is still open, you can apply again from its page.
                 </div>
-            @elseif($application->isRejected())
-                {{-- The resume file is deleted when the company rejects, so there is nothing to view. --}}
-                <div class="alert alert-light jl-card mb-0" style="border-left: 4px solid var(--jl-rose) !important;">
-                    The company decided not to move forward with this application. Your resume file was deleted when it was rejected. Check your notifications for their message.
-                </div>
             @else
                 <div class="d-flex flex-wrap gap-2">
                     <a href="{{ route('applications.resume', $application) }}" class="btn btn-outline-secondary" target="_blank">
@@ -66,6 +61,12 @@
             @if($application->status === 'interview')
                 <div class="alert alert-light jl-card mt-4" style="border-left: 4px solid var(--jl-gold) !important;">
                     You've been invited to interview. Check your notifications for details from the company.
+                </div>
+            @endif
+
+            @if($application->isRejected())
+                <div class="alert alert-light jl-card mt-4" style="border-left: 4px solid var(--jl-rose) !important;">
+                    The company decided not to move forward with this application. Check your notifications for their message.
                 </div>
             @endif
         </div>
