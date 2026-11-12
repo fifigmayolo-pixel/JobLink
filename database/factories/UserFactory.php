@@ -61,4 +61,21 @@ class UserFactory extends Factory
             $profile->for($user)->create();
         });
     }
+
+    /**
+     * withProfile() plus the minimum CV needed to apply (summary + one skill).
+     * Use: User::factory()->cvReady()->create()
+     *      User::factory()->alumni()->cvReady()->create()
+     */
+    public function cvReady(): static
+    {
+        return $this->withProfile()->afterCreating(function (User $user) {
+            $profile = $user->profile()->first();
+
+            $profile->update([
+                'cv_summary' => 'Fresh graduate looking for an entry-level role where I can learn and contribute to the team.',
+            ]);
+            $profile->skills()->create(['name' => 'Communication']);
+        });
+    }
 }

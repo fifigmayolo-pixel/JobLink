@@ -12,6 +12,8 @@ class JobApplication extends Model
     protected $fillable = [
         'job_posting_id',
         'applicant_id',
+        'profile_id',
+        'cv_snapshot',
         'date_applied',
         'status',
         'hidden_by_applicant_at',
@@ -22,6 +24,7 @@ class JobApplication extends Model
         return [
             'date_applied' => 'datetime',
             'hidden_by_applicant_at' => 'datetime',
+            'cv_snapshot' => 'array',
         ];
     }
 
@@ -43,6 +46,20 @@ class JobApplication extends Model
     public function applicant()
     {
         return $this->belongsTo(User::class, 'applicant_id')->withTrashed();
+    }
+
+    /**
+     * The live profile the application was made from. Null if the profile
+     * was removed since; the cv_snapshot is what the company actually received.
+     */
+    public function profile()
+    {
+        return $this->belongsTo(StudentAlumniProfile::class, 'profile_id');
+    }
+
+    public function hasCvSnapshot(): bool
+    {
+        return ! empty($this->cv_snapshot);
     }
 
     public function notifications()
@@ -79,13 +96,17 @@ class JobApplication extends Model
         return $query->whereIn('status', ['rejected', 'withdrawn']);
     }
 
-    
+    /**
+     * True once the applicant has withdrawn it.
+     */
     public function isWithdrawn(): bool
     {
         return $this->status === 'withdrawn';
     }
 
-    
+    /**
+     * True once the company has rejected it.
+     */
     public function isRejected(): bool
     {
         return $this->status === 'rejected';
