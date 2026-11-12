@@ -38,7 +38,7 @@ Anything not written in this file is something Linky does not know. Lines contai
 - When the school publishes a new Tracer Study link, alumni see the screen once more for the new one.
 
 ## Jobs (students and alumni)
-- Open Jobs in the sidebar to browse postings. Open a posting to read the details, then apply by uploading a resume. Jobs can be saved and found later under Saved.
+- Open Jobs in the sidebar to browse postings. Open a posting to read the details, then apply with your profile as your CV. Jobs can be saved and found later under Saved.
 - My Applications shows each application's status: Pending, Interview or Rejected.
 - Companies can message applicants. Messages and status updates appear under Notifications (the bell icon) and are also emailed to the personal email on the profile.
 - Only jobs approved by the Job Coordinator are visible.
@@ -52,7 +52,7 @@ Anything not written in this file is something Linky does not know. Lines contai
 ## Companies (employers)
 - Company accounts are created by the Job Coordinator. A temporary password is emailed; the company must choose its own password at first login.
 - To post a job, use Post a Job (see "Posting a job" above). New postings wait for the Job Coordinator's approval before students and alumni can see them. The company is notified when a posting is approved, or rejected with a reason.
-- Applicants: open Applicants in the sidebar, review an application and resume, write a message, and choose Invite to Interview or Reject. The applicant is notified in JobLink and by email.
+- Applicants: open Applicants in the sidebar, review an application and the applicant's profile (CV), write a message, and choose Invite to Interview or Reject. The applicant is notified in JobLink and by email.
 - A company can edit its details and logo under Company Profile. To change the company's login email, ask the Job Coordinator.
 
 ## Job Coordinator (administrator)

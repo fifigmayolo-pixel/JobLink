@@ -22,7 +22,10 @@ class JobPostingTaggingTest extends TestCase
     {
         $company = Company::factory()->create();
 
-        $this->actingAs($company->user)->post(route('jobs.store'), $this->jobPayload());
+        $response = $this->actingAs($company->user)->post(route('jobs.store'), $this->jobPayload());
+
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect();
 
         $this->assertDatabaseHas('job_postings', [
             'title' => 'QA Tester',
@@ -43,7 +46,7 @@ class JobPostingTaggingTest extends TestCase
 
     public function test_a_student_cannot_post_a_job(): void
     {
-        $student = User::factory()->create(['role' => 'student']);
+        $student = User::factory()->withProfile()->create();
 
         $response = $this->actingAs($student)->post(route('jobs.store'), $this->jobPayload());
 
@@ -58,6 +61,7 @@ class JobPostingTaggingTest extends TestCase
             'qualifications' => 'Test qualifications',
             'requirements' => 'Test requirements',
             'location' => 'Alaminos City',
+            'job_type' => 'full_time',
             'application_deadline' => now()->addWeek()->toDateString(),
         ];
     }

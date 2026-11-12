@@ -20,20 +20,13 @@
 
             @if($application->applicantRemoved())
                 <div class="alert alert-light jl-card mb-4" style="border-left: 4px solid var(--jl-rose) !important;" role="alert">
-                    This applicant's account has been removed, so status updates and messages will not reach them. Their application and resume are kept for your records.
+                    This applicant's account has been removed, so status updates and messages will not reach them. Their application is kept for your records.
                 </div>
             @endif
 
-            {{-- A withdrawn application has no resume file left to open. --}}
-            @unless($application->isWithdrawn())
-                <a href="{{ route('company.applications.resume', $application) }}" class="btn btn-outline-secondary mb-4" target="_blank">
-                    <i class="bi bi-file-earmark-pdf"></i> View Resume (PDF)
-                </a>
-            @endunless
-
             @if($application->isWithdrawn())
                 <div class="alert alert-light jl-card mb-0" style="border-left: 4px solid var(--jl-slate) !important;">
-                    The applicant withdrew this application on {{ $application->updated_at->format('M j, Y') }}. Their resume was removed, and messages can no longer be sent.
+                    The applicant withdrew this application on {{ $application->updated_at->format('M j, Y') }}. Messages can no longer be sent.
                 </div>
             @else
             <hr class="jl-rule">

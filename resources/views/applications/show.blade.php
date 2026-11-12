@@ -39,22 +39,19 @@
             <p class="text-secondary small mb-4">Applied {{ $application->date_applied->format('M j, Y') }}</p>
 
             @if($application->isWithdrawn())
-                {{-- The resume file is deleted on withdrawal, so there is nothing to view. --}}
+            
                 <div class="alert alert-light jl-card mb-0" style="border-left: 4px solid var(--jl-slate) !important;">
-                    You withdrew this application on {{ $application->updated_at->format('M j, Y') }}. Your resume was removed. If the job is still open, you can apply again from its page.
+                    You withdrew this application on {{ $application->updated_at->format('M j, Y') }}. If the job is still open, you can apply again from its page.
                 </div>
-            @else
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="{{ route('applications.resume', $application) }}" class="btn btn-outline-secondary" target="_blank">
-                        <i class="bi bi-file-earmark-pdf"></i> View Submitted Resume
-                    </a>
+                @elseif($application->status === 'pending')
+                   {{-- Only while the company hasn't acted on it yet. --}}
 
-                    {{-- Only while the company hasn't acted on it yet. --}}
-                    @if($application->status === 'pending')
-                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#withdrawModal">
-                            Withdraw application
-                        </button>
-                    @endif
+                <div class="d-flex flex-wrap gap-2">
+                    
+
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#withdrawModal">
+                        Withdraw application
+                    </button>
                 </div>
             @endif
 
@@ -84,8 +81,8 @@
                 <div class="modal-body">
                     <p class="mb-0">
                         Your application for <strong>{{ $application->jobPosting->title }}</strong> at
-                        {{ $company?->company_name ?? 'the company' }} will be marked as withdrawn, and your submitted
-                        resume will be deleted. You can apply again later if the job is still open.
+                        {{ $company?->company_name ?? 'the company' }} will be marked as withdrawn. You can apply
++                        again later if the job is still open.
                     </p>
                 </div>
                 <div class="modal-footer border-0 pt-0">

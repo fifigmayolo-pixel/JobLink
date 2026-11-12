@@ -26,7 +26,7 @@ class ProfileLockedFieldsTest extends TestCase
             'course_program' => 'BSIT',
         ]);
 
-        $this->actingAs($user)->patch(route('profile.update'), [
+        $response = $this->actingAs($user)->patch(route('profile.update'), [
             'full_name' => 'Changed Name', // not in ProfileUpdateRequest's rules
             'personal_email' => 'new@example.com',
             'mobile_number' => '09171234567',
@@ -36,6 +36,8 @@ class ProfileLockedFieldsTest extends TestCase
             'province' => 'Pangasinan',
             'postal_code' => '2404',
         ]);
+
+        $response->assertSessionHasNoErrors();
 
         $profile->refresh();
 

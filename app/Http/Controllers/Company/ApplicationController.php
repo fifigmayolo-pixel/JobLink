@@ -8,7 +8,7 @@ use App\Models\JobApplication;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
+
 
 class ApplicationController extends Controller
 {
@@ -43,16 +43,7 @@ class ApplicationController extends Controller
         return view('company.applications.show', compact('application'));
     }
 
-    public function downloadResume(JobApplication $application)
-    {
-        Gate::authorize('review', $application);
-
-        // The file is deleted when the applicant withdraws.
-        abort_if($application->isWithdrawn(), 404);
-        abort_unless($application->resume_path && Storage::exists($application->resume_path), 404);
-
-        return Storage::response($application->resume_path);
-    }
+   
 
     public function updateStatus(UpdateApplicationStatusRequest $request, JobApplication $application)
     {

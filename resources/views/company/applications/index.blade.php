@@ -51,9 +51,8 @@
                 @endif
                 <p class="text-secondary small mb-3 flex-grow-1">
                     {{ $application->jobPosting->title }} &middot; Applied {{ $application->date_applied->format('M j, Y') }}
-                    @if($application->isWithdrawn())
-                        &middot; Resume removed
-                    @endif
+                    
+                        
                 </p>
                 <a href="{{ route('company.applications.show', $application) }}" class="btn btn-jl-navy btn-sm w-100">
                     {{ $tab === 'past' ? 'View Details' : 'Review Application' }}

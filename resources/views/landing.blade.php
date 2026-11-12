@@ -401,8 +401,8 @@
                     <div aria-hidden="true" class="jl-landing-card-icon">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F2A5C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"></path><path d="M14 3v5h5"></path></svg>
                     </div>
-                    <h3>Apply with a PDF resume</h3>
-                    <p>Pick a job, upload your resume and send it. Your status shows as Pending, Interview or Rejected.</p>
+                    <h3>Apply with your profile</h3>
+                    <p>Pick a job and apply with your JobLink profile. Your status shows as Pending, Interview or Rejected.</p>
                 </div>
                 <div class="jl-landing-card">
                     <div aria-hidden="true" class="jl-landing-card-icon">
@@ -459,7 +459,7 @@
                 <div class="jl-landing-card">
                     <div aria-hidden="true" class="jl-landing-step-num">3</div>
                     <h3>Apply and track</h3>
-                    <p>Browse approved jobs, apply with a PDF resume, and follow your status: Pending, Interview or Rejected.</p>
+                    <p>Browse approved jobs, apply with your profile, and follow your status: Pending, Interview or Rejected.</p>
                 </div>
             </div>
         </div>
@@ -477,14 +477,14 @@
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F2A5C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
                     </div>
                     <h3>Students and alumni</h3>
-                    <p>Save jobs you like, apply with your resume, and get notified in JobLink and by email.</p>
+                    <p>Save jobs you like, apply with your profile, and get notified in JobLink and by email.</p>
                 </div>
                 <div class="jl-landing-role-card">
                     <div aria-hidden="true" class="jl-landing-card-icon">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F2A5C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1"></rect><path d="M9 8h2M13 8h2M9 12h2M13 12h2M10 21v-4h4v4"></path></svg>
                     </div>
                     <h3>Companies</h3>
-                    <p>Post openings, review applicants and resumes, and invite the right people to interview.</p>
+                    <p>Post openings, review applicant profiles, and invite the right people to interview.</p>
                 </div>
                 <div class="jl-landing-role-card">
                     <div aria-hidden="true" class="jl-landing-card-icon">

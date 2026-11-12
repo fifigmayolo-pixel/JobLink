@@ -19,7 +19,7 @@ class CompanyFactory extends Factory
             'contact_person' => fake()->name(),
             'contact_number' => fake()->numerify('09#########'),
             'address' => fake()->address(),
-            'created_by' => User::factory()->coordinator(),
+             'created_by' => User::factory()->jobCoordinator(),
         ];
     }
 }

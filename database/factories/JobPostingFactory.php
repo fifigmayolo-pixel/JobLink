@@ -22,7 +22,7 @@ class JobPostingFactory extends Factory
             'date_posted' => now(),
             'application_deadline' => now()->addWeeks(3),
             'status' => 'open',
-            'posted_by' => User::factory()->coordinator(),
+            'posted_by' => User::factory()->jobCoordinator(),
             'company_id' => Company::factory(),
         ];
     }

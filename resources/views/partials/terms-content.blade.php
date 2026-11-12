@@ -9,7 +9,7 @@
 
 <h2 class="h6" style="color: var(--jl-navy);">3. Information We Collect</h2>
 <p>To use JobLink, we collect information such as your name, date of birth, gender, civil status, nationality, course/program, year level or year graduated, contact details including email and mobile number, home address, and, if you choose to add one, a profile picture.</p>
-<p>Students and alumni applying to jobs may also submit a resume.</p>
+<p>Students and alumni applying to jobs share their JobLink profile with the company as their CV.</p>
 <p>This information is used to verify your identity, match you with relevant opportunities, and support PSU's official tracer study reporting to partner employers and accrediting bodies.</p>
 
 <h2 class="h6" style="color: var(--jl-navy);">4. Accuracy of Information</h2>
@@ -29,7 +29,7 @@
 </ul>
 
 <h2 class="h6" style="color: var(--jl-navy);">7. Companies and Job Postings</h2>
-<p>Companies are responsible for the accuracy of their job postings and for handling applicant data, including resumes, contact information, and application status, in accordance with the applicable policies and laws.</p>
+<p>Companies are responsible for the accuracy of their job postings and for handling applicant data, including applicant profiles (CVs), contact information, and application status, in accordance with the applicable policies and laws.</p>
 <p>The Job Coordinator is responsible for reviewing job postings and may remove postings that violate these Terms &amp; Conditions.</p>
 
 <h2 class="h6" style="color: var(--jl-navy);">8. Data Retention and Removal</h2>

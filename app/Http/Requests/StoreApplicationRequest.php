@@ -14,22 +14,8 @@ class StoreApplicationRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
-            'resume' => [
-                'required',
-                'file',
-                'mimes:pdf',
-                'mimetypes:application/pdf',
-                'max:4096', // 4 MB (Vercel's request limit is 4.5 MB)
-            ],
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'resume.max' => 'The resume field must not be greater than 4 MB.',
-        ];
+        // No fields: the CV comes from the applicant's profile, not from the form.
+        return [];
     }
 
     public function withValidator($validator): void
@@ -42,7 +28,7 @@ class StoreApplicationRequest extends FormRequest
                 ->exists();
 
             if ($alreadyApplied) {
-                $validator->errors()->add('resume', 'You have already applied to this job.');
+                $validator->errors()->add('application', 'You have already applied to this job.');
             }
         });
     }

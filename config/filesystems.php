@@ -5,7 +5,7 @@
 | Local development (XAMPP) is unchanged: leave FILESYSTEM_DISK and PUBLIC_DISK_DRIVER
 | unset in your local .env and the app keeps using storage/app/private and storage/app/public.
 |
-|   FILESYSTEM_DISK=s3      -> default disk = private bucket (resumes, roster spreadsheets)
+|   FILESYSTEM_DISK=s3      -> default disk = private bucket (roster spreadsheets)
 |   PUBLIC_DISK_DRIVER=s3   -> "public" disk = public bucket (company logos, profile pictures)
 */
 $publicDiskOnS3 = env('PUBLIC_DISK_DRIVER', 'local') === 's3';
@@ -72,7 +72,7 @@ return [
                 'report' => false,
             ],
 
-        // Private files (resumes, roster spreadsheets) when FILESYSTEM_DISK=s3.
+        // Private files (roster spreadsheets) when FILESYSTEM_DISK=s3.
         // This must point at the PRIVATE Supabase bucket. Supabase needs path-style URLs.
         's3' => [
             'driver' => 's3',

@@ -19,7 +19,7 @@ class CompanyApplicationIsolationTest extends TestCase
         $this->seed(RolesAndPermissionsSeeder::class);
     }
 
-    public function test_a_company_cannot_review_another_companys_applications(): void
+    public function test_a_company_cannot_update_status_on_another_companys_application(): void
     {
         $companyA = Company::factory()->create();
         $companyB = Company::factory()->create();
@@ -28,7 +28,6 @@ class CompanyApplicationIsolationTest extends TestCase
         $applicant = User::factory()->create(['role' => 'student']);
         $application = $job->applications()->create([
             'applicant_id' => $applicant->id,
-            'resume_path' => 'resumes/test.pdf',
             'date_applied' => now(),
             'status' => 'pending',
         ]);
@@ -47,7 +46,6 @@ class CompanyApplicationIsolationTest extends TestCase
         $applicant = User::factory()->create(['role' => 'student']);
         $application = $job->applications()->create([
             'applicant_id' => $applicant->id,
-            'resume_path' => 'resumes/test.pdf',
             'date_applied' => now(),
             'status' => 'pending',
         ]);

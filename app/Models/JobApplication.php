@@ -12,7 +12,6 @@ class JobApplication extends Model
     protected $fillable = [
         'job_posting_id',
         'applicant_id',
-        'resume_path',
         'date_applied',
         'status',
         'hidden_by_applicant_at',
@@ -80,17 +79,13 @@ class JobApplication extends Model
         return $query->whereIn('status', ['rejected', 'withdrawn']);
     }
 
-    /**
-     * True once the applicant has withdrawn it (their resume file is deleted then).
-     */
+    
     public function isWithdrawn(): bool
     {
         return $this->status === 'withdrawn';
     }
 
-    /**
-     * True once the company has rejected it. The resume file is kept.
-     */
+    
     public function isRejected(): bool
     {
         return $this->status === 'rejected';
