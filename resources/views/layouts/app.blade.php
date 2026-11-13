@@ -390,6 +390,9 @@
                         <a class="jl-sidebar-link {{ request()->routeIs('saved-jobs.*') ? 'active' : '' }}" href="{{ route('saved-jobs.index') }}">
                             <i class="bi bi-bookmark"></i> Saved
                         </a>
+                         <a class="jl-sidebar-link {{ request()->routeIs('cv.*') ? 'active' : '' }}" href="{{ route('cv.edit') }}">
+                              <i class="bi bi-person-vcard"></i> My CV
+                          </a>
                     @endrole
 
                     @role('company')
@@ -491,6 +494,7 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             @role('student|alumni')
                                 <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ route('cv.edit') }}">My CV</a></li>
                             @endrole
                             @role('company')
                                 <li><a class="dropdown-item" href="{{ route('company.profile.edit') }}">Company Profile</a></li>

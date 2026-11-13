@@ -21,6 +21,7 @@ use App\Http\Controllers\Coordinator\RecordController;
 use App\Http\Controllers\Coordinator\StudentRosterController;
 use App\Http\Controllers\Coordinator\TracerStudyLinkController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CvController;
 use App\Http\Controllers\JobPostingController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PasswordChangeController;
@@ -121,6 +122,8 @@ Route::middleware(['auth', 'role:student|alumni'])->group(function () {
     Route::get('/profile/complete/barangays', [ProfileController::class, 'barangaysForCity'])->name('profile.complete.barangays');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/my-cv', [CvController::class, 'edit'])->name('cv.edit');
+    Route::put('/my-cv', [CvController::class, 'update'])->name('cv.update');
 
     Route::get('/my-applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::get('/my-applications/{application}', [ApplicationController::class, 'show'])->name('applications.show');
