@@ -21,9 +21,11 @@ class StudentAlumniProfileFactory extends Factory
             'gender' => fake()->randomElement(['Male', 'Female']),
             'civil_status' => 'Single',
             'nationality' => 'Filipino',
-            'course_program' => 'BS Information Technology',
-            'year_level' => '4th Year',
-            'section' => 'A',
+            // Real values from StudentAlumniProfile's constants, so pages that
+            // validate or display them behave like they do with real data.
+            'course_program' => fake()->randomElement(StudentAlumniProfile::PROGRAMS),
+            'year_level' => fake()->randomElement(StudentAlumniProfile::YEAR_LEVELS),
+            'section' => fake()->randomElement(StudentAlumniProfile::SECTIONS),
             'personal_email' => fake()->unique()->safeEmail(),
             'mobile_number' => fake()->numerify('09#########'),
             'house_street' => fake()->streetAddress(),
@@ -41,7 +43,7 @@ class StudentAlumniProfileFactory extends Factory
             'status' => 'alumni',
             'year_level' => null,
             'section' => null,
-            'year_graduated' => fake()->numberBetween(2018, 2025),
+            'year_graduated' => fake()->randomElement(StudentAlumniProfile::academicYearRanges()),
         ]);
     }
 }

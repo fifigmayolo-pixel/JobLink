@@ -25,7 +25,7 @@ class JobPostingController extends Controller
         ->when($request->location, fn ($q, $location) => $q->where('location', 'like', "%{$location}%"))
         ->when($request->job_type, fn ($q, $jobType) => $q->where('job_type', $jobType))
         ->latest('date_posted')
-        ->paginate(15);
+        ->paginate(15)->withQueryString();
 
     return view('jobs.index', compact('jobPostings'));
 }

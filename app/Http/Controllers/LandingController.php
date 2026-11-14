@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\JobPosting;
 use App\Support\CompanyAccent;
+use App\Support\JobCardData;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class LandingController extends Controller
 {
@@ -20,24 +20,20 @@ class LandingController extends Controller
         // Public page, so cache briefly instead of querying on every visit.
         // Stored as plain arrays (not Eloquent models) so the cache stays
         // safe across deploys. A newly approved job can take up to 5 minutes
-        // to appear here.
-        $featuredJobs = Cache::remember('landing.featured-jobs', 300, function () {
-            $typeLabels = [
-                'full_time' => 'Full-time',
-                'part_time' => 'Part-time',
-                'internship' => 'Internship',
-            ];
-
-            // Same visibility rules as the Open Positions page (JobPostingController@index).
+        // to appear here. The key has a version suffix: bump it when the shape
+        // of these arrays changes, so a deploy never reads old-shaped entries.
+        $featuredJobs = Cache::remember('landing.featured-jobs.v2', 300, function () {
+            // listed() = the exact same visibility rules as the Open Positions page
+            // (JobPostingController@index): approved, open (status and deadline),
+            // and the company's login is not archived.
             return JobPosting::query()
-                ->approved()
-                ->open()
+                ->listed()
                 ->with('company')
                 ->latest('date_posted')
                 ->latest('id')
                 ->limit(5)
                 ->get()
-                ->map(function ($job) use ($typeLabels) {
+                ->map(function ($job) {
                     $name = $job->company?->company_name;
                     $accent = CompanyAccent::for($job->company?->id, $name);
 
@@ -48,7 +44,8 @@ class LandingController extends Controller
                         'initial' => CompanyAccent::initial($name),
                         'logo' => $job->company?->logo ? Storage::disk('public')->url($job->company->logo) : null,
                         'location' => $job->location,
-                        'type' => $typeLabels[$job->job_type] ?? Str::headline($job->job_type ?? ''),
+                        'type' => JobCardData::typeLabel($job->job_type),
+                        'excerpt' => JobCardData::excerpt($job, 140),
                         'deadline' => $job->application_deadline->toDateString(),
                         'posted' => $job->date_posted?->toDateString(),
                         'accentSoft' => $accent['soft'],

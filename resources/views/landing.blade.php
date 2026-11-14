@@ -122,7 +122,7 @@
     .jl-landing-rotator .jl-landing-preview-logo { box-shadow: 0 0 0 3px var(--accent-soft, #E8EDF7); }
     .jl-landing-rotator .jl-landing-preview-card-head h4 { font-size: 21px; line-height: 1.25; }
     .jl-landing-rotator .jl-landing-preview-card-head p strong { color: var(--accent-text, var(--jl-navy)); }
-    .jl-landing-slide-loc { display: flex; align-items: center; gap: 6px; margin: 12px 0 0; font-size: 14px; color: #4B5563; }
+    .jl-landing-slide-excerpt { margin: 10px 0 0; font-size: 14px; line-height: 1.5; color: #4B5563; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;}
     .jl-landing-rotator .jl-landing-preview-pills { margin: 14px 0 18px; }
     .jl-landing-rotator .jl-landing-preview-pills span {
         display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; font-weight: 500;
@@ -292,6 +292,7 @@
                                         $daysLeft = (int) now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($j['deadline'])->startOfDay(), false);
                                         $isUrgent = $daysLeft >= 0 && $daysLeft <= 14;
                                         $isNew = ! empty($j['posted']) && \Carbon\Carbon::parse($j['posted'])->gte(now()->subDays(7)->startOfDay());
+                                        $postedLabel = \App\Support\JobCardData::postedLabel($j['posted'] ?? null);
                                     @endphp
                                     <article class="jl-landing-slide {{ $i === 0 ? 'is-active' : '' }}" role="group" aria-roledescription="slide" aria-label="{{ $i + 1 }} of {{ count($featuredJobs) }}" style="--accent-soft: {{ $j['accentSoft'] }}; --accent-text: {{ $j['accentText'] }};">
                                         <div class="jl-landing-preview-card-head">
@@ -308,8 +309,10 @@
                                             </div>
                                         </div>
                                         <p class="jl-landing-slide-loc"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.2-6-10a6 6 0 0 1 12 0c0 4.8-6 10-6 10z"></path><circle cx="12" cy="11" r="2"></circle></svg>{{ $j['location'] }}</p>
+                                         @if(! empty($j['excerpt']))<p class="jl-landing-slide-excerpt">{{ $j['excerpt'] }}</p>@endif
                                         <div class="jl-landing-preview-pills">
                                             @if($isNew)<span class="jl-landing-pill-new">New</span>@endif
+                                            @if($postedLabel)<span>{{ $postedLabel }}</span>@endif
                                             @if($isUrgent)<span class="jl-landing-pill-urgent">{{ $daysLeft === 0 ? 'Closes today' : $daysLeft.' '.\Illuminate\Support\Str::plural('day', $daysLeft).' left' }}</span>@endif
                                             @if($j['type'])<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg>{{ $j['type'] }}</span>@endif
                                             <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Deadline {{ \Carbon\Carbon::parse($j['deadline'])->format('M j, Y') }}</span>

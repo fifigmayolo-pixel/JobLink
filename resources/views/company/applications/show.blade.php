@@ -4,13 +4,14 @@
 
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <div class="col-xl-9 col-lg-10">
         <a href="{{ route('company.applications.index') }}" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-left"></i> Back
         </a>
 
+        {{-- Who applied, and for what --}}
         <div class="jl-card p-4 p-md-5 mt-3">
-            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                 <div>
                     <h1 class="h4 mb-1">{{ $application->applicantName() }}</h1>
                     <p class="text-secondary mb-0">Applied for {{ $application->jobPosting->title }} &middot; {{ $application->date_applied->format('M j, Y') }}</p>
@@ -19,51 +20,73 @@
             </div>
 
             @if($application->applicantRemoved())
-                <div class="alert alert-light jl-card mb-4" style="border-left: 4px solid var(--jl-rose) !important;" role="alert">
+                <div class="alert alert-light jl-card mt-3 mb-0" style="border-left: 4px solid var(--jl-rose) !important;" role="alert">
                     This applicant's account has been removed, so status updates and messages will not reach them. Their application is kept for your records.
                 </div>
             @endif
 
             @if($application->isWithdrawn())
-                <div class="alert alert-light jl-card mb-0" style="border-left: 4px solid var(--jl-slate) !important;">
-                    The applicant withdrew this application on {{ $application->updated_at->format('M j, Y') }}. Messages can no longer be sent.
+                <div class="alert alert-light jl-card mt-3 mb-0" style="border-left: 4px solid var(--jl-slate) !important;">
+                    The applicant withdrew this application on {{ $application->updated_at->format('M j, Y') }}. Their CV was removed, and messages can no longer be sent.
                 </div>
-            @else
-            <hr class="jl-rule">
-
-            <h2 class="h6 text-uppercase text-secondary mb-3">Send a Message</h2>
-
-            <form method="POST" action="{{ route('company.applications.message', $application) }}" id="messageForm">
-                @csrf
-                {{-- Holds the selected decision ('interview' or 'rejected').
-                     Nothing is applied until Send Message submits this form. --}}
-                <input type="hidden" name="status" id="statusInput" value="{{ old('status') }}">
-
-                <div class="mb-3">
-                    <textarea name="message" rows="4" maxlength="2000" class="form-control @error('message') is-invalid @enderror" placeholder="Message to the applicant" required autofocus>{{ old('message') }}</textarea>
-                    @error('message')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="d-flex flex-wrap align-items-center gap-2">
-                    <button type="submit" class="btn btn-jl-navy">Send Message</button>
-
-                    <span class="vr mx-1"></span>
-                    <span class="text-secondary small">Update status:</span>
-
-                    <button type="button" class="btn btn-outline-secondary js-status-btn" data-status="interview">Invite to Interview</button>
-                    <button type="button" class="btn btn-outline-secondary js-status-btn" data-status="rejected">Reject</button>
-                </div>
-
-                <p id="statusHint" class="small text-secondary mt-2 mb-0"></p>
-
-                @error('status')
-                    <p class="small text-danger mt-2 mb-0">{{ $message }}</p>
-                @enderror
-            </form>
             @endif
         </div>
+
+        @unless($application->isWithdrawn())
+            {{-- The CV exactly as the applicant submitted it --}}
+            @if($application->hasCvSnapshot())
+                <div class="jl-card p-4 p-md-5 mt-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+                        <h2 class="h6 text-uppercase text-secondary mb-0">Applicant's CV</h2>
+                        <a href="{{ route('company.applications.cv', $application) }}" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-printer" aria-hidden="true"></i> Print / save as PDF
+                        </a>
+                    </div>
+
+                    @include('cv._document', ['cv' => $application->cv_snapshot])
+                </div>
+            @else
+                <div class="alert alert-light jl-card mt-3 mb-0" style="border-left: 4px solid var(--jl-gold) !important;" role="alert">
+                    This application was submitted before the CV system, so no CV is on file. You can still message the applicant.
+                </div>
+            @endif
+
+            {{-- Reply --}}
+            <div class="jl-card p-4 p-md-5 mt-3">
+                <h2 class="h6 text-uppercase text-secondary mb-3">Send a Message</h2>
+
+                <form method="POST" action="{{ route('company.applications.message', $application) }}" id="messageForm">
+                    @csrf
+                    {{-- Holds the selected decision ('interview' or 'rejected').
+                         Nothing is applied until Send Message submits this form. --}}
+                    <input type="hidden" name="status" id="statusInput" value="{{ old('status') }}">
+
+                    <div class="mb-3">
+                        {{-- No autofocus: it would scroll past the CV straight to this box. --}}
+                        <textarea name="message" rows="4" maxlength="2000" class="form-control @error('message') is-invalid @enderror" placeholder="Message to the applicant" required>{{ old('message') }}</textarea>
+                        @error('message')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <button type="submit" class="btn btn-jl-navy">Send Message</button>
+
+                        <span class="vr mx-1"></span>
+                        <span class="text-secondary small">Update status:</span>
+
+                        <button type="button" class="btn btn-outline-secondary js-status-btn" data-status="interview">Invite to Interview</button>
+                        <button type="button" class="btn btn-outline-secondary js-status-btn" data-status="rejected">Reject</button>
+                    </div>
+
+                    <p id="statusHint" class="small text-secondary mt-2 mb-0"></p>
+
+                    @error('status')
+                        <p class="small text-danger mt-2 mb-0">{{ $message }}</p>
+                    @enderror
+                </form>
+            </div>
+        @endunless
     </div>
 </div>
 

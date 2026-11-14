@@ -9,7 +9,6 @@ use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-
 class ApplicationController extends Controller
 {
     public function __construct(private NotificationService $notifications) {}
@@ -43,7 +42,27 @@ class ApplicationController extends Controller
         return view('company.applications.show', compact('application'));
     }
 
-   
+    /**
+     * Printable copy of the CV the applicant submitted. Same rule as the review
+     * page: only the company that owns the job posting can open it. A withdrawn
+     * application has no CV left (it was cleared), and an application from before
+     * the CV system never had one, so both are a 404.
+     */
+    public function cv(JobApplication $application)
+    {
+        Gate::authorize('review', $application);
+
+        abort_unless($application->hasCvSnapshot(), 404);
+
+        return response()
+            ->view('company.applications.cv-print', [
+                'application' => $application,
+                'cv' => $application->cv_snapshot,
+            ])
+            // Personal details: don't let browsers or proxies keep a copy, or search engines index it.
+            ->header('Cache-Control', 'no-store, private')
+            ->header('X-Robots-Tag', 'noindex, nofollow');
+    }
 
     public function updateStatus(UpdateApplicationStatusRequest $request, JobApplication $application)
     {

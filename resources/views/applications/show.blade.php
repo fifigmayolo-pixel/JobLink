@@ -39,19 +39,24 @@
             <p class="text-secondary small mb-4">Applied {{ $application->date_applied->format('M j, Y') }}</p>
 
             @if($application->isWithdrawn())
-            
                 <div class="alert alert-light jl-card mb-0" style="border-left: 4px solid var(--jl-slate) !important;">
-                    You withdrew this application on {{ $application->updated_at->format('M j, Y') }}. If the job is still open, you can apply again from its page.
+                    You withdrew this application on {{ $application->updated_at->format('M j, Y') }}. The company no longer has your CV. If the job is still open, you can apply again from its page.
                 </div>
-                @elseif($application->status === 'pending')
-                   {{-- Only while the company hasn't acted on it yet. --}}
-
+            @else
                 <div class="d-flex flex-wrap gap-2">
-                    
+                    {{-- The copy of the CV the company received. Applications from before the CV system have none. --}}
+                    @if($application->hasCvSnapshot())
+                        <a href="{{ route('applications.cv', $application) }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-person-lines-fill" aria-hidden="true"></i> View the CV I sent
+                        </a>
+                    @endif
 
-                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#withdrawModal">
-                        Withdraw application
-                    </button>
+                    {{-- Only while the company hasn't acted on it yet. --}}
+                    @if($application->status === 'pending')
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#withdrawModal">
+                            Withdraw application
+                        </button>
+                    @endif
                 </div>
             @endif
 
@@ -81,8 +86,8 @@
                 <div class="modal-body">
                     <p class="mb-0">
                         Your application for <strong>{{ $application->jobPosting->title }}</strong> at
-                        {{ $company?->company_name ?? 'the company' }} will be marked as withdrawn. You can apply
-+                        again later if the job is still open.
+                        {{ $company?->company_name ?? 'the company' }} will be marked as withdrawn, and the company
+                        will no longer see your CV. You can apply again later if the job is still open.
                     </p>
                 </div>
                 <div class="modal-footer border-0 pt-0">

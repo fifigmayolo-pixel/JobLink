@@ -127,6 +127,7 @@ Route::middleware(['auth', 'role:student|alumni'])->group(function () {
 
     Route::get('/my-applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::get('/my-applications/{application}', [ApplicationController::class, 'show'])->name('applications.show');
+    Route::get('/my-applications/{application}/cv', [ApplicationController::class, 'cv'])->name('applications.cv');
     Route::patch('/my-applications/{application}/withdraw', [ApplicationController::class, 'withdraw'])->name('applications.withdraw');
     Route::patch('/my-applications/{application}/hide', [ApplicationController::class, 'hide'])->name('applications.hide');
     Route::post('/jobs/{jobPosting}/apply', [ApplicationController::class, 'store'])->name('applications.store');
@@ -143,6 +144,7 @@ Route::middleware(['auth', 'role:company'])->prefix('company')->name('company.')
 
     Route::get('/applications', [CompanyApplicationController::class, 'index'])->name('applications.index');
     Route::get('/applications/{application}', [CompanyApplicationController::class, 'show'])->name('applications.show');
+    Route::get('/applications/{application}/cv', [CompanyApplicationController::class, 'cv'])->name('applications.cv');
     Route::patch('/applications/{application}/status', [CompanyApplicationController::class, 'updateStatus'])->name('applications.status');
     Route::post('/applications/{application}/message', [CompanyMessageController::class, 'store'])->name('applications.message');
 });

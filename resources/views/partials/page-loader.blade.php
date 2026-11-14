@@ -117,7 +117,7 @@
             if (a.pathname === window.location.pathname && a.search === window.location.search && a.hash) return;
 
             // File downloads don't leave the page, so the loader would never go away
-            if (/\/export(\/|$)/i.test(a.pathname)) return;
+            if (/\/(cv|export)(\/|$)/i.test(a.pathname)) return;
 
             show();
         });

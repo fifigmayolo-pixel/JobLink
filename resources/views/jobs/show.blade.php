@@ -16,6 +16,14 @@
         'internship' => 'Internship',
     ];
     $jobTypeLabel = $jobTypeLabels[$jobPosting->job_type] ?? \Illuminate\Support\Str::headline($jobPosting->job_type ?? '');
+
+    // Students and alumni can only apply once their CV has a summary and a skill.
+    $cvState = null;
+    if (auth()->check() && in_array(auth()->user()->role, ['student', 'alumni'])) {
+        $cvState = auth()->user()->profile?->cvCompleteness();
+    }
+    $cvReady = $cvState['ready'] ?? false;
+    $cvMissing = $cvState['missing_required'] ?? ['Personal summary', 'Skills'];
 @endphp
 
 <div class="row justify-content-center" style="--accent: {{ $accent['base'] }}; --accent-soft: {{ $accent['soft'] }}; --accent-text: {{ $accent['text'] }}; --accent-deep: {{ $accent['deep'] }};">
@@ -41,15 +49,14 @@
                 @endcan
             </div>
         @endif
-         
 
-            @unless($jobPosting->companyIsActive())
-                <div class="alert alert-light jl-card mt-3 mb-0" style="border-left: 4px solid var(--jl-rose) !important;" role="alert">
-                    <strong>Company account archived.</strong>
-                    This posting is hidden from students and alumni. It will reappear if the account is restored and the deadline hasn't passed.
-                </div>
-            @endunless
-    
+        @unless($jobPosting->companyIsActive())
+            <div class="alert alert-light jl-card mt-3 mb-0" style="border-left: 4px solid var(--jl-rose) !important;" role="alert">
+                <strong>Company account archived.</strong>
+                This posting is hidden from students and alumni. It will reappear if the account is restored and the deadline hasn't passed.
+            </div>
+        @endunless
+
         <div class="row g-4 mt-1">
             {{-- Main column --}}
             <div class="col-lg-8">
@@ -164,23 +171,29 @@
                     @auth
                         @role('student|alumni')
                             @can('create', [\App\Models\JobApplication::class, $jobPosting])
-                                <p class="text-secondary small mb-3">
-                                    Your JobLink profile is sent as your CV. Apply before the deadline on {{ $jobPosting->application_deadline->format('M j, Y') }}.
-                                </p>
+                                @if($cvReady)
+                                    <p class="text-secondary small mb-3">
+                                        Your CV from your JobLink profile is sent to the company. Apply before the deadline on {{ $jobPosting->application_deadline->format('M j, Y') }}.
+                                    </p>
 
-                                @error('application')
-                                    <div class="alert alert-danger py-2 small" role="alert">{{ $message }}</div>
-                                @enderror
-
-                                {{-- The button opens the confirmation modal below. Nothing is sent until the student confirms. --}}
-                                <form method="POST" action="{{ route('applications.store', $jobPosting) }}" id="applyForm"></form>
-                                    @csrf
-                                    <button type="button" class="btn btn-jl-accent w-100 mb-2" data-bs-toggle="modal" data-bs-target="#applyConfirmModal">
-                                        Apply now <i class="bi bi-arrow-right"></i>
-                                    </button>
-                                </form>
+                                    {{-- The button opens the confirmation modal below. Nothing is sent until the student confirms. --}}
+                                    <form method="POST" action="{{ route('applications.store', $jobPosting) }}" id="applyForm">
+                                        @csrf
+                                        <button type="button" class="btn btn-jl-accent w-100 mb-2" data-bs-toggle="modal" data-bs-target="#applyConfirmModal">
+                                            Apply now <i class="bi bi-arrow-right"></i>
+                                        </button>
+                                    </form>
+                                @else
+                                    <div class="alert alert-light jl-card py-3 small mb-3" style="border-left: 4px solid var(--jl-gold) !important;" role="alert">
+                                        <strong>Finish your CV to apply.</strong>
+                                        <div class="mt-1">Still needed: {{ implode(' and ', $cvMissing) }}.</div>
+                                    </div>
+                                    <a href="{{ route('cv.edit') }}" class="btn btn-jl-accent w-100 mb-2">
+                                        Finish my CV <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                @endif
                             @else
-                                <p class="text-secondary small mb-3">You've already applied, or applications are no longer open for this role.</p>
+                                <p class="text-secondary small mb-3">Applications are no longer open for this role.</p>
                             @endcan
 
                             <form method="POST" action="{{ route('saved-jobs.store', $jobPosting) }}">
@@ -189,8 +202,6 @@
                                     <i class="bi bi-bookmark"></i> Save job
                                 </button>
                             </form>
-
-                            
                         @endrole
                     @endauth
 
@@ -213,6 +224,7 @@
 @auth
 @role('student|alumni')
 @can('create', [\App\Models\JobApplication::class, $jobPosting])
+@if($cvReady)
 @push('scripts')
 {{-- Confirm-before-apply. Pushed to the scripts stack so the modal sits at the end of <body>. --}}
 <div class="modal fade" id="applyConfirmModal" tabindex="-1" aria-labelledby="applyConfirmTitle" aria-hidden="true"
@@ -226,9 +238,14 @@
                     <p class="text-secondary mb-0">{{ $jobPosting->title }} &middot; {{ $jobPosting->company?->company_name ?? 'Company' }}</p>
                 </div>
 
+                <p class="small text-secondary mb-2">
+                    The company gets a copy of your CV as it is today: your name, course and year, email, mobile number,
+                    city and province, summary, skills, experience, education and certifications.
+                </p>
                 <p class="small text-secondary mb-3">
-                    The company will see your JobLink profile as your CV. Make sure it is up to date before you submit.
-                    <a href="{{ route('profile.edit') }}" target="_blank" rel="noopener">Review my profile</a>
+                    It does not include your date of birth, gender, civil status or street address.
+                    Changing your CV later does not change what you send now.
+                    <a href="{{ route('cv.edit') }}" target="_blank" rel="noopener">Review my CV</a>
                 </p>
 
                 <div class="d-flex flex-column flex-sm-row gap-2 justify-content-end">
@@ -270,7 +287,8 @@
 })();
 </script>
 @endpush
+@endif
 @endcan
 @endrole
 @endauth
-@endsection 
+@endsection

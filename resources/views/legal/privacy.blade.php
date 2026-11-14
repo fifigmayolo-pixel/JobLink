@@ -21,7 +21,7 @@
 
         <h2 class="h5 mt-4">1. What we collect</h2>
         <ul>
-            <li><strong>Students and alumni:</strong> Student ID number, full name, program, section, year graduated, contact details, address, profile picture, the resumes you upload, and your job applications and saved jobs.</li>
+            <li><strong>Students and alumni:</strong> Student ID number, full name, program, section, year graduated, contact details, address, profile picture, your CV (summary, skills, experience, education and certifications), and your job applications and saved jobs.</li>
             <li><strong>Companies:</strong> company name, logo, industry, contact person, contact number, address, email address, and the job postings you submit.</li>
             <li><strong>All users:</strong> email address, login activity, and notifications sent to you.</li>
             <li><strong>Tracer study:</strong> whether you opened the tracer study link for the current year.</li>
@@ -41,7 +41,7 @@
         <h2 class="h5 mt-4">3. Who can see it</h2>
         <ul>
             <li>The Job Coordinator can view and correct student and alumni records and company accounts.</li>
-            <li>A company can see the information you include in an application to its job posting, including your resume.</li>
+            <li>A company can see the CV you send with an application to its job posting: your name, course and year, email, mobile number, city and province, summary, skills, experience, education, certifications and links. It does not see your date of birth, gender, civil status or street address.</li>
             <li>We do not sell personal information.</li>
         </ul>
 
@@ -57,11 +57,11 @@
 
         <h2 class="h5 mt-4">5. How long we keep it</h2>
         <p>
-            We keep your information while your account is active. A resume you upload is deleted when
-      you withdraw the application. Resumes for other applications are kept so the company can
-      review them, and the application record (the job, the date and the status) is kept for
-      reporting. Records the Job Coordinator removes are hidden from the system but may stay in
-      the audit history for [RETENTION PERIOD].
+    We keep your information while your account is active. When you apply, the company gets a copy
+    of your CV as it was that day. If you withdraw the application, that copy is deleted. Copies
+    for other applications are kept so the company can finish reviewing them. The application
+    record (the job, the date and the status) is kept for reporting. Records the Job Coordinator
+    removes are hidden from the system but may stay in the audit history for [RETENTION PERIOD].
         </p>
 
         <h2 class="h5 mt-4">6. How we protect it</h2>

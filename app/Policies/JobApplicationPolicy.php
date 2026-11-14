@@ -20,9 +20,20 @@ class JobApplicationPolicy
             && $application->jobPosting->company_id === $user->company->id;
     }
 
+    /**
+     * Students and alumni may apply to a posting that is open: status "open" AND
+     * the deadline has not passed (same meaning as JobPosting::scopeOpen).
+     *
+     * Approval and archived-company checks happen in ApplicationController@store,
+     * and "CV ready" is checked there too, so the student gets a clear message
+     * instead of a bare 403.
+     */
     public function create(User $user, JobPosting $jobPosting): bool
     {
-        return in_array($user->role, ['student', 'alumni']) && $jobPosting->status === 'open';
+        return in_array($user->role, ['student', 'alumni'])
+            && $jobPosting->status === 'open'
+            && ($jobPosting->application_deadline === null
+                || $jobPosting->application_deadline->gte(now()->startOfDay()));
     }
 
     /**
