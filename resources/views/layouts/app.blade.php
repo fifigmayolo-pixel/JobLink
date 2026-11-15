@@ -399,6 +399,9 @@
                         <a class="jl-sidebar-link {{ request()->routeIs('company.applications.*') ? 'active' : '' }}" href="{{ route('company.applications.index') }}">
                             <i class="bi bi-people"></i> Applicants
                         </a>
+                        <a class="jl-sidebar-link {{ request()->routeIs('company.candidates.*') ? 'active' : '' }}" href="{{ route('company.candidates.index') }}">
+                            <i class="bi bi-search"></i> Find Candidates
+                        </a>
                     @endrole
 
                     @role('job_coordinator')

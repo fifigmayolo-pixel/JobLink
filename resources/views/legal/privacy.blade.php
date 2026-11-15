@@ -9,7 +9,7 @@
        class="btn btn-outline-secondary btn-sm mb-3 js-privacy-back">&larr; Back</a>
 
     <h1 class="h2 mb-1">Privacy Policy</h1>
-    <p class="text-secondary mb-4">Last updated: October 30, 2026</p>
+    <p class="text-secondary mb-4">Last updated: November 14, 2026</p>
 
     <div class="jl-card p-4 p-md-5">
         <p>
@@ -22,17 +22,19 @@
         <h2 class="h5 mt-4">1. What we collect</h2>
         <ul>
             <li><strong>Students and alumni:</strong> Student ID number, full name, program, section, year graduated, contact details, address, profile picture, your CV (summary, skills, experience, education and certifications), and your job applications and saved jobs.</li>
+            <li><strong>Your searchable setting:</strong> whether you chose to make your profile searchable by partner companies, and when you chose it.</li>
             <li><strong>Companies:</strong> company name, logo, industry, contact person, contact number, address, email address, and the job postings you submit.</li>
             <li><strong>All users:</strong> email address, login activity, and notifications sent to you.</li>
             <li><strong>Tracer study:</strong> whether you opened the tracer study link for the current year.</li>
             <li><strong>Linky chatbot:</strong> the messages you type to Linky.</li>
-            <li><strong>Audit records:</strong> changes made to records by the Job Coordinator, with the date and the reason.</li>
+            <li><strong>Audit records:</strong> changes made to records by the Job Coordinator, with the date and the reason, and a record each time a company opens a searchable profile.</li>
         </ul>
 
         <h2 class="h5 mt-4">2. Why we use it</h2>
         <ul>
             <li>To create and secure your account.</li>
             <li>To let students and alumni find and apply for jobs, and companies review applicants.</li>
+            <li>To let partner companies find the CVs of students and alumni who chose to be searchable, so they can invite suitable people to apply.</li>
             <li>To send notifications, announcements and interview or rejection messages by email and inside JobLink.</li>
             <li>To monitor tracer study participation and prepare campus reports.</li>
             <li>To keep the system safe and to correct records when needed.</li>
@@ -40,14 +42,24 @@
 
         <h2 class="h5 mt-4">3. Who can see it</h2>
         <ul>
-            <li>The Job Coordinator can view and correct student and alumni records and company accounts.</li>
+            <li>The Job Coordinator can view and correct student and alumni records and company accounts. The Job Coordinator's records pages do not show your CV.</li>
             <li>A company can see the CV you send with an application to its job posting: your name, course and year, email, mobile number, city and province, summary, skills, experience, education, certifications and links. It does not see your date of birth, gender, civil status or street address.</li>
+            <li>
+                <strong>Searchable profile (your choice, off by default).</strong>
+                If you turn on &ldquo;Make my profile searchable by partner companies&rdquo; in Profile settings, partner
+                companies can find your CV when they search, even if you have not applied to them. They can see your name,
+                course and year, city and province, and your CV. They cannot see your email, mobile number, street address,
+                date of birth, gender, civil status or profile picture, unless you apply to one of their jobs or you agree to
+                share your contact details with that company. Joining JobLink or accepting the Terms &amp; Conditions does not
+                turn this on. You can turn it off at any time, and your profile disappears from search straight away.
+            </li>
             <li>We do not sell personal information.</li>
         </ul>
 
         <h2 class="h5 mt-4">4. Services we rely on</h2>
         <p>
-            JobLink is hosted on Railway. Emails are sent through an email delivery service.
+            JobLink is hosted on Vercel, and its database and stored files are kept with Supabase.
+            Emails are sent through an email delivery service.
             Linky answers your questions using Google's Gemini API, so the messages you type to
             Linky are sent to Google for processing. Please do not type passwords, ID numbers or
             other sensitive details into Linky. Page fonts, styling and icons are loaded from
@@ -57,11 +69,15 @@
 
         <h2 class="h5 mt-4">5. How long we keep it</h2>
         <p>
-    We keep your information while your account is active. When you apply, the company gets a copy
-    of your CV as it was that day. If you withdraw the application, that copy is deleted. Copies
-    for other applications are kept so the company can finish reviewing them. The application
-    record (the job, the date and the status) is kept for reporting. Records the Job Coordinator
-    removes are hidden from the system but may stay in the audit history for [RETENTION PERIOD].
+            We keep your information while your account is active. When you apply, the company gets a copy
+            of your CV as it was that day. If you withdraw the application, that copy is deleted. Copies
+            for other applications are kept so the company can finish reviewing them. The application
+            record (the job, the date and the status) is kept for reporting. Records the Job Coordinator
+            removes are hidden from the system but may stay in the audit history for [RETENTION PERIOD].
+        </p>
+        <p>
+            Your searchable setting is kept while your account is active. The audit history keeps the date you
+            turned it on or off, and which companies opened your searchable profile and when.
         </p>
 
         <h2 class="h5 mt-4">6. How we protect it</h2>
@@ -88,7 +104,8 @@
         <p>
             Under the Data Privacy Act you may ask to access your information, correct it, object
             to its processing, request that it be erased or blocked, receive a copy of it, and
-            claim damages where applicable. To make a request, contact the Job Coordinator office.
+            claim damages where applicable. You can withdraw your consent to being searchable at any
+            time in Profile settings. To make any other request, contact the Job Coordinator office.
             You may also file a complaint with the National Privacy Commission (privacy.gov.ph).
         </p>
 

@@ -32,6 +32,8 @@ use App\Http\Controllers\UpdatePasswordController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LinkyController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\Company\CandidateController;
+use App\Http\Controllers\ProfileSearchabilityController;
 
 // Guests see the marketing landing page; anyone already logged in goes
 // straight to their dashboard instead (same as the old behavior, where
@@ -124,6 +126,8 @@ Route::middleware(['auth', 'role:student|alumni'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/my-cv', [CvController::class, 'edit'])->name('cv.edit');
     Route::put('/my-cv', [CvController::class, 'update'])->name('cv.update');
+    Route::patch('/profile/searchable', [ProfileSearchabilityController::class, 'update'])->name('profile.searchable.update');
+    Route::get('/profile/searchable/preview', [ProfileSearchabilityController::class, 'preview'])->name('profile.searchable.preview');
 
     Route::get('/my-applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::get('/my-applications/{application}', [ApplicationController::class, 'show'])->name('applications.show');
@@ -147,6 +151,8 @@ Route::middleware(['auth', 'role:company'])->prefix('company')->name('company.')
     Route::get('/applications/{application}/cv', [CompanyApplicationController::class, 'cv'])->name('applications.cv');
     Route::patch('/applications/{application}/status', [CompanyApplicationController::class, 'updateStatus'])->name('applications.status');
     Route::post('/applications/{application}/message', [CompanyMessageController::class, 'store'])->name('applications.message');
+    Route::get('/candidates', [CandidateController::class, 'index'])->middleware('throttle:60,1,candidates')->name('candidates.index');
+    Route::get('/candidates/{profile}', [CandidateController::class, 'show'])->middleware('throttle:60,1,candidates')->name('candidates.show');
 });
 
 // Job Coordinator only

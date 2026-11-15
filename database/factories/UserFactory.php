@@ -78,4 +78,18 @@ class UserFactory extends Factory
             $profile->skills()->create(['name' => 'Communication']);
         });
     }
+
+    /**
+     * cvReady() plus the opt-in switch turned on, so company search can find them.
+     * Use: User::factory()->searchable()->create()
+     */
+    public function searchable(): static
+    {
+        return $this->cvReady()->afterCreating(function (User $user) {
+            $user->profile()->first()->update([
+                'searchable_by_companies' => true,
+                'searchable_consented_at' => now(),
+            ]);
+        });
+    }
 }

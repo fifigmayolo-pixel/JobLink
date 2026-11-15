@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Policies\CandidateProfilePolicy;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+#[UsePolicy(CandidateProfilePolicy::class)]
 class StudentAlumniProfile extends Model
 {
     use HasFactory;
@@ -34,6 +37,8 @@ class StudentAlumniProfile extends Model
         'cv_summary',
         'linkedin_url',
         'portfolio_url',
+        'searchable_by_companies',
+        'searchable_consented_at',
     ];
 
     protected function casts(): array
@@ -41,6 +46,8 @@ class StudentAlumniProfile extends Model
         return [
             'date_of_birth' => 'date',
             'profile_completed_at' => 'datetime',
+            'searchable_by_companies' => 'boolean',
+            'searchable_consented_at' => 'datetime',
         ];
     }
 
@@ -213,6 +220,35 @@ class StudentAlumniProfile extends Model
         return $this->relationLoaded($relation)
             ? $this->getRelation($relation)->count()
             : $this->{$relation}()->count();
+    }
+
+    /**
+     * THE rule for who partner companies may find. Every candidate list and every
+     * candidate page goes through this one scope, so it can't be skipped in a view.
+     *
+     * A profile is searchable only when ALL of these are true:
+     *  - the student turned the switch on (off by default)
+     *  - the basic profile is complete
+     *  - the CV is ready (a summary of at least 50 characters and one skill),
+     *    so companies never see an empty profile
+     *  - the account is still active (a removed account is soft-deleted)
+     */
+    public function scopeSearchable($query)
+    {
+        return $query
+            ->where('student_alumni_profiles.searchable_by_companies', true)
+            ->whereNotNull('student_alumni_profiles.profile_completed_at')
+            ->whereRaw("length(trim(coalesce(student_alumni_profiles.cv_summary, ''))) >= ?", [self::CV_SUMMARY_MIN_LENGTH])
+            ->whereHas('skills')
+            ->whereHas('user');
+    }
+
+    /**
+     * Same answer as the scope, for one profile.
+     */
+    public function isSearchable(): bool
+    {
+        return static::query()->searchable()->whereKey($this->getKey())->exists();
     }
 
     public function scopeStudents($query)

@@ -29,6 +29,10 @@ class FieldChangeLog extends Model
         'job_posting_rejected' => 'Job Posting Rejected',
         'job_posting_resubmitted' => 'Job Posting Resubmitted',
         'tracer_study_update' => 'Tracer Study Link Updated',
+        // Candidate search: who looked at whose profile, and the student's consent trail.
+        'candidate_profile_viewed' => 'Candidate Profile Viewed',
+        'searchable_enabled' => 'Searchable Profile Turned On',
+        'searchable_disabled' => 'Searchable Profile Turned Off',
     ];
 
     public const JOB_POSTING_ACTIONS = [

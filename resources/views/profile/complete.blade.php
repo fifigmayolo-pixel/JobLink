@@ -145,7 +145,9 @@
                 <a href="{{ route('privacy') }}" class="fw-semibold" target="_blank" rel="noopener">Privacy Policy</a>.
             </label>
             </div>
-
+             <p class="small text-secondary mb-3">
+                Agreeing to the Terms &amp; Conditions does not make your profile searchable. After you finish, you can choose in Profile settings whether partner companies may find your CV. It stays off unless you turn it on.
+            </p>
             <button type="submit" class="btn btn-jl-gold btn-lg" id="saveProfileBtn">Save and Continue</button>
         </form>
     </div>

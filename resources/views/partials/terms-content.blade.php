@@ -9,18 +9,23 @@
 
 <h2 class="h6" style="color: var(--jl-navy);">3. Information We Collect</h2>
 <p>To use JobLink, we collect information such as your name, date of birth, gender, civil status, nationality, course/program, year level or year graduated, contact details including email and mobile number, home address, and, if you choose to add one, a profile picture.</p>
-<p>Students and alumni applying to jobs share their JobLink profile with the company as their CV.</p>
+<p>Students and alumni applying to jobs send the company a copy of their JobLink CV, together with their name, course and year, email, mobile number, and city and province. The copy does not include your date of birth, gender, civil status or street address.</p>
 <p>This information is used to verify your identity, match you with relevant opportunities, and support PSU's official tracer study reporting to partner employers and accrediting bodies.</p>
 
-<h2 class="h6" style="color: var(--jl-navy);">4. Accuracy of Information</h2>
+<h2 class="h6" style="color: var(--jl-navy);">4. Searchable Profiles (Your Choice)</h2>
+<p>By default, only a company you apply to can see your CV. Agreeing to these Terms &amp; Conditions does not make your profile searchable.</p>
+<p>In Profile settings you may choose &ldquo;Make my profile searchable by partner companies&rdquo;. If you do, partner companies can find your CV when they search, even if you have not applied to them. They can see your name, course and year, city and province, and your CV. They cannot see your email, mobile number, street address, date of birth, gender, civil status or profile picture, unless you apply to one of their jobs or agree to share your contact details with that company.</p>
+<p>You can turn this off at any time. JobLink records when you turn it on or off, and each time a company opens your searchable profile.</p>
+
+<h2 class="h6" style="color: var(--jl-navy);">5. Accuracy of Information</h2>
 <p>You are responsible for keeping your contact and address details current.</p>
 <p>Certain academic fields &mdash; full name, course/program, year level, section, and year graduated &mdash; are locked after your profile is completed and can only be corrected by your Job Coordinator in order to protect the integrity of official records.</p>
 
-<h2 class="h6" style="color: var(--jl-navy);">5. Account Security</h2>
+<h2 class="h6" style="color: var(--jl-navy);">6. Account Security</h2>
 <p>You are responsible for keeping your password confidential and for protecting access to your account.</p>
 <p>If you suspect unauthorized access to your account, notify your Job Coordinator immediately.</p>
 
-<h2 class="h6" style="color: var(--jl-navy);">6. Acceptable Use</h2>
+<h2 class="h6" style="color: var(--jl-navy);">7. Acceptable Use</h2>
 <p>When using JobLink, you agree not to:</p>
 <ul>
     <li>post false or misleading job listings or applicant information;</li>
@@ -28,17 +33,18 @@
     <li>attempt to access accounts, records, or administrative functions that you are not authorized to use.</li>
 </ul>
 
-<h2 class="h6" style="color: var(--jl-navy);">7. Companies and Job Postings</h2>
+<h2 class="h6" style="color: var(--jl-navy);">8. Companies and Job Postings</h2>
 <p>Companies are responsible for the accuracy of their job postings and for handling applicant data, including applicant profiles (CVs), contact information, and application status, in accordance with the applicable policies and laws.</p>
+<p>Companies may use candidate search only to find people for real openings. They may not copy, export or share candidate profiles outside JobLink, or use them for any other purpose.</p>
 <p>The Job Coordinator is responsible for reviewing job postings and may remove postings that violate these Terms &amp; Conditions.</p>
 
-<h2 class="h6" style="color: var(--jl-navy);">8. Data Retention and Removal</h2>
+<h2 class="h6" style="color: var(--jl-navy);">9. Data Retention and Removal</h2>
 <p>The Job Coordinator may correct, update, or remove student and alumni records as needed for administrative accuracy.</p>
 <p>You may contact your Job Coordinator to request information about the data associated with your account.</p>
 
-<h2 class="h6" style="color: var(--jl-navy);">9. Changes to These Terms</h2>
+<h2 class="h6" style="color: var(--jl-navy);">10. Changes to These Terms</h2>
 <p>These Terms &amp; Conditions may be updated from time to time.</p>
 <p>Continued use of JobLink after changes are posted constitutes acceptance of the revised terms.</p>
 
-<h2 class="h6 mb-2" style="color: var(--jl-navy);">10. Contact</h2>
+<h2 class="h6 mb-2" style="color: var(--jl-navy);">11. Contact</h2>
 <p class="mb-0">Questions about these Terms &amp; Conditions or your data should be directed to the Job Coordinator's office at PSU Alaminos City Campus.</p>
