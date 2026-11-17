@@ -379,6 +379,12 @@
                     JobLink
                 </a>
                 <nav class="jl-sidebar-nav">
+                    @role('student|alumni|company')
+                        <a class="jl-sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    @endrole
+
                     <a class="jl-sidebar-link {{ request()->routeIs('jobs.*') ? 'active' : '' }}" href="{{ route('jobs.index') }}">
                         <i class="bi bi-briefcase"></i> Jobs
                     </a>

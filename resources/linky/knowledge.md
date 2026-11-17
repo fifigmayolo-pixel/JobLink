@@ -31,6 +31,25 @@ Anything not written in this file is something Linky does not know. Lines contai
 - At the end, tick the box agreeing to the Terms & Conditions (click the link to read them), then Save and Continue.
 - Full name comes from registration. After the profile is saved, these fields are locked and only the Job Coordinator can correct them: full name, course/program, year level, section, year graduated.
 - Contact details, address and profile picture can be edited later from the profile menu, under Profile.
+- After the profile is saved, build your CV under My CV (see "My CV" below).
+
+## My CV (students and alumni)
+- There is no file to upload. JobLink builds your CV from your profile and what you add under My CV (sidebar, or the profile menu).
+- Sections: personal summary, skills, work experience or OJT, other education, certifications and seminars, and online links (LinkedIn, portfolio). A CV strength percentage shows how complete it is.
+- To apply for jobs, the CV needs a personal summary of at least 50 characters and at least one skill. The other sections are optional and raise the percentage.
+- A company sees your name, course, year, city and province, and the CV sections. Date of birth, age, gender, civil status, street address and profile picture are not part of the CV that companies see. Your email and mobile number go to a company only when you apply to its job.
+
+## Being found by companies (students and alumni)
+- Under Profile, the switch "Make my profile searchable by partner companies" lets partner companies find your CV in Find Candidates. It is off by default, and only you can turn it on or off.
+- You are listed only when the switch is on, your profile is complete and your CV is ready. Companies do not see your email, mobile number, date of birth, gender, civil status or street address.
+- Turning the switch off hides you right away. Companies you already applied to keep the CV you sent them.
+- "What companies see" on that page previews exactly what a company sees.
+- Turning the switch on or off is recorded with the date.
+- Other students cannot see your CV, and the Job Coordinator does not open applicants' CVs.
+
+## Dashboard
+- Students and alumni: the Dashboard shows your CV strength, how many applications are Pending, Interview, Rejected or Withdrawn, your latest applications, recent notifications, and up to 5 suggested jobs. Suggestions are matched from the words in your skills, course and education against open job postings. This happens inside JobLink and is not shared with companies. Jobs you already applied to are not suggested.
+- Companies: the Dashboard shows how many students and alumni have registered (one number, no names), your jobs by status (Pending approval, Not approved, Open, Closed), applicants waiting for review, and your latest postings and applicants.
 
 ## Tracer Study (alumni)
 - Alumni are asked to open the Tracer Study. Click "Go to Tracer Study" — it opens the external form in a new tab, and Continue unlocks after that.
@@ -38,21 +57,25 @@ Anything not written in this file is something Linky does not know. Lines contai
 - When the school publishes a new Tracer Study link, alumni see the screen once more for the new one.
 
 ## Jobs (students and alumni)
-- Open Jobs in the sidebar to browse postings. Open a posting to read the details, then apply with your profile as your CV. Jobs can be saved and found later under Saved.
-- My Applications shows each application's status: Pending, Interview or Rejected.
+- Open Jobs in the sidebar to browse postings. Search by keyword or location and filter by job type: Full-time, Part-time or Internship. Open a posting to read the details, then apply. Jobs can be saved and found later under Saved.
+- When you apply, JobLink sends the company a copy of your CV, built from your profile. Changing your CV later does not change the copy a company already received. Open the application and choose "View the CV I sent" to see it.
+- My Applications shows each application's status: Pending, Interview or Rejected. While an application is still Pending you can withdraw it, and the company then no longer has your CV.
 - Companies can message applicants. Messages and status updates appear under Notifications (the bell icon) and are also emailed to the personal email on the profile.
 - Only jobs approved by the Job Coordinator are visible.
 
 ## Posting a job (companies and the Job Coordinator)
 - Both companies and the Job Coordinator can post jobs, using Post a Job.
-- The form asks for: Job title, Job type (Full-time or Part-time), Location, Application deadline, Description, Qualifications and Requirements. Every field is required.
+- The form asks for: Job title, Job type (Full-time, Part-time or Internship), Location, Application deadline, Description, Qualifications and Requirements. Every field is required.
 - When the Job Coordinator posts a job, they also choose which company the job is for from a list of company accounts. Companies posting for themselves do not see this field.
 - Whether a job posted by the Job Coordinator needs approval before students and alumni can see it: [FILL IN]
 
 ## Companies (employers)
 - Company accounts are created by the Job Coordinator. A temporary password is emailed; the company must choose its own password at first login.
 - To post a job, use Post a Job (see "Posting a job" above). New postings wait for the Job Coordinator's approval before students and alumni can see them. The company is notified when a posting is approved, or rejected with a reason.
-- Applicants: open Applicants in the sidebar, review an application and the applicant's profile (CV), write a message, and choose Invite to Interview or Reject. The applicant is notified in JobLink and by email.
+- Under Jobs, a company sees Your Posted Jobs: only its own postings, by status (pending approval, not approved, open, closed).
+- Applicants: open Applicants in the sidebar, review an application and the CV the applicant sent, write a message, and choose Invite to Interview or Reject. The applicant is notified in JobLink and by email.
+- Find Candidates (sidebar): search the students and alumni who chose to be searchable. Search by keywords (every word must appear in the CV), by skills (any of them), by course, and by student or alumni. Open a candidate to read the CV. Their email and mobile number stay hidden until they apply to one of the company's jobs.
+- Dashboard (sidebar): see "Dashboard" above.
 - A company can edit its details and logo under Company Profile. To change the company's login email, ask the Job Coordinator.
 
 ## Job Coordinator (administrator)
@@ -64,4 +87,5 @@ Anything not written in this file is something Linky does not know. Lines contai
 - Records: search and filter students and alumni, correct locked fields, and convert students to alumni (or back) in bulk.
 - Announce: send an announcement as a notification and an email to Students and Alumni, Companies, or Everyone.
 - Tracer Study Link: set the link for the current Tracer Study.
-- Audit Log: review and export a log of changes.
+- Audit Log: review and export a log of changes, including when a student turns the searchable setting on or off and when a company opens a searchable profile.
+- The Job Coordinator does not open applicants' CVs or the Find Candidates page; those are for companies.

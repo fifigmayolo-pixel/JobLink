@@ -3,11 +3,19 @@
 namespace App\Http\Requests\Company;
 
 use App\Models\StudentAlumniProfile;
+use App\Support\ContactMask;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class CandidateSearchRequest extends FormRequest
 {
+    /**
+     * A failed search goes back to the clean search page, not to wherever the
+     * company came from (which is "/" when the URL was typed or bookmarked).
+     */
+    protected $redirectRoute = 'company.candidates.index';
+
     public function authorize(): bool
     {
         $user = $this->user();
@@ -23,6 +31,25 @@ class CandidateSearchRequest extends FormRequest
             'course' => ['nullable', Rule::in(StudentAlumniProfile::PROGRAMS)],
             'status' => ['nullable', Rule::in(['student', 'alumni'])],
         ];
+    }
+
+    /**
+     * Searching for an email, phone number or web address would let a company
+     * confirm that a hidden detail appears in someone's CV text, so those
+     * searches are refused. Skills and job words are what this page is for.
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            foreach (['q', 'skills'] as $field) {
+                if (ContactMask::looksLikeContact($this->input($field))) {
+                    $validator->errors()->add(
+                        $field,
+                        'Search by skills or job words, not by an email address, phone number or web address.'
+                    );
+                }
+            }
+        });
     }
 
     public function attributes(): array

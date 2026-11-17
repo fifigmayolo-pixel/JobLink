@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\JobApplication;
 use App\Models\JobPosting;
+use App\Models\Notification;
 use App\Models\User;
 use Database\Seeders\DemoDataSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -53,6 +54,15 @@ class DemoDataSeederTest extends TestCase
             User::where('student_id_number', '99-0002-02')->first(),
         ] as $user) {
             $this->actingAs($user)->get(route('jobs.index'))->assertOk();
+
+            // The dashboard too: the Coordinator is sent to their own, everyone else gets one.
+            $dashboard = $this->actingAs($user)->get(route('dashboard'));
+
+            if ($user->role === 'job_coordinator') {
+                $dashboard->assertRedirect(route('coordinator.dashboard'));
+            } else {
+                $dashboard->assertOk();
+            }
         }
     }
 
@@ -95,6 +105,91 @@ class DemoDataSeederTest extends TestCase
         $this->actingAs($company)->get(route('company.applications.index'))
             ->assertOk()
             ->assertSee('Demo Student');
+    }
+
+    public function test_the_student_dashboard_has_something_to_show(): void
+    {
+        $this->seed(DemoDataSeeder::class);
+
+        $student = User::where('student_id_number', '99-0001-01')->first();
+
+        $response = $this->actingAs($student)->get(route('dashboard'))->assertOk();
+
+        $this->assertSame(100, $response->viewData('completeness')['percent']);
+        $this->assertSame(['pending' => 1, 'interview' => 0, 'rejected' => 0, 'withdrawn' => 0], $response->viewData('statusCounts'));
+
+        // The job already applied to is left out; the other open one matches on "communication".
+        $this->assertSame(['Customer Service Associate'], $response->viewData('suggestions')->pluck('job.title')->all());
+
+        $response->assertSee('Junior Web Developer')            // in the latest applications
+            ->assertSee('Welcome to JobLink')
+            ->assertSee('Suggested jobs based on your profile');
+    }
+
+    public function test_the_alumni_dashboard_asks_for_the_cv(): void
+    {
+        $this->seed(DemoDataSeeder::class);
+
+        $alumni = User::where('student_id_number', '99-0002-02')->first();
+
+        $this->actingAs($alumni)->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Your CV is not ready to apply with yet')
+            ->assertSee('Finish your CV to see suggested jobs')
+            ->assertSee('0 applications');
+    }
+
+    public function test_the_company_dashboard_has_something_to_show(): void
+    {
+        $this->seed(DemoDataSeeder::class);
+
+        $company = User::where('email', 'company@joblink.test')->first();
+
+        $response = $this->actingAs($company)->get(route('dashboard'))->assertOk();
+
+        $this->assertEquals(['pending' => 1, 'rejected' => 0, 'open' => 2, 'closed' => 1], $response->viewData('jobCounts'));
+        $this->assertSame(1, $response->viewData('applicantsTotal'));
+        $this->assertSame(2, $response->viewData('registeredCount'), 'the demo student and the demo alumni');
+
+        $response->assertSee('Demo Student')
+            ->assertSee('Office Clerk');
+
+        // The company's own notification is there on its Notifications page.
+        $this->get(route('notifications.index'))
+            ->assertOk()
+            ->assertSee('Job posting approved');
+    }
+
+    public function test_the_company_can_find_the_demo_student_but_not_the_alumni(): void
+    {
+        $this->seed(DemoDataSeeder::class);
+
+        $student = User::where('student_id_number', '99-0001-01')->first()->profile;
+        $alumni = User::where('student_id_number', '99-0002-02')->first()->profile;
+
+        $this->assertTrue($student->isSearchable());
+        $this->assertNotNull($student->searchable_consented_at);
+
+        $this->assertFalse($alumni->isSearchable());
+        $this->assertNull($alumni->searchable_consented_at);
+
+        $this->actingAs(User::where('email', 'company@joblink.test')->first())
+            ->get(route('company.candidates.index'))
+            ->assertOk()
+            ->assertSee('Demo Student')
+            ->assertDontSee('Demo Alumni');
+    }
+
+    public function test_the_closed_demo_job_is_never_shown_to_students(): void
+    {
+        $this->seed(DemoDataSeeder::class);
+
+        $this->assertSame('closed', JobPosting::where('title', 'Office Clerk')->firstOrFail()->status);
+
+        $this->actingAs(User::where('student_id_number', '99-0001-01')->first())
+            ->get(route('jobs.index'))
+            ->assertOk()
+            ->assertDontSee('Office Clerk');
     }
 
     public function test_running_it_twice_does_not_duplicate_anything(): void
@@ -140,6 +235,7 @@ class DemoDataSeederTest extends TestCase
             'experiences' => \App\Models\ProfileExperience::count(),
             'educations' => \App\Models\ProfileEducation::count(),
             'certifications' => \App\Models\ProfileCertification::count(),
+            'notifications' => Notification::count(),
         ];
     }
 }

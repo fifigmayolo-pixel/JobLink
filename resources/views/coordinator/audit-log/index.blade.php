@@ -6,7 +6,8 @@
 
 <h1 class="h2 mb-1">Audit Log</h1>
 <p class="text-secondary mb-4">
-    Account creations, roster imports, field corrections, record deletions, and job posting changes.
+    Account creations, roster imports, field corrections, record deletions, job posting changes,
+    students and alumni turning "searchable by partner companies" on or off, and each time a company opens a searchable profile.
 </p>
 
 <form method="GET" class="row g-2 mb-3">

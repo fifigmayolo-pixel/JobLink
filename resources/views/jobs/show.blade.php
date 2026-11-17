@@ -28,7 +28,7 @@
 
 <div class="row justify-content-center" style="--accent: {{ $accent['base'] }}; --accent-soft: {{ $accent['soft'] }}; --accent-text: {{ $accent['text'] }}; --accent-deep: {{ $accent['deep'] }};">
     <div class="col-lg-10">
-        <a href="{{ route('jobs.index') }}" class="btn btn-outline-secondary btn-sm">&larr; Back to all jobs</a>
+        <a href="{{ route('jobs.index') }}" class="btn btn-outline-secondary btn-sm">&larr; {{ auth()->user()?->role === 'company' ? 'Back to your jobs' : 'Back to all jobs' }}</a>
 
         @if($jobPosting->isPending())
             <div class="alert alert-light jl-card mt-3 mb-0" style="border-left: 4px solid var(--jl-gold) !important;" role="alert">

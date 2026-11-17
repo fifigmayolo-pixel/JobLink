@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Company;
 use App\Models\JobApplication;
 use App\Models\JobPosting;
+use App\Models\Notification;
 use App\Models\StudentAlumniProfile;
 use App\Models\User;
 use App\Support\CvSnapshot;
@@ -23,6 +24,15 @@ use Illuminate\Support\Facades\Hash;
  *
  * It never overwrites the password of a Coordinator account that has already been
  * changed from the bootstrap default.
+ *
+ * What the demo shows, per login:
+ *   Coordinator  one job waiting for approval
+ *   Company      dashboard with a pending, two open and one closed posting, one applicant,
+ *                and the student findable under Find Candidates
+ *   Student      full CV, dashboard with a suggested job, one pending application,
+ *                searchable by partner companies (switch on)
+ *   Alumni       basic profile only: dashboard asks to finish the CV, switch off, so the
+ *                alumni does not show up in Find Candidates
  */
 class DemoDataSeeder extends Seeder
 {
@@ -41,6 +51,8 @@ class DemoDataSeeder extends Seeder
         $company = $companyUser->company;
         $jobs = $this->jobs($company, $companyUser, $coordinator);
 
+        $this->notifications($student, $companyUser, $jobs['web']);
+
         // One application already sent, so the company's Applicants page is not empty.
         // The student can still apply to the other open job live (and gets the
         // duplicate warning if they try this one again).
@@ -58,9 +70,9 @@ class DemoDataSeeder extends Seeder
             ['Role', 'Log in with', 'Password', 'Notes'],
             [
                 ['Job Coordinator', 'coordinator@joblink.test', $password, 'Approves jobs. One job is waiting for approval.'],
-                ['Company', 'company@joblink.test', $password, 'Demo Tech Solutions, 2 approved jobs, 1 applicant.'],
-                ['Student', '99-0001-01', $password, 'Full CV, ready to apply. Already applied to one job.'],
-                ['Alumni', '99-0002-02', $password, 'Profile done, CV empty: fill it in live, then apply.'],
+                ['Company', 'company@joblink.test', $password, 'Demo Tech Solutions: 2 open jobs, 1 pending, 1 closed, 1 applicant. Can find the student under Find Candidates.'],
+                ['Student', '99-0001-01', $password, 'Full CV, ready to apply, searchable by companies. Already applied to one job; the dashboard suggests another.'],
+                ['Alumni', '99-0002-02', $password, 'Profile done, CV empty and not searchable: fill the CV in live, then apply.'],
             ]
         );
     }
@@ -149,8 +161,15 @@ class DemoDataSeeder extends Seeder
                 'cv_summary' => 'Fourth-year BSIT student with hands-on OJT experience in web development and office IT support. Looking for an entry-level developer role where I can learn quickly and contribute to the team.',
                 'linkedin_url' => 'https://www.linkedin.com/in/demo-student',
                 'portfolio_url' => null,
+                // The opt-in is on, so the demo company can find this CV (Phase 8).
+                'searchable_by_companies' => true,
             ]
         );
+
+        // The date the student chose it, kept as it is when the seeder runs again.
+        if ($profile->searchable_consented_at === null) {
+            $profile->forceFill(['searchable_consented_at' => now()])->save();
+        }
 
         // A full CV (100%). Each section is replaced, so running this again is safe.
         $profile->skills()->delete();
@@ -231,6 +250,9 @@ class DemoDataSeeder extends Seeder
                 'cv_summary' => null,
                 'linkedin_url' => null,
                 'portfolio_url' => null,
+                // The opt-in is off (the default), so this profile is never listed for companies.
+                'searchable_by_companies' => false,
+                'searchable_consented_at' => null,
             ]
         );
 
@@ -243,7 +265,7 @@ class DemoDataSeeder extends Seeder
     }
 
     /**
-     * @return array{web: JobPosting, support: JobPosting, intern: JobPosting}
+     * @return array{web: JobPosting, support: JobPosting, intern: JobPosting, closed: JobPosting}
      */
     private function jobs(Company $company, User $companyUser, User $coordinator): array
     {
@@ -303,6 +325,48 @@ class DemoDataSeeder extends Seeder
             ]
         );
 
-        return ['web' => $web, 'support' => $support, 'intern' => $intern];
+        // Approved, then closed after its deadline: fills the "Closed" card on the
+        // company dashboard. Students never see it.
+        $closed = JobPosting::updateOrCreate(
+            ['company_id' => $company->id, 'title' => 'Office Clerk'],
+            array_merge($approved, [
+                'job_type' => 'full_time',
+                'description' => "Handle filing and front-desk tasks.\nKeep the office records in order.",
+                'qualifications' => 'Any college level.',
+                'requirements' => 'Neat and organized.',
+                'location' => 'Alaminos City, Pangasinan',
+                'date_posted' => now()->subDays(40)->toDateString(),
+                'application_deadline' => now()->subDays(10)->toDateString(),
+                'status' => 'closed',
+                'posted_by' => $companyUser->id,
+            ])
+        );
+
+        return ['web' => $web, 'support' => $support, 'intern' => $intern, 'closed' => $closed];
+    }
+
+    /**
+     * One notification each for the student and the company, so the dashboards' notification
+     * panels are not empty. Found by recipient, type and title, so running again adds nothing,
+     * and each one is unread again after a run.
+     */
+    private function notifications(User $student, User $companyUser, JobPosting $approvedJob): void
+    {
+        Notification::updateOrCreate(
+            ['recipient_id' => $student->id, 'type' => 'announcement', 'title' => 'Welcome to JobLink'],
+            [
+                'message' => 'Build your CV, browse open jobs and apply. Companies can only find you if you turn on "searchable" in your profile settings.',
+                'read_at' => null,
+            ]
+        );
+
+        Notification::updateOrCreate(
+            ['recipient_id' => $companyUser->id, 'type' => 'job_posting_approved', 'related_job_posting_id' => $approvedJob->id],
+            [
+                'title' => 'Job posting approved',
+                'message' => 'Your posting "'.$approvedJob->title.'" was approved. Students and alumni can now apply.',
+                'read_at' => null,
+            ]
+        );
     }
 }

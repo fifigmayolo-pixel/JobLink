@@ -132,7 +132,7 @@ class CandidateSearchTest extends TestCase
             ->assertSee('You are not searchable');
 
         $student->profile()->first()->update(['searchable_by_companies' => true]);
-        $student->unsetRelation('profile'); // the logged-in user still holds the profile from the first request
+        $student->unsetRelation('profile');
 
         $this->get(route('profile.edit'))->assertSee('Visible to partner companies');
         $this->get(route('profile.searchable.preview'))->assertSee('Your profile is searchable');
@@ -206,7 +206,8 @@ class CandidateSearchTest extends TestCase
             ->assertSee('Fresh graduate')
             ->assertSee('IT Intern')
             ->assertSee('Contact details are hidden')
-            ->assertSee('https://www.linkedin.com/in/vera', false);
+            // Phase 8 change: web links are contact too, so they wait for an application.
+            ->assertDontSee('linkedin.com/in/vera');
         foreach ($private as $value) {
             $page->assertDontSee($value);
         }

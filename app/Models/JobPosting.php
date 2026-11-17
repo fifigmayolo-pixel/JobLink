@@ -89,6 +89,61 @@ class JobPosting extends Model
     {
         return $query->where('approval_status', 'pending');
     }
+
+    /**
+     * One company's postings, every status. A null company matches NOTHING: a plain
+     * where('company_id', null) would turn into "company_id IS NULL" and return
+     * every posting that has no company tagged.
+     */
+    public function scopeOfCompany($query, ?int $companyId)
+    {
+        return $companyId === null
+            ? $query->whereRaw('1 = 0')
+            : $query->where('job_postings.company_id', $companyId);
+    }
+
+    /**
+     * Filter for the company's own list: pending, rejected, open or closed.
+     * "closed" covers a posting that was closed by hand and one whose deadline passed.
+     * Any other value leaves the list as it is.
+     */
+    public function scopeInListingState($query, ?string $state)
+    {
+        return match ($state) {
+            'pending' => $query->awaitingApproval(),
+            'rejected' => $query->where('approval_status', 'rejected'),
+            'open' => $query->approved()->open(),
+            'closed' => $query->approved()->where(function ($q) {
+                $q->where('status', '!=', 'open')
+                    ->orWhere('application_deadline', '<', now()->toDateString());
+            }),
+            default => $query,
+        };
+    }
+
+    public const LISTING_STATES = ['pending', 'rejected', 'open', 'closed'];
+
+    /**
+     * Where this posting stands, for the company that posted it. Same meaning as
+     * the scopes above: pending, rejected, open (approved, open, deadline not passed)
+     * or closed (approved but closed by hand or past its deadline).
+     */
+    public function listingState(): string
+    {
+        if ($this->isPending()) {
+            return 'pending';
+        }
+
+        if ($this->isRejected()) {
+            return 'rejected';
+        }
+
+        $stillOpen = $this->status === 'open'
+            && $this->application_deadline !== null
+            && $this->application_deadline->toDateString() >= now()->toDateString();
+
+        return $stillOpen ? 'open' : 'closed';
+    }
     
         /**
      * A posting only counts as live while its company's login is not archived.

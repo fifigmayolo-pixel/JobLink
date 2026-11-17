@@ -16,7 +16,10 @@ use Illuminate\Support\Str;
  * Text matching is case-insensitive on every database (lower(...) like ...) because
  * PostgreSQL's LIKE is case-sensitive while the local SQLite one is not. The search
  * words are escaped, so typing % or _ matches those characters and not "everything".
- * Contact details are never searched and never returned.
+ * Contact details are never searched and never returned: the email and mobile number
+ * columns are not touched, and the summary excerpt on a card goes through ContactMask.
+ * (CandidateSearchRequest also refuses a search that is itself an email, phone number
+ * or web address.)
  */
 class CandidateSearch
 {
@@ -106,7 +109,8 @@ class CandidateSearch
                 ? trim('Graduated '.$profile->year_graduated)
                 : (string) $profile->year_level,
             'place' => implode(', ', array_filter([$profile->municipality_city, $profile->province])),
-            'excerpt' => Str::limit((string) $profile->cv_summary, 180),
+            // Masked first, then cut, so a phone number can't be split in half and slip through.
+            'excerpt' => Str::limit(ContactMask::text($profile->cv_summary), 180),
             'skills' => $profile->skills->pluck('name')->all(),
             'matched_skills' => (int) ($profile->matched_skills ?? 0),
         ];

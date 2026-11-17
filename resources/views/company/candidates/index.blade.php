@@ -47,7 +47,7 @@
 <div class="alert alert-light jl-card mb-3 small" style="border-left: 4px solid var(--jl-gold) !important;" role="note">
     <i class="bi bi-shield-check me-1" aria-hidden="true"></i>
     Only people who turned on <strong>&ldquo;Make my profile searchable by partner companies&rdquo;</strong> appear here.
-    You see their CV, not their email or mobile number. Contact details are shared when they apply to one of your jobs.
+    You see their CV, not their email, mobile number or web links. Contact details are shared when they apply to one of your jobs.
     Each profile you open is recorded in the audit log.
 </div>
 

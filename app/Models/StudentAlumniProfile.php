@@ -251,6 +251,32 @@ class StudentAlumniProfile extends Model
         return static::query()->searchable()->whereKey($this->getKey())->exists();
     }
 
+    /**
+     * Plain-language reasons this profile is not findable yet, for messages shown to
+     * the student. Never empty-sounding: if the basic profile is the only gap, that
+     * is what it says. Does not look at the switch itself.
+     *
+     * @return array<int, string>
+     */
+    public function searchabilityBlockers(): array
+    {
+        $blockers = [];
+
+        if ($this->profile_completed_at === null) {
+            $blockers[] = 'your basic profile (Complete Profile)';
+        }
+
+        if (! $this->hasCvSummary()) {
+            $blockers[] = 'a personal summary of at least '.self::CV_SUMMARY_MIN_LENGTH.' characters';
+        }
+
+        if ($this->cvCount('skills') < self::CV_MIN_SKILLS) {
+            $blockers[] = self::CV_MIN_SKILLS === 1 ? 'at least one skill' : 'at least '.self::CV_MIN_SKILLS.' skills';
+        }
+
+        return $blockers;
+    }
+
     public function scopeStudents($query)
     {
         return $query->where('status', 'student');

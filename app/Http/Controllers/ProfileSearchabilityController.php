@@ -48,10 +48,14 @@ class ProfileSearchabilityController extends Controller
 
         $profile = $profile->fresh();
 
-        return back()->with('status', $profile->isSearchable()
-            ? 'Your profile is now searchable by partner companies.'
-            : 'Saved. You will appear in company search once your CV is ready: add '
-                .implode(' and ', $profile->cvCompleteness()['missing_required']).'.');
+        if ($profile->isSearchable()) {
+            return back()->with('status', 'Your profile is now searchable by partner companies.');
+        }
+
+        $blockers = $profile->searchabilityBlockers();
+
+        return back()->with('status', 'Saved. You will appear in company search once your profile is ready.'
+            .($blockers ? ' Still needed: '.implode(', ', $blockers).'.' : ''));
     }
 
     /**
@@ -68,7 +72,7 @@ class ProfileSearchabilityController extends Controller
             'cv' => CandidateCv::forCompany($profile),
             'switchOn' => (bool) $profile->searchable_by_companies,
             'visibleNow' => $profile->isSearchable(),
-            'missing' => $profile->cvCompleteness()['missing_required'],
+            'missing' => $profile->searchabilityBlockers(),
         ]);
     }
 }

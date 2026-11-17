@@ -40,7 +40,7 @@
 
             @if($application->isWithdrawn())
                 <div class="alert alert-light jl-card mb-0" style="border-left: 4px solid var(--jl-slate) !important;">
-                    You withdrew this application on {{ $application->updated_at->format('M j, Y') }}. The company no longer has your CV. If the job is still open, you can apply again from its page.
+                    You withdrew this application on {{ $application->updated_at->format('M j, Y') }}. The copy of your CV that came with it has been deleted. If you turned on "searchable by partner companies" in Profile settings, companies can still find your CV there. If the job is still open, you can apply again from its page.
                 </div>
             @else
                 <div class="d-flex flex-wrap gap-2">
@@ -86,8 +86,9 @@
                 <div class="modal-body">
                     <p class="mb-0">
                         Your application for <strong>{{ $application->jobPosting->title }}</strong> at
-                        {{ $company?->company_name ?? 'the company' }} will be marked as withdrawn, and the company
-                        will no longer see your CV. You can apply again later if the job is still open.
+                        {{ $company?->company_name ?? 'the company' }} will be marked as withdrawn, and the copy of
+                        your CV you sent with it will be deleted. (If you turned on "searchable by partner companies", companies
+                        can still find your CV in search until you turn that off.) You can apply again later if the job is still open.
                     </p>
                 </div>
                 <div class="modal-footer border-0 pt-0">

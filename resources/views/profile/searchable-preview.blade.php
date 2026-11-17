@@ -11,8 +11,10 @@
 
         <h1 class="h2 mt-3 mb-1">What companies see</h1>
         <p class="text-secondary mb-3">
-            This is your CV exactly as a partner company sees it in search. Your email, mobile number, street address,
+            This is your CV exactly as a partner company sees it in search. Your email, mobile number, web links, street address,
             date of birth, gender, civil status and profile picture are not part of it.
+            Any email address, phone number or web address you typed into your CV text is hidden too, so please do not
+            rely on writing contact details there.
         </p>
 
         @if($visibleNow)
@@ -22,7 +24,7 @@
         @elseif($switchOn)
             <div class="alert alert-light jl-card small" style="border-left: 4px solid var(--jl-gold) !important;" role="status">
                 <strong>The switch is on, but you are not visible yet.</strong>
-                You will appear once your CV is ready. Still needed: {{ implode(' and ', $missing) }}.
+                You will appear once your profile is ready. Still needed: {{ implode(', ', $missing) }}.
                 <a href="{{ route('cv.edit') }}">Open My CV</a>
             </div>
         @else

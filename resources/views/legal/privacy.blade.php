@@ -9,7 +9,7 @@
        class="btn btn-outline-secondary btn-sm mb-3 js-privacy-back">&larr; Back</a>
 
     <h1 class="h2 mb-1">Privacy Policy</h1>
-    <p class="text-secondary mb-4">Last updated: November 14, 2026</p>
+    <p class="text-secondary mb-4">Last updated: November 16, 2026</p>
 
     <div class="jl-card p-4 p-md-5">
         <p>
@@ -48,10 +48,13 @@
                 <strong>Searchable profile (your choice, off by default).</strong>
                 If you turn on &ldquo;Make my profile searchable by partner companies&rdquo; in Profile settings, partner
                 companies can find your CV when they search, even if you have not applied to them. They can see your name,
-                course and year, city and province, and your CV. They cannot see your email, mobile number, street address,
-                date of birth, gender, civil status or profile picture, unless you apply to one of their jobs or you agree to
-                share your contact details with that company. Joining JobLink or accepting the Terms &amp; Conditions does not
-                turn this on. You can turn it off at any time, and your profile disappears from search straight away.
+                course and year, city and province, and your CV (summary, skills, experience, education and certifications).
+                They cannot see your email, mobile number or your LinkedIn and portfolio links. A company gets those only
+                when you apply to one of its jobs. They never see your street address, date of birth, gender, civil status or
+                profile picture, even after you apply. Contact details you type into your CV text are hidden from search
+                where JobLink can recognise them, but you should not write them there. Joining JobLink or accepting the
+                Terms &amp; Conditions does not turn this on. You can turn it off at any time, and your profile disappears
+                from search straight away.
             </li>
             <li>We do not sell personal information.</li>
         </ul>

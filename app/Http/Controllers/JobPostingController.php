@@ -17,18 +17,80 @@ class JobPostingController extends Controller
 {
     public function index(Request $request)
 {
+    // A company account sees "Your Posted Jobs" instead: only its own postings,
+    // never another company's. Everyone else keeps the public listing below.
+    if ($request->user()->role === 'company') {
+        return $this->companyIndex($request);
+    }
+
     // Only approved, open postings from active companies appear.
+    // Search ignores upper and lower case (see likeLower): on PostgreSQL a plain LIKE is
+    // case sensitive, so "developer" would not find "Web Developer" on the live site.
     $jobPostings = JobPosting::query()
         ->listed()
         ->with('company')
-        ->when($request->search, fn ($q, $search) => $q->where('title', 'like', "%{$search}%"))
-        ->when($request->location, fn ($q, $location) => $q->where('location', 'like', "%{$location}%"))
-        ->when($request->job_type, fn ($q, $jobType) => $q->where('job_type', $jobType))
+        ->when($this->term($request->query('search')), fn ($q, $search) => $this->likeLower($q, 'job_postings.title', $search))
+        ->when($this->term($request->query('location')), fn ($q, $location) => $this->likeLower($q, 'job_postings.location', $location))
+        ->when($this->term($request->query('job_type')), fn ($q, $jobType) => $q->where('job_type', $jobType))
         ->latest('date_posted')
         ->paginate(15)->withQueryString();
 
     return view('jobs.index', compact('jobPostings'));
 }
+
+    /**
+     * Your Posted Jobs. The company id comes from the logged-in account, never from
+     * the request, and the list includes every status (pending, not approved, open,
+     * closed) so the company can follow its own postings through approval.
+     */
+    private function companyIndex(Request $request)
+    {
+        $status = in_array($request->query('status'), JobPosting::LISTING_STATES, true)
+            ? $request->query('status')
+            : null;
+
+        $search = $this->term($request->query('search')) ?? '';
+
+        $jobPostings = JobPosting::query()
+            ->ofCompany($request->user()->company?->id)
+            ->withCount(['applications as applicants_count' => fn ($q) => $q->where('status', '!=', 'withdrawn')])
+            ->inListingState($status)
+            ->when($search !== '', fn ($q) => $this->likeLower($q, 'job_postings.title', $search))
+            ->latest('date_posted')
+            ->latest('id')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('jobs.mine', [
+            'jobPostings' => $jobPostings,
+            'status' => $status,
+            'search' => $search,
+            'filtersActive' => $status !== null || $search !== '',
+        ]);
+    }
+
+    /**
+     * A search box value as a trimmed string, or null when it is empty or not text
+     * (a hand-made ?search[]=x would otherwise reach the query as an array).
+     */
+    private function term(mixed $value): ?string
+    {
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $value = trim($value);
+
+        return $value === '' ? null : mb_substr($value, 0, 100);
+    }
+
+    /**
+     * "column contains text", ignoring case, the same on SQLite and PostgreSQL.
+     */
+    private function likeLower($query, string $column, string $text)
+    {
+        return $query->whereRaw("lower({$column}) like ?", ['%'.mb_strtolower($text).'%']);
+    }
 
     public function show(JobPosting $jobPosting)
 {
@@ -112,18 +174,32 @@ class JobPostingController extends Controller
             ->with('status', 'Job submitted for approval. You will be notified once the Job Coordinator reviews it.');
     }
 
+    /**
+     * Edit, close and delete go through here. Someone who is not even allowed to
+     * see the posting (another company) gets a 404, like show(), so ids can't be
+     * probed; someone who can see it but not change it gets a 403.
+     */
+    private function authorizeManage(JobPosting $jobPosting): void
+    {
+        abort_unless(Gate::allows('view', $jobPosting), 404);
+
+        Gate::authorize('update', $jobPosting);
+    }
+
     public function edit(JobPosting $jobPosting)
     {
-        Gate::authorize('update', $jobPosting);
+        $this->authorizeManage($jobPosting);
 
         return view('jobs.edit', compact('jobPosting'));
     }
 
     public function update(UpdateJobPostingRequest $request, JobPosting $jobPosting)
     {
-        Gate::authorize('update', $jobPosting);
+        $this->authorizeManage($jobPosting);
 
-        $data = $request->validated();
+        // The posting's company is fixed when it is posted. Whatever the request
+        // carries, it can never move a posting to another company.
+        $data = collect($request->validated())->except(['company_id', 'posted_by'])->all();
         $trackedFields = ['title', 'job_type', 'location', 'application_deadline', 'status'];
         $changes = [];
 
@@ -183,6 +259,8 @@ class JobPostingController extends Controller
 
     public function destroy(JobPosting $jobPosting)
     {
+        abort_unless(Gate::allows('view', $jobPosting), 404);
+
         Gate::authorize('delete', $jobPosting);
 
         $jobPosting->delete();

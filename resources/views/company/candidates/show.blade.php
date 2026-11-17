@@ -12,7 +12,7 @@
         <div class="alert alert-light jl-card mt-3 mb-3 small" style="border-left: 4px solid var(--jl-gold) !important;" role="note">
             <i class="bi bi-shield-check me-1" aria-hidden="true"></i>
             <strong>Contact details are hidden.</strong>
-            This candidate chose to be searchable, so you can read their CV. Their email and mobile number are shared when they apply to one of your jobs.
+            This candidate chose to be searchable, so you can read their CV. Their email, mobile number and web links are shared when they apply to one of your jobs.
             @if($application)
                 <div class="mt-2">
                     They applied to <strong>{{ $application->jobPosting->title }}</strong>.

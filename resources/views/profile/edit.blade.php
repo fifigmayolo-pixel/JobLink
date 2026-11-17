@@ -7,7 +7,7 @@
     // The "searchable by partner companies" card below.
     $searchOn = (bool) $profile->searchable_by_companies;
     $visibleNow = $searchOn && $profile->isSearchable();
-    $cvMissing = $profile->cvCompleteness()['missing_required'];
+    $cvMissing = $profile->searchabilityBlockers();
 @endphp
 <div class="row justify-content-center">
     <div class="col-lg-8">
@@ -105,14 +105,14 @@
                         <ul class="mb-0 ps-3">
                             <li>Your name, course and year</li>
                             <li>Your city and province</li>
-                            <li>Your CV: summary, skills, experience, education, certifications and links</li>
+                            <li>Your CV: summary, skills, experience, education and certifications</li>
                         </ul>
                     </div>
                     <div class="col-md-6">
                         <div class="fw-semibold mb-1">Companies cannot see</div>
                         <ul class="mb-0 ps-3">
-                            <li>Your email and mobile number, unless you apply to their job or agree to share them</li>
-                            <li>Your street address, date of birth, gender, civil status and profile picture</li>
+                            <li>Your email, mobile number, and LinkedIn or portfolio links. A company gets these only when you apply to one of its jobs</li>
+                            <li>Your street address, date of birth, gender, civil status and profile picture, even after you apply</li>
                         </ul>
                     </div>
                 </div>
@@ -121,7 +121,7 @@
                     <p class="mb-3"><span class="jl-pill jl-pill-neutral"><i class="bi bi-eye me-1" aria-hidden="true"></i> Visible to partner companies</span></p>
                 @elseif($searchOn)
                     <div class="alert alert-light jl-card py-2 small" style="border-left: 4px solid var(--jl-gold) !important;" role="status">
-                        The switch is on, but you will appear only when your CV is ready. Still needed: {{ implode(' and ', $cvMissing) }}.
+                        The switch is on, but you will appear only when your profile is ready. Still needed: {{ implode(', ', $cvMissing) }}.
                         <a href="{{ route('cv.edit') }}">Open My CV</a>
                     </div>
                 @else
@@ -133,7 +133,12 @@
                     <a href="{{ route('profile.searchable.preview') }}" class="btn btn-outline-secondary">Preview what companies see</a>
                 </div>
 
-                <p class="text-secondary small mt-3 mb-0">
+                <p class="text-secondary small mt-3 mb-2">
+                    Companies see your summary and experience text exactly as you wrote it, so do not type your phone number,
+                    email or social media links there. JobLink hides what it recognises, but it cannot catch everything.
+                </p>
+
+                <p class="text-secondary small mt-0 mb-0">
                     You can turn this off at any time and you disappear from search straight away. Each time a company opens
                     your profile, JobLink records it. See the <a href="{{ route('privacy') }}" target="_blank" rel="noopener">Privacy Policy</a>.
                 </p>

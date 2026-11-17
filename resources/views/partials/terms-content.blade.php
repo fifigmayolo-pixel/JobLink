@@ -14,7 +14,7 @@
 
 <h2 class="h6" style="color: var(--jl-navy);">4. Searchable Profiles (Your Choice)</h2>
 <p>By default, only a company you apply to can see your CV. Agreeing to these Terms &amp; Conditions does not make your profile searchable.</p>
-<p>In Profile settings you may choose &ldquo;Make my profile searchable by partner companies&rdquo;. If you do, partner companies can find your CV when they search, even if you have not applied to them. They can see your name, course and year, city and province, and your CV. They cannot see your email, mobile number, street address, date of birth, gender, civil status or profile picture, unless you apply to one of their jobs or agree to share your contact details with that company.</p>
+<p>In Profile settings you may choose &ldquo;Make my profile searchable by partner companies&rdquo;. If you do, partner companies can find your CV when they search, even if you have not applied to them. They can see your name, course and year, city and province, and your CV. They cannot see your email, mobile number or LinkedIn and portfolio links; a company gets those only when you apply to one of its jobs. They never see your street address, date of birth, gender, civil status or profile picture, even after you apply. Please do not type contact details into your CV text.</p>
 <p>You can turn this off at any time. JobLink records when you turn it on or off, and each time a company opens your searchable profile.</p>
 
 <h2 class="h6" style="color: var(--jl-navy);">5. Accuracy of Information</h2>
@@ -35,7 +35,7 @@
 
 <h2 class="h6" style="color: var(--jl-navy);">8. Companies and Job Postings</h2>
 <p>Companies are responsible for the accuracy of their job postings and for handling applicant data, including applicant profiles (CVs), contact information, and application status, in accordance with the applicable policies and laws.</p>
-<p>Companies may use candidate search only to find people for real openings. They may not copy, export or share candidate profiles outside JobLink, or use them for any other purpose.</p>
+<p>Companies may use candidate search only to find people for real openings. They may not copy, export or share candidate profiles outside JobLink, try to find a candidate's hidden contact details, or use profiles for any other purpose. Each time a company opens a candidate profile, JobLink records it.</p>
 <p>The Job Coordinator is responsible for reviewing job postings and may remove postings that violate these Terms &amp; Conditions.</p>
 
 <h2 class="h6" style="color: var(--jl-navy);">9. Data Retention and Removal</h2>
