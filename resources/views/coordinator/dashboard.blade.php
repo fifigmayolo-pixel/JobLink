@@ -79,12 +79,11 @@
 
             @php
                 $pendingPct = $totalForRange > 0 ? round($pendingCount / $totalForRange * 100) : 0;
-                $interviewPct = $totalForRange > 0 ? round($interviewCount / $totalForRange * 100) : 0;
-                $rejectedPct = $totalForRange > 0 ? max(0, 100 - $pendingPct - $interviewPct) : 0;
+                // Two slices that always add up to 100, so rounding never shows 101%.
+                $interviewPct = $totalForRange > 0 ? 100 - $pendingPct : 0;
                 $deg1 = $pendingPct * 3.6;
-                $deg2 = $deg1 + $interviewPct * 3.6;
                 $donutBackground = $totalForRange > 0
-                    ? "conic-gradient(var(--jl-slate) 0deg {$deg1}deg, var(--jl-gold) {$deg1}deg {$deg2}deg, var(--jl-rose) {$deg2}deg 360deg)"
+                    ? "conic-gradient(var(--jl-slate) 0deg {$deg1}deg, var(--jl-gold) {$deg1}deg 360deg)"
                     : 'rgba(107,114,128,0.12)';
             @endphp
 
@@ -93,7 +92,7 @@
                     <div style="width: 100%; height: 100%; border-radius: 50%; background: {{ $donutBackground }};"></div>
                     <div style="position: absolute; inset: 16px; background: #fff; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                         <div class="display-font h4 mb-0" style="color: var(--jl-navy);">{{ $totalForRange }}</div>
-                        <div class="text-secondary" style="font-size: 0.65rem;">Total Applications</div>
+                        <div class="text-secondary" style="font-size: 0.65rem;">Active Applications</div>
                     </div>
                 </div>
                 <div class="flex-grow-1" style="min-width: 160px;">
@@ -104,10 +103,6 @@
                     <div class="d-flex justify-content-between align-items-center py-1">
                         <span><i class="bi bi-circle-fill me-1" style="color: var(--jl-gold); font-size: 0.6rem;"></i>Interview</span>
                         <span>{{ $interviewCount }} <span class="text-secondary small">({{ $interviewPct }}%)</span></span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center py-1">
-                        <span><i class="bi bi-circle-fill me-1" style="color: var(--jl-rose); font-size: 0.6rem;"></i>Rejected</span>
-                         <span>{{ $rejectedCount }} <span class="text-secondary small">({{ $rejectedPct }}%)</span></span>
                     </div>
                 </div>
             </div>

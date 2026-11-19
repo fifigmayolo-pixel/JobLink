@@ -16,19 +16,21 @@ class DashboardController extends Controller
     {
         $range = $request->get('range', 'last_30_days');
 
+        // The Application Overview shows applications still in play: Pending and Interview.
+        // (Rejected stays a status for companies and applicants; it is just not counted here.)
         $statusCounts = JobApplication::query()
             ->when($range === 'today', fn ($q) => $q->whereDate('date_applied', now()->toDateString()))
             ->when($range === 'last_7_days', fn ($q) => $q->where('date_applied', '>=', now()->subDays(7)->startOfDay()))
             ->when($range === 'last_30_days', fn ($q) => $q->where('date_applied', '>=', now()->subDays(30)->startOfDay()))
             ->when($range === 'last_100_days', fn ($q) => $q->where('date_applied', '>=', now()->subDays(100)->startOfDay()))
             ->when($range === 'this_month', fn ($q) => $q->where('date_applied', '>=', now()->startOfMonth()))
+            ->whereIn('status', ['pending', 'interview'])
             ->selectRaw('status, count(*) as count')
             ->groupBy('status')
             ->pluck('count', 'status');
 
         $pendingCount = (int) $statusCounts->get('pending', 0);
         $interviewCount = (int) $statusCounts->get('interview', 0);
-        $rejectedCount = (int) $statusCounts->get('rejected', 0);
 
         return view('coordinator.dashboard', [
             // Only accounts that have actually been activated — a pre-registered
@@ -43,8 +45,7 @@ class DashboardController extends Controller
             'applicationRange' => $range,
             'pendingCount' => $pendingCount,
             'interviewCount' => $interviewCount,
-            'rejectedCount' => $rejectedCount,
-            'totalForRange' => $pendingCount + $interviewCount + $rejectedCount,
+            'totalForRange' => $pendingCount + $interviewCount,
             // null when no tracer study link is active
             'tracerStats' => TracerStudyLink::current()?->participation(),
         ]);
