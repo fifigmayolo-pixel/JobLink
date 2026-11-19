@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Company;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Company\UpdateApplicationStatusRequest;
 use App\Models\JobApplication;
+use App\Models\JobPosting;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class ApplicationController extends Controller
@@ -70,12 +72,44 @@ class ApplicationController extends Controller
 
         abort_if($application->isWithdrawn(), 403, 'This application was withdrawn by the applicant.');
 
-        $application->update(['status' => $request->validated('status')]);
+        $newStatus = $request->validated('status');
+
+        // Each applicant in Interview fills one of the posting's slots. The count, the check and the
+        // change happen together with the posting row locked, so two invitations at the same moment
+        // cannot both take the last slot.
+        $outcome = DB::transaction(function () use ($application, $newStatus) {
+            $posting = JobPosting::withTrashed()->whereKey($application->job_posting_id)->lockForUpdate()->first();
+            $liveSlots = $posting && ! $posting->trashed();
+
+            $takesNewSlot = $newStatus === 'interview' && $application->status !== 'interview';
+
+            if ($liveSlots && $takesNewSlot && $posting->interviewCount() >= $posting->slotsTotal()) {
+                return ['full', null];
+            }
+
+            $application->update(['status' => $newStatus]);
+
+            // The posting closes when the last slot is taken, and reopens when one is freed.
+            return ['ok', $liveSlots ? $posting->syncSlots(auth()->id()) : null];
+        });
+
+        if ($outcome[0] === 'full') {
+            return back()->withErrors([
+                'status' => 'Every interview slot for this job is filled. '
+                    .'Raise the number of slots, or move someone out of Interview, to invite another applicant.',
+            ]);
+        }
 
         if (in_array($application->status, ['interview', 'rejected'])) {
             $this->notifications->applicationStatusChanged($application);
         }
 
-        return back()->with('status', 'Application status updated.');
+        $message = match ($outcome[1]) {
+            'closed' => 'Application status updated. All interview slots are now filled, so the job is closed to new applications.',
+            'reopened' => 'Application status updated. A slot is free again, so the job is open to new applications.',
+            default => 'Application status updated.',
+        };
+
+        return back()->with('status', $message);
     }
 }

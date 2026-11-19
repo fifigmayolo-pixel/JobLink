@@ -22,8 +22,17 @@
     if (auth()->check() && in_array(auth()->user()->role, ['student', 'alumni'])) {
         $cvState = auth()->user()->profile?->cvCompleteness();
     }
+    $slotsLabel = $jobPosting->slotsLabel();
+    $closedLabel = $jobPosting->closedLabel();
+    $isFull = $jobPosting->isFull();
     $cvReady = $cvState['ready'] ?? false;
     $cvMissing = $cvState['missing_required'] ?? ['Personal summary', 'Skills'];
+
+    // With a ready CV, the two clearances (NBI and barangay) still have to be uploaded and valid.
+    $clearanceMessage = $cvReady && $cvState !== null
+        ? auth()->user()->profile?->clearanceApplyMessage()
+        : null;
+    $canSubmit = $cvReady && $clearanceMessage === null;
 @endphp
 
 <div class="row justify-content-center" style="--accent: {{ $accent['base'] }}; --accent-soft: {{ $accent['soft'] }}; --accent-text: {{ $accent['text'] }}; --accent-deep: {{ $accent['deep'] }};">
@@ -56,6 +65,20 @@
                 This posting is hidden from students and alumni. It will reappear if the account is restored and the deadline hasn't passed.
             </div>
         @endunless
+
+        @if($closedLabel === 'Full' || ($isFull && $jobPosting->isApproved()))
+            <div class="alert alert-light jl-card mt-3 mb-0" style="border-left: 4px solid var(--jl-gold) !important;" role="alert">
+                <strong>Full.</strong>
+                Every interview slot for this job is filled, so it is not taking new applications.
+                @can('update', $jobPosting)
+                    <div class="small mt-1">Raise the number of slots, or move someone out of Interview, to reopen it.</div>
+                @endcan
+            </div>
+        @elseif($closedLabel === 'Closed')
+            <div class="alert alert-light jl-card mt-3 mb-0" style="border-left: 4px solid var(--jl-slate) !important;" role="alert">
+                <strong>Closed.</strong> This job is not taking new applications.
+            </div>
+        @endif
 
         <div class="row g-4 mt-1">
             {{-- Main column --}}
@@ -110,6 +133,14 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="mt-3 d-flex align-items-center flex-wrap gap-2">
+                        <span class="jl-pill jl-pill-neutral"><i class="bi bi-people" aria-hidden="true"></i> {{ $slotsLabel }}</span>
+                        @if($closedLabel)
+                            <span class="jl-pill" style="background: rgba(107,114,128,0.15); color: #4B5563;">{{ $closedLabel }}</span>
+                        @endif
+                    </div>
+                    <div class="text-secondary small mt-1">An interview invitation counts as one filled slot. It is not a job offer.</div>
 
                     @can('update', $jobPosting)
                         <div class="mt-3">
@@ -171,7 +202,7 @@
                     @auth
                         @role('student|alumni')
                             @can('create', [\App\Models\JobApplication::class, $jobPosting])
-                                @if($cvReady)
+                                @if($canSubmit)
                                     <p class="text-secondary small mb-3">
                                         Your CV from your JobLink profile is sent to the company. Apply before the deadline on {{ $jobPosting->application_deadline->format('M j, Y') }}.
                                     </p>
@@ -183,6 +214,14 @@
                                             Apply now <i class="bi bi-arrow-right"></i>
                                         </button>
                                     </form>
+                                @elseif($cvReady)
+                                    <div class="alert alert-light jl-card py-3 small mb-3" style="border-left: 4px solid var(--jl-gold) !important;" role="alert">
+                                        <strong>Upload your clearances to apply.</strong>
+                                        <div class="mt-1">{{ $clearanceMessage }}</div>
+                                    </div>
+                                    <a href="{{ route('clearances.edit') }}" class="btn btn-jl-accent w-100 mb-2">
+                                        Go to My Clearances <i class="bi bi-arrow-right"></i>
+                                    </a>
                                 @else
                                     <div class="alert alert-light jl-card py-3 small mb-3" style="border-left: 4px solid var(--jl-gold) !important;" role="alert">
                                         <strong>Finish your CV to apply.</strong>
@@ -193,7 +232,13 @@
                                     </a>
                                 @endif
                             @else
-                                <p class="text-secondary small mb-3">Applications are no longer open for this role.</p>
+                                <p class="text-secondary small mb-3">
+                                    @if($isFull)
+                                        This job has filled all of its interview slots, so it is not taking new applications.
+                                    @else
+                                        Applications are no longer open for this role.
+                                    @endif
+                                </p>
                             @endcan
 
                             <form method="POST" action="{{ route('saved-jobs.store', $jobPosting) }}">
@@ -224,7 +269,7 @@
 @auth
 @role('student|alumni')
 @can('create', [\App\Models\JobApplication::class, $jobPosting])
-@if($cvReady)
+@if($canSubmit)
 @push('scripts')
 {{-- Confirm-before-apply. Pushed to the scripts stack so the modal sits at the end of <body>. --}}
 <div class="modal fade" id="applyConfirmModal" tabindex="-1" aria-labelledby="applyConfirmTitle" aria-hidden="true"
@@ -241,6 +286,7 @@
                 <p class="small text-secondary mb-2">
                     The company gets a copy of your CV as it is today: your name, course and year, email, mobile number,
                     city and province, summary, skills, experience, education and certifications.
+                    The company can also open your NBI clearance and barangay clearance PDFs for as long as your application is active.
                 </p>
                 <p class="small text-secondary mb-3">
                     It does not include your date of birth, gender, civil status or street address.

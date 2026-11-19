@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\ClearanceController;
+use App\Http\Controllers\ClearanceFileController;
 use App\Http\Controllers\Auth\RegistrationRequestController;
 use App\Http\Controllers\Auth\ActivateAccountController;
 use App\Http\Controllers\Auth\TermsController;
@@ -112,6 +114,14 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/jobs', [JobPostingController::class, 'index'])->name('jobs.index');
     Route::get('/jobs/{jobPosting}', [JobPostingController::class, 'show'])->name('jobs.show');
+
+    // Opens one clearance PDF. Open to every logged-in role on purpose: the policy decides
+    // (the owner, or a company the owner applied to) and answers 404 to everyone else,
+    // so the Coordinator and other companies get nothing here.
+    Route::get('/clearances/{clearance}', ClearanceFileController::class)
+        ->whereNumber('clearance')
+        ->middleware('throttle:60,1,clearance-file')
+        ->name('clearances.show');
 });
 
 // Student & Alumni
@@ -126,6 +136,16 @@ Route::middleware(['auth', 'role:student|alumni'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/my-cv', [CvController::class, 'edit'])->name('cv.edit');
     Route::put('/my-cv', [CvController::class, 'update'])->name('cv.update');
+
+    // Required clearances. One file per request: Vercel rejects requests over about 4.5 MB.
+    Route::get('/my-clearances', [ClearanceController::class, 'edit'])->name('clearances.edit');
+    Route::post('/my-clearances/{type}', [ClearanceController::class, 'store'])
+        ->whereIn('type', ['nbi', 'barangay'])
+        ->middleware('throttle:12,1,clearance-upload')
+        ->name('clearances.store');
+    Route::delete('/my-clearances/{type}', [ClearanceController::class, 'destroy'])
+        ->whereIn('type', ['nbi', 'barangay'])
+        ->name('clearances.destroy');
     Route::patch('/profile/searchable', [ProfileSearchabilityController::class, 'update'])->name('profile.searchable.update');
     Route::get('/profile/searchable/preview', [ProfileSearchabilityController::class, 'preview'])->name('profile.searchable.preview');
 

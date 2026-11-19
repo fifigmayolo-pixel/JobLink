@@ -39,6 +39,7 @@ class StudentAlumniProfile extends Model
         'portfolio_url',
         'searchable_by_companies',
         'searchable_consented_at',
+        'clearance_consent_at',
     ];
 
     protected function casts(): array
@@ -48,6 +49,7 @@ class StudentAlumniProfile extends Model
             'profile_completed_at' => 'datetime',
             'searchable_by_companies' => 'boolean',
             'searchable_consented_at' => 'datetime',
+            'clearance_consent_at' => 'datetime',
         ];
     }
 
@@ -275,6 +277,100 @@ class StudentAlumniProfile extends Model
         }
 
         return $blockers;
+    }
+
+    // ---- Required clearances (Phase 14) -------------------------------------
+    //
+    // Applying needs a ready CV and BOTH clearances, uploaded and not expired.
+    // They do not change the CV strength percent and do not decide who is searchable:
+    // companies only get to open the files after the person applies to them.
+
+    public function clearances()
+    {
+        return $this->hasMany(ProfileClearance::class, 'profile_id');
+    }
+
+    /**
+     * Where each required clearance stands: missing, expired or valid. Reads the rows fresh
+     * unless the relation was deliberately loaded, so a long-lived object never goes stale.
+     *
+     * @return array<string, array{type:string, label:string, sentence:string, clearance:?ProfileClearance, state:string}>
+     */
+    public function clearanceStates(): array
+    {
+        $rows = ($this->relationLoaded('clearances') ? $this->clearances : $this->clearances()->get())->keyBy('type');
+
+        $states = [];
+
+        foreach (config('clearances.types', []) as $type => $meta) {
+            $row = $rows->get($type);
+
+            $states[$type] = [
+                'type' => $type,
+                'label' => $meta['label'],
+                'sentence' => $meta['sentence'],
+                'clearance' => $row,
+                'state' => $row === null ? 'missing' : ($row->isExpired() ? 'expired' : 'valid'),
+            ];
+        }
+
+        return $states;
+    }
+
+    /**
+     * The clearances that stop the person from applying (missing or expired).
+     */
+    public function clearanceProblems(): array
+    {
+        return array_values(array_filter(
+            $this->clearanceStates(),
+            fn (array $state) => $state['state'] !== 'valid'
+        ));
+    }
+
+    public function clearancesReady(): bool
+    {
+        return $this->clearanceProblems() === [];
+    }
+
+    /**
+     * Ready CV and both clearances valid.
+     */
+    public function canApply(): bool
+    {
+        return $this->cvReady() && $this->clearancesReady();
+    }
+
+    /**
+     * One plain sentence (or two) saying what to fix before applying, or null when nothing
+     * is in the way. Used by the apply action and the job page so they always agree.
+     */
+    public function clearanceApplyMessage(): ?string
+    {
+        $missing = [];
+        $expired = [];
+
+        foreach ($this->clearanceProblems() as $problem) {
+            if ($problem['state'] === 'missing') {
+                $missing[] = $problem['sentence'];
+            } else {
+                $expired[] = $problem['sentence'];
+            }
+        }
+
+        $parts = [];
+
+        if ($missing !== []) {
+            $parts[] = 'Upload your '.implode(' and ', $missing).' to apply.';
+        }
+
+        if ($expired !== []) {
+            $parts[] = count($expired) === 1
+                ? 'Your '.$expired[0].' has expired. Replace it to apply.'
+                : 'Your '.implode(' and ', $expired).' have expired. Replace them to apply.';
+        }
+
+        return $parts === [] ? null : implode(' ', $parts);
     }
 
     public function scopeStudents($query)

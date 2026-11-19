@@ -9,6 +9,7 @@ use App\Models\JobApplication;
 use App\Models\JobPosting;
 use App\Models\Notification;
 use App\Models\User;
+use App\Models\ProfileClearance;
 use App\Support\PhilippineLocations;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -254,6 +255,7 @@ class RevisionJourneyTest extends TestCase
                 'requirements' => 'PHP and a willingness to learn.',
                 'location' => 'Alaminos City',
                 'job_type' => 'full_time',
+                'slots' => 3,
                 'application_deadline' => now()->addWeek()->toDateString(),
             ])
             ->assertSessionHasNoErrors();
@@ -293,12 +295,34 @@ class RevisionJourneyTest extends TestCase
             ->assertOk()
             ->assertSee('Journey PHP Developer');
 
-        $this->assertContains(
+                $this->assertContains(
             'Journey PHP Developer',
             $this->get(route('dashboard'))->viewData('suggestions')->pluck('job.title')->all(),
             'the job matches the skill PHP, so the dashboard suggests it'
         );
 
+        // ADD HERE:
+        // She cannot apply yet: the NBI and barangay clearances are required.
+        $this->post(route('applications.store', $job))->assertSessionHasErrors('application');
+        $this->assertDatabaseMissing('job_applications', ['applicant_id' => $maria->id]);
+
+        // She uploads both, one file per request.
+        $this->get(route('clearances.edit'))->assertOk()->assertSee('Who can open your clearances');
+
+        foreach (['nbi', 'barangay'] as $type) {
+            $this->post(route('clearances.store', $type), [
+                'doc' => $type,
+                'file' => UploadedFile::fake()->createWithContent($type.'.pdf', "%PDF-1.4\n%journey\n%%EOF\n"),
+                'valid_until' => now()->addMonths(6)->toDateString(),
+                'consent' => '1',
+            ])->assertSessionHasNoErrors();
+        }
+
+        $nbi = ProfileClearance::where('profile_id', $profile->id)
+            ->where('type', 'nbi')
+            ->firstOrFail();
+
+        // KEEP THIS EXISTING LINE:
         $this->post(route('applications.store', $job))->assertSessionHasNoErrors();
 
         $application = JobApplication::where('job_posting_id', $job->id)->firstOrFail();
@@ -335,9 +359,18 @@ class RevisionJourneyTest extends TestCase
             ->assertSee('IT Intern')
             ->assertSee(self::STUDENT_EMAIL);                  // contact details she sent with it
 
-        $this->get(route('company.applications.cv', $application))
+                $this->get(route('company.applications.cv', $application))
             ->assertOk()
             ->assertSee('Motivated graduate');
+
+        // ADD:
+        $this->get(route('company.applications.show', $application))
+            ->assertSee('NBI clearance')
+            ->assertSee(route('clearances.show', $nbi), false);
+
+        $this->get(route('clearances.show', $nbi))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/pdf');
 
         // The searchable page shows the live CV, still without contact details,
         // and now points to her application.
@@ -349,12 +382,15 @@ class RevisionJourneyTest extends TestCase
 
         // Another company cannot open this application or its CV.
         $other = Company::factory()->create()->user;
-        foreach ([
+                foreach ([
             route('company.applications.show', $application),
             route('company.applications.cv', $application),
         ] as $url) {
             $this->assertContains($this->actingAs($other)->get($url)->getStatusCode(), [403, 404], $url);
         }
+
+        // ADD:
+        $this->actingAs($other)->get(route('clearances.show', $nbi))->assertNotFound();
 
         // ---- 12. The Coordinator can never open the CV ----
 
@@ -363,6 +399,9 @@ class RevisionJourneyTest extends TestCase
         $this->get(route('company.applications.cv', $application))->assertForbidden();
         $this->get(route('applications.cv', $application))->assertForbidden();
         $this->get(route('company.candidates.show', $profile))->assertForbidden();
+
+        // ADD:
+        $this->get(route('clearances.show', $nbi))->assertNotFound();
 
         // Records is the Coordinator's page for a student; it carries no CV.
         $this->get(route('coordinator.records.show', $profile))

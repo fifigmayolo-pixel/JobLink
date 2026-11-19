@@ -60,6 +60,14 @@ class ApplicationController extends Controller
         // URL directly.
         abort_unless($jobPosting->isApproved() && $jobPosting->companyIsActive(), 404);
 
+        // A full posting says so, instead of a bare "forbidden". (A posting the company
+        // closed by hand still falls through to the policy below.)
+        if ($jobPosting->closed_by_slots || ($jobPosting->status === 'open' && $jobPosting->isFull())) {
+            return back()->withErrors([
+                'application' => 'This job has filled all of its interview slots and is no longer taking applications.',
+            ]);
+        }
+
         Gate::authorize('create', [JobApplication::class, $jobPosting]);
 
         // The CV is the application, so it has to be ready first. This is checked
@@ -74,6 +82,12 @@ class ApplicationController extends Controller
             return back()->withErrors([
                 'application' => 'Finish your CV before applying. Still needed: '.implode(' and ', $missing).'.',
             ]);
+        }
+
+        // Both clearances (NBI and barangay) must be uploaded and not expired. Checked here
+        // too, so posting to the URL cannot skip it, and checked on the day of applying.
+        if ($clearanceMessage = $profile->clearanceApplyMessage()) {
+            return back()->withErrors(['application' => $clearanceMessage]);
         }
 
         $jobPosting->applications()->create([

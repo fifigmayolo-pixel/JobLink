@@ -9,7 +9,7 @@
        class="btn btn-outline-secondary btn-sm mb-3 js-privacy-back">&larr; Back</a>
 
     <h1 class="h2 mb-1">Privacy Policy</h1>
-    <p class="text-secondary mb-4">Last updated: November 16, 2026</p>
+    <p class="text-secondary mb-4">Last updated: November 19, 2026</p>
 
     <div class="jl-card p-4 p-md-5">
         <p>
@@ -22,18 +22,24 @@
         <h2 class="h5 mt-4">1. What we collect</h2>
         <ul>
             <li><strong>Students and alumni:</strong> Student ID number, full name, program, section, year graduated, contact details, address, profile picture, your CV (summary, skills, experience, education and certifications), and your job applications and saved jobs.</li>
+            <li>
+                <strong>Clearances (students and alumni):</strong> a PDF of your NBI clearance and a PDF of your barangay clearance,
+                and the date each one is valid until. A clearance can contain sensitive personal information, such as the result of
+                a records check, so JobLink asks for your agreement on the upload page before you add your first one.
+            </li>
             <li><strong>Your searchable setting:</strong> whether you chose to make your profile searchable by partner companies, and when you chose it.</li>
             <li><strong>Companies:</strong> company name, logo, industry, contact person, contact number, address, email address, and the job postings you submit.</li>
             <li><strong>All users:</strong> email address, login activity, and notifications sent to you.</li>
             <li><strong>Tracer study:</strong> whether you opened the tracer study link for the current year.</li>
             <li><strong>Linky chatbot:</strong> the messages you type to Linky.</li>
-            <li><strong>Audit records:</strong> changes made to records by the Job Coordinator, with the date and the reason, and a record each time a company opens a searchable profile.</li>
+            <li><strong>Audit records:</strong> changes made to records by the Job Coordinator, with the date and the reason, and a record each time a company opens a searchable profile or one of your clearances. These records do not contain the files.</li>
         </ul>
 
         <h2 class="h5 mt-4">2. Why we use it</h2>
         <ul>
             <li>To create and secure your account.</li>
             <li>To let students and alumni find and apply for jobs, and companies review applicants.</li>
+            <li>To check that applicants have a current NBI clearance and barangay clearance. JobLink requires both before you can apply, because employers may ask for them.</li>
             <li>To let partner companies find the CVs of students and alumni who chose to be searchable, so they can invite suitable people to apply.</li>
             <li>To send notifications, announcements and interview or rejection messages by email and inside JobLink.</li>
             <li>To monitor tracer study participation and prepare campus reports.</li>
@@ -42,7 +48,7 @@
 
         <h2 class="h5 mt-4">3. Who can see it</h2>
         <ul>
-            <li>The Job Coordinator can view and correct student and alumni records and company accounts. The Job Coordinator's records pages do not show your CV.</li>
+            <li>The Job Coordinator can view and correct student and alumni records and company accounts. The Job Coordinator's records pages do not show your CV or your clearances.</li>
             <li>A company can see the CV you send with an application to its job posting: your name, course and year, email, mobile number, city and province, summary, skills, experience, education, certifications and links. It does not see your date of birth, gender, civil status or street address.</li>
             <li>
                 <strong>Searchable profile (your choice, off by default).</strong>
@@ -56,12 +62,20 @@
                 Terms &amp; Conditions does not turn this on. You can turn it off at any time, and your profile disappears
                 from search straight away.
             </li>
+            <li>
+                <strong>Your clearances.</strong>
+                You can open your own files at any time. A company you applied to can open your NBI clearance and barangay
+                clearance files only while your application to that company is active. It can no longer open them if you
+                withdraw the application or your account is removed. The Job Coordinator, other companies and other students
+                cannot open them, and they are never shown when companies search for candidates. There are no public links:
+                every file is opened through JobLink, which checks who is asking each time.
+            </li>
             <li>We do not sell personal information.</li>
         </ul>
 
         <h2 class="h5 mt-4">4. Services we rely on</h2>
         <p>
-            JobLink is hosted on Vercel, and its database and stored files are kept with Supabase.
+            JobLink is hosted on Vercel, and its database and stored files are kept with Supabase. Clearance files are kept in a private storage bucket that is not open to the public.
             Emails are sent through an email delivery service.
             Linky answers your questions using Google's Gemini API, so the messages you type to
             Linky are sent to Google for processing. Please do not type passwords, ID numbers or
@@ -77,6 +91,12 @@
             for other applications are kept so the company can finish reviewing them. The application
             record (the job, the date and the status) is kept for reporting. Records the Job Coordinator
             removes are hidden from the system but may stay in the audit history for [RETENTION PERIOD].
+        </p>
+        <p>
+            Your clearance files are kept while your account is active. When you replace a clearance or remove it, the old file
+            is deleted from storage. If you withdraw an application, that company can no longer open your clearances. If your
+            account is removed, companies can no longer open them, and the files stay in private storage until the account is
+            permanently deleted.
         </p>
         <p>
             Your searchable setting is kept while your account is active. The audit history keeps the date you
@@ -108,7 +128,7 @@
             Under the Data Privacy Act you may ask to access your information, correct it, object
             to its processing, request that it be erased or blocked, receive a copy of it, and
             claim damages where applicable. You can withdraw your consent to being searchable at any
-            time in Profile settings. To make any other request, contact the Job Coordinator office.
+            time in Profile settings. You can replace or remove a clearance yourself at any time under My Clearances, which deletes the file. To make any other request, contact the Job Coordinator office.
             You may also file a complaint with the National Privacy Commission (privacy.gov.ph).
         </p>
 

@@ -39,6 +39,7 @@ class FullJourneyTest extends TestCase
                 'requirements' => 'A willingness to learn.',
                 'location' => 'Alaminos City',
                 'job_type' => 'full_time',
+                'slots' => 3,
                 'application_deadline' => now()->addWeek()->toDateString(),
             ])
             ->assertSessionHasNoErrors();

@@ -111,9 +111,10 @@
                             Posted {{ $job->date_posted->format('M j, Y') }}
                             &middot; Deadline {{ $job->application_deadline->format('M j, Y') }}
                             &middot; {{ $applicants }} {{ \Illuminate\Support\Str::plural('applicant', $applicants) }}
+                            &middot; {{ $job->slotsLabel() }}
                         </div>
                     </div>
-                    <span class="jl-pill {{ $ui['class'] }} flex-shrink-0" @if($ui['style']) style="{{ $ui['style'] }}" @endif>{{ $ui['label'] }}</span>
+                    <span class="jl-pill {{ $ui['class'] }} flex-shrink-0" @if($ui['style']) style="{{ $ui['style'] }}" @endif>{{ $job->closedLabel() === 'Full' ? 'Full' : $ui['label'] }}</span>
                 </div>
             @empty
                 <div class="text-center py-4">

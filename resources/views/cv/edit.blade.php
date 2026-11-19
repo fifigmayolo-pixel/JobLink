@@ -75,7 +75,8 @@
                         This part comes from your school record, so it is filled in for you. Your Job Coordinator can fix it if there is a typo.
                     </p>
                 </div>
-
+                
+                 @include('cv._clearances-summary', ['profile' => $profile])
                 <form method="POST" action="{{ route('cv.update') }}" id="cvForm" novalidate>
                     @csrf
                     @method('PUT')

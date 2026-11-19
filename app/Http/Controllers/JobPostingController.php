@@ -29,6 +29,7 @@ class JobPostingController extends Controller
     $jobPostings = JobPosting::query()
         ->listed()
         ->with('company')
+        ->withInterviewCount()
         ->when($this->term($request->query('search')), fn ($q, $search) => $this->likeLower($q, 'job_postings.title', $search))
         ->when($this->term($request->query('location')), fn ($q, $location) => $this->likeLower($q, 'job_postings.location', $location))
         ->when($this->term($request->query('job_type')), fn ($q, $jobType) => $q->where('job_type', $jobType))
@@ -54,6 +55,7 @@ class JobPostingController extends Controller
         $jobPostings = JobPosting::query()
             ->ofCompany($request->user()->company?->id)
             ->withCount(['applications as applicants_count' => fn ($q) => $q->where('status', '!=', 'withdrawn')])
+            ->withInterviewCount()
             ->inListingState($status)
             ->when($search !== '', fn ($q) => $this->likeLower($q, 'job_postings.title', $search))
             ->latest('date_posted')
@@ -200,10 +202,15 @@ class JobPostingController extends Controller
         // The posting's company is fixed when it is posted. Whatever the request
         // carries, it can never move a posting to another company.
         $data = collect($request->validated())->except(['company_id', 'posted_by'])->all();
-        $trackedFields = ['title', 'job_type', 'location', 'application_deadline', 'status'];
+        $trackedFields = ['title', 'job_type', 'location', 'application_deadline', 'status', 'slots'];
         $changes = [];
 
         foreach ($trackedFields as $field) {
+            // slots is optional in the request: a request without it keeps the current number.
+            if (! array_key_exists($field, $data)) {
+                continue;
+            }
+
             $oldValue = $jobPosting->{$field};
 
             // application_deadline is cast to Carbon; compare/store as a
@@ -236,11 +243,20 @@ class JobPostingController extends Controller
             ]);
         }
 
+        // Who closed it? A company that sets Closed on an open posting closed it by hand, and
+        // setting Open clears the "closed because full" mark. Closed to Closed keeps whatever it was.
+        if ($data['status'] === 'open' || $jobPosting->status === 'open') {
+            $data['closed_by_slots'] = false;
+        }
+
         $jobPosting->update($data);
 
         foreach ($changes as $change) {
             FieldChangeLog::create($change);
         }
+
+        // A new slot count can fill the posting (close it) or free a slot (reopen it).
+        $slotChange = $jobPosting->syncSlots(auth()->id());
 
         if ($resubmitting) {
             FieldChangeLog::create([
@@ -254,7 +270,11 @@ class JobPostingController extends Controller
                 ->with('status', 'Job updated and resubmitted for approval.');
         }
 
-        return redirect()->route('jobs.show', $jobPosting)->with('status', 'Job updated.');
+        return redirect()->route('jobs.show', $jobPosting)->with('status', match ($slotChange) {
+            'closed' => 'Job updated. All interview slots are filled, so the posting is now closed.',
+            'reopened' => 'Job updated. A slot is free again, so the posting is open.',
+            default => 'Job updated.',
+        });
     }
 
     public function destroy(JobPosting $jobPosting)

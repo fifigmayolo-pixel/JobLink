@@ -6,8 +6,10 @@ use App\Models\Company;
 use App\Models\JobApplication;
 use App\Models\JobPosting;
 use App\Models\Notification;
+use App\Models\ProfileClearance;
 use App\Models\StudentAlumniProfile;
 use App\Models\User;
+use App\Support\ClearanceStore;
 use App\Support\CvSnapshot;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -29,10 +31,10 @@ use Illuminate\Support\Facades\Hash;
  *   Coordinator  one job waiting for approval
  *   Company      dashboard with a pending, two open and one closed posting, one applicant,
  *                and the student findable under Find Candidates
- *   Student      full CV, dashboard with a suggested job, one pending application,
- *                searchable by partner companies (switch on)
- *   Alumni       basic profile only: dashboard asks to finish the CV, switch off, so the
- *                alumni does not show up in Find Candidates
+ *   Student      full CV and both clearances (sample PDFs), dashboard with a suggested job,
+ *                one pending application, searchable by partner companies (switch on)
+ *   Alumni       basic profile only: dashboard asks to finish the CV, no clearances, switch off,
+ *                so the alumni does not show up in Find Candidates
  */
 class DemoDataSeeder extends Seeder
 {
@@ -71,8 +73,8 @@ class DemoDataSeeder extends Seeder
             [
                 ['Job Coordinator', 'coordinator@joblink.test', $password, 'Approves jobs. One job is waiting for approval.'],
                 ['Company', 'company@joblink.test', $password, 'Demo Tech Solutions: 2 open jobs, 1 pending, 1 closed, 1 applicant. Can find the student under Find Candidates.'],
-                ['Student', '99-0001-01', $password, 'Full CV, ready to apply, searchable by companies. Already applied to one job; the dashboard suggests another.'],
-                ['Alumni', '99-0002-02', $password, 'Profile done, CV empty and not searchable: fill the CV in live, then apply.'],
+                ['Student', '99-0001-01', $password, 'Full CV and both clearances (sample PDFs), ready to apply, searchable by companies. Already applied to one job; the dashboard suggests another.'],
+                ['Alumni', '99-0002-02', $password, 'Profile done, CV and clearances empty, not searchable: fill the CV in live and upload both clearances, then apply.'],
             ]
         );
     }
@@ -206,7 +208,69 @@ class DemoDataSeeder extends Seeder
             'date_received' => now()->subYear()->toDateString(),
         ]);
 
+        $this->clearances($profile);
+
         return $user->load('profile');
+    }
+
+    /**
+     * Both required clearances, valid for most of a year, so the demo student can apply.
+     * The PDFs are tiny samples that say so. They are written to the clearance disk unless
+     * the tests are running, where the rows alone are enough.
+     */
+    private function clearances(StudentAlumniProfile $profile): void
+    {
+        foreach (config('clearances.types') as $type => $meta) {
+            $path = trim((string) config('clearances.folder', 'clearances'), '/').'/'.$profile->id.'/'.$type.'-demo.pdf';
+            $pdf = $this->samplePdf('SAMPLE '.strtoupper($meta['label']).' - JobLink demo only');
+
+            if (! app()->runningUnitTests()) {
+                ClearanceStore::disk()->put($path, $pdf);
+            }
+
+            ProfileClearance::updateOrCreate(
+                ['profile_id' => $profile->id, 'type' => $type],
+                [
+                    'file_path' => $path,
+                    'size_bytes' => strlen($pdf),
+                    'valid_until' => now()->addMonths(10)->toDateString(),
+                ]
+            );
+        }
+    }
+
+    /**
+     * A one-page PDF with a line of text, built here so the demo needs no file in the repository.
+     */
+    private function samplePdf(string $text): string
+    {
+        $text = str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], $text);
+        $stream = 'BT /F1 14 Tf 24 100 Td ('.$text.') Tj ET';
+
+        $objects = [
+            '<< /Type /Catalog /Pages 2 0 R >>',
+            '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+            '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 420 200] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
+            '<< /Length '.strlen($stream)." >>\nstream\n".$stream."\nendstream",
+            '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+        ];
+
+        $pdf = "%PDF-1.4\n";
+        $offsets = [];
+
+        foreach ($objects as $index => $body) {
+            $offsets[] = strlen($pdf);
+            $pdf .= ($index + 1)." 0 obj\n".$body."\nendobj\n";
+        }
+
+        $xref = strlen($pdf);
+        $pdf .= "xref\n0 ".(count($objects) + 1)."\n0000000000 65535 f \n";
+
+        foreach ($offsets as $offset) {
+            $pdf .= sprintf("%010d 00000 n \n", $offset);
+        }
+
+        return $pdf."trailer\n<< /Size ".(count($objects) + 1)." /Root 1 0 R >>\nstartxref\n".$xref."\n%%EOF\n";
     }
 
     private function alumni(string $password): User
@@ -272,6 +336,7 @@ class DemoDataSeeder extends Seeder
         $approved = [
             'approval_status' => 'approved',
             'status' => 'open',
+            'closed_by_slots' => false,
             'reviewed_by' => $coordinator->id,
             'reviewed_at' => now(),
             'rejection_reason' => null,
@@ -280,6 +345,7 @@ class DemoDataSeeder extends Seeder
         $web = JobPosting::updateOrCreate(
             ['company_id' => $company->id, 'title' => 'Junior Web Developer'],
             array_merge($approved, [
+                'slots' => 3,
                 'job_type' => 'full_time',
                 'description' => "Build and maintain web applications for our clients.\nWork with a small team using PHP, Laravel and MySQL.",
                 'qualifications' => "Graduate of BSIT or a related course.\nKnowledge of HTML, CSS, JavaScript and PHP.",
@@ -294,6 +360,7 @@ class DemoDataSeeder extends Seeder
         $support = JobPosting::updateOrCreate(
             ['company_id' => $company->id, 'title' => 'Customer Service Associate'],
             array_merge($approved, [
+                'slots' => 5,
                 'job_type' => 'full_time',
                 'description' => "Answer customer questions by phone, chat and email.\nKeep accurate records of every conversation.",
                 'qualifications' => "College level or graduate of any business-related course.\nGood communication skills in English and Filipino.",
@@ -309,6 +376,8 @@ class DemoDataSeeder extends Seeder
         $intern = JobPosting::updateOrCreate(
             ['company_id' => $company->id, 'title' => 'IT Support Intern'],
             [
+                'slots' => 2,
+                'closed_by_slots' => false,
                 'job_type' => 'internship',
                 'description' => "Assist the IT team with day-to-day support.\nLearn how a real help desk works.",
                 'qualifications' => 'Third or fourth year BSIT student.',
@@ -330,6 +399,7 @@ class DemoDataSeeder extends Seeder
         $closed = JobPosting::updateOrCreate(
             ['company_id' => $company->id, 'title' => 'Office Clerk'],
             array_merge($approved, [
+                'slots' => 1,
                 'job_type' => 'full_time',
                 'description' => "Handle filing and front-desk tasks.\nKeep the office records in order.",
                 'qualifications' => 'Any college level.',

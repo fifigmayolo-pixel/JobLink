@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class JobPosting extends Model
 {
@@ -20,6 +22,8 @@ class JobPosting extends Model
         'date_posted',
         'application_deadline',
         'status',
+        'slots',
+        'closed_by_slots',
         'posted_by',
         'company_id',
         'approval_status',
@@ -34,6 +38,8 @@ class JobPosting extends Model
             'date_posted' => 'date',
             'application_deadline' => 'date',
             'reviewed_at' => 'datetime',
+            'slots' => 'integer',
+            'closed_by_slots' => 'boolean',
         ];
     }
 
@@ -190,6 +196,127 @@ class JobPosting extends Model
     public function isRejected(): bool
     {
         return $this->approval_status === 'rejected';
+    }
+
+    // ---- Vacancy slots ------------------------------------------------------
+    //
+    // A slot is "filled" by an applicant whose status is Interview (JobLink does not
+    // track hiring). When every slot is filled the posting closes by itself; when a
+    // slot frees up again it reopens, but only if JobLink was the one that closed it.
+
+    public const MAX_SLOTS = 1000;
+
+    /**
+     * Adds interview_count to each posting in one query, so a list of cards
+     * does not run a count per card.
+     */
+    public function scopeWithInterviewCount($query)
+    {
+        return $query->withCount(['applications as interview_count' => fn ($q) => $q->where('status', 'interview')]);
+    }
+
+    public function slotsTotal(): int
+    {
+        return max(1, (int) $this->slots);
+    }
+
+    /**
+     * People currently invited to interview. Uses interview_count when the posting
+     * was loaded with scopeWithInterviewCount, and asks the database otherwise.
+     */
+    public function filledSlots(): int
+    {
+        if (array_key_exists('interview_count', $this->attributes)) {
+            return (int) $this->attributes['interview_count'];
+        }
+
+        return $this->interviewCount();
+    }
+
+    /**
+     * Always a fresh count, never the loaded one. Used where the answer decides something.
+     */
+    public function interviewCount(): int
+    {
+        return $this->applications()->where('status', 'interview')->count();
+    }
+
+    public function isFull(): bool
+    {
+        return $this->filledSlots() >= $this->slotsTotal();
+    }
+
+    /**
+     * "3 of 5 interview slots filled". These are interview invitations, not hires.
+     */
+    public function slotsLabel(): string
+    {
+        $total = $this->slotsTotal();
+
+        return $this->filledSlots().' of '.$total.' interview '.Str::plural('slot', $total).' filled';
+    }
+
+    /**
+     * The badge for a posting that is not taking applications: "Full" when JobLink
+     * closed it because every slot is taken, "Closed" when it was closed by hand.
+     * Null for a posting that is still open.
+     */
+    public function closedLabel(): ?string
+    {
+        if ($this->status !== 'closed') {
+            return null;
+        }
+
+        return $this->closed_by_slots ? 'Full' : 'Closed';
+    }
+
+    /**
+     * Closes the posting when every slot is taken and reopens it when one is free again.
+     * Returns 'closed', 'reopened' or null (nothing changed).
+     *
+     * Runs in a transaction with the row locked, so two status changes at the same moment
+     * cannot both read an old count. Every change is written to the audit log.
+     */
+    public function syncSlots(int $changedBy): ?string
+    {
+        return DB::transaction(function () use ($changedBy) {
+            $posting = static::query()->whereKey($this->getKey())->lockForUpdate()->first();
+
+            if (! $posting) {
+                return null; // removed since
+            }
+
+            $filled = $posting->interviewCount();
+            $total = $posting->slotsTotal();
+            $result = null;
+
+            if ($posting->status === 'open' && $filled >= $total) {
+                $posting->update(['status' => 'closed', 'closed_by_slots' => true]);
+                $result = 'closed';
+
+                FieldChangeLog::create([
+                    'action' => 'job_posting_closed_full',
+                    'changed_by' => $changedBy,
+                    'job_posting_id' => $posting->id,
+                    'details' => "Closed automatically: {$filled} of {$total} interview ".Str::plural('slot', $total).' filled.',
+                ]);
+            } elseif ($posting->status === 'closed' && $posting->closed_by_slots && $filled < $total) {
+                $posting->update(['status' => 'open', 'closed_by_slots' => false]);
+                $result = 'reopened';
+
+                FieldChangeLog::create([
+                    'action' => 'job_posting_reopened_slots',
+                    'changed_by' => $changedBy,
+                    'job_posting_id' => $posting->id,
+                    'details' => "Reopened automatically: {$filled} of {$total} interview ".Str::plural('slot', $total).' filled.',
+                ]);
+            }
+
+            // Keep the caller's copy in step with what was just saved.
+            $this->setRawAttributes($posting->getAttributes(), true);
+
+            return $result;
+        });
     }
 
     /**

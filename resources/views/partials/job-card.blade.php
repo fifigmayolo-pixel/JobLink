@@ -22,6 +22,10 @@
     $isUrgent = $daysLeft !== null && $daysLeft >= 0 && $daysLeft <= 14;
 
     $isSaved = in_array($job->id, $savedJobIds ?? []);
+
+    // Interview slots (not hires). "Full" when JobLink closed the posting because every slot is taken.
+    $slotsLabel = $job->slotsLabel();
+    $closedLabel = $job->closedLabel();
 @endphp
 
 @once
@@ -80,6 +84,7 @@
     .jl-job-pill-type { background: var(--accent-soft, #E8EDF7); color: var(--accent-text, var(--jl-navy)); }
     .jl-job-pill-new { background: #DDF4E7; color: #14683F; }
     .jl-job-pill-urgent { background: #FDECC8; color: #8A5A00; }
+    .jl-job-pill-closed { background: rgba(107, 114, 128, 0.15); color: #4B5563; }
 
     .jl-job-excerpt {
         margin: 0.8rem 0 0; font-size: 0.9rem; line-height: 1.5; color: #4B5563;
@@ -144,6 +149,7 @@
 
     <ul class="jl-job-meta">
         <li><i class="bi bi-geo-alt" aria-hidden="true"></i><span>{{ $job->location }}</span></li>
+        <li><i class="bi bi-people" aria-hidden="true"></i><span>{{ $slotsLabel }}</span></li>
         @if($daysLeft !== null && ! $isUrgent)
             <li><i class="bi bi-calendar-event" aria-hidden="true"></i><span>Apply by {{ $job->application_deadline->format('M j, Y') }}</span></li>
         @endif
@@ -152,6 +158,9 @@
     <div class="jl-job-pills">
         @if($typeLabel !== '')
             <span class="jl-pill jl-job-pill-type">{{ $typeLabel }}</span>
+        @endif
+        @if($closedLabel)
+            <span class="jl-pill jl-job-pill-closed">{{ $closedLabel }}</span>
         @endif
         @if($isNew)
             <span class="jl-pill jl-job-pill-new">New</span>

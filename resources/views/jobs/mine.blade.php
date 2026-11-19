@@ -68,6 +68,7 @@
                 $ui = $stateUi[$state];
                 $deadlinePassed = $state === 'closed' && $job->status === 'open';
                 $applicants = (int) $job->applicants_count;
+                $closedLabel = $job->closedLabel();
             @endphp
             <article class="jl-card jl-card-hover p-3 p-md-4">
                 <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
@@ -83,7 +84,7 @@
                         </div>
                     </div>
                     <span class="jl-pill {{ $ui['class'] }} flex-shrink-0" @if($ui['style']) style="{{ $ui['style'] }}" @endif>
-                        {{ $ui['label'] }}@if($deadlinePassed) &middot; deadline passed @endif
+                        {{ $closedLabel === 'Full' ? 'Full' : $ui['label'] }}@if($deadlinePassed) &middot; deadline passed @endif
                     </span>
                 </div>
 
@@ -97,6 +98,7 @@
                     <span class="text-secondary small">
                         <i class="bi bi-people" aria-hidden="true"></i>
                         {{ $applicants }} {{ \Illuminate\Support\Str::plural('applicant', $applicants) }}
+                        &middot; {{ $job->slotsLabel() }}
                         @if($applicants > 0)
                             &middot; <a href="{{ route('company.applications.index') }}">Review applicants</a>
                         @endif

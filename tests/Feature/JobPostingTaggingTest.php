@@ -62,6 +62,7 @@ class JobPostingTaggingTest extends TestCase
             'requirements' => 'Test requirements',
             'location' => 'Alaminos City',
             'job_type' => 'full_time',
+            'slots' => 3,
             'application_deadline' => now()->addWeek()->toDateString(),
         ];
     }

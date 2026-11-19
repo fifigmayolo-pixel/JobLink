@@ -50,6 +50,7 @@ class DashboardController extends Controller
         $latestJobs = JobPosting::query()
             ->ofCompany($companyId)
             ->withCount(['applications as applicants_count' => fn ($q) => $q->where('status', '!=', 'withdrawn')])
+            ->withInterviewCount()
             ->latest('date_posted')
             ->latest('id')
             ->limit(5)

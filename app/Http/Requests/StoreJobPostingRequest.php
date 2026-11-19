@@ -28,6 +28,7 @@ class StoreJobPostingRequest extends FormRequest
             'requirements' => ['required', 'string'],
             'location' => ['required', 'string', 'max:255'],
             'application_deadline' => ['required', 'date', 'after:today'],
+            'slots' => ['required', 'integer', 'min:1', 'max:'.JobPosting::MAX_SLOTS],
         ];
 
         if ($this->user()->role === 'job_coordinator') {
@@ -35,5 +36,20 @@ class StoreJobPostingRequest extends FormRequest
         }
 
         return $rules;
+    }
+
+    public function attributes(): array
+    {
+        return ['slots' => 'number of slots'];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'slots.required' => 'Enter the number of slots needed, for example 5.',
+            'slots.integer' => 'The number of slots must be a whole number, for example 5.',
+            'slots.min' => 'The number of slots must be at least 1.',
+            'slots.max' => 'The number of slots cannot be more than '.JobPosting::MAX_SLOTS.'.',
+        ];
     }
 }

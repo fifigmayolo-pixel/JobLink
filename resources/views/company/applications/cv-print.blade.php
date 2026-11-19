@@ -58,8 +58,13 @@
         </div>
     </div>
 
-    <main class="cv-sheet">
-        @include('cv._document', ['cv' => $cv])
-    </main>
+    
+     <main class="cv-sheet">
+    @include('cv._document', ['cv' => $cv])
+
+    {{-- Applicant clearance documents for printing --}}
+    @include('partials.applicant-clearances-print', ['application' => $application])
+      </main>
+
 </body>
 </html>

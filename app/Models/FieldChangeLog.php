@@ -28,11 +28,20 @@ class FieldChangeLog extends Model
         'job_posting_approved' => 'Job Posting Approved',
         'job_posting_rejected' => 'Job Posting Rejected',
         'job_posting_resubmitted' => 'Job Posting Resubmitted',
+        // Vacancy slots: JobLink closes a posting when every interview slot is taken and reopens it when one frees up.
+        'job_posting_closed_full' => 'Job Posting Closed (Slots Full)',
+        'job_posting_reopened_slots' => 'Job Posting Reopened (Slot Freed)',
         'tracer_study_update' => 'Tracer Study Link Updated',
         // Candidate search: who looked at whose profile, and the student's consent trail.
         'candidate_profile_viewed' => 'Candidate Profile Viewed',
         'searchable_enabled' => 'Searchable Profile Turned On',
         'searchable_disabled' => 'Searchable Profile Turned Off',
+        // Required clearances: who uploaded, replaced or removed one, and each company opening one.
+        // The entries hold the document type and validity date only, never the file.
+        'clearance_uploaded' => 'Clearance Uploaded',
+        'clearance_replaced' => 'Clearance Replaced',
+        'clearance_removed' => 'Clearance Removed',
+        'clearance_opened' => 'Clearance Opened by Company',
     ];
 
     public const JOB_POSTING_ACTIONS = [
@@ -42,6 +51,8 @@ class FieldChangeLog extends Model
         'job_posting_approved',
         'job_posting_rejected',
         'job_posting_resubmitted',
+        'job_posting_closed_full',
+        'job_posting_reopened_slots',
     ];
 
     protected $fillable = [

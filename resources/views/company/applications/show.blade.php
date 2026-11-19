@@ -50,6 +50,9 @@
                     This application was submitted before the CV system, so no CV is on file. You can still message the applicant.
                 </div>
             @endif
+                {{-- Applicant clearance documents --}}
+            @include('partials.applicant-clearances', ['application' => $application])
+
 
             {{-- Reply --}}
             <div class="jl-card p-4 p-md-5 mt-3">

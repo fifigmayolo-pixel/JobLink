@@ -22,7 +22,8 @@ class JobApplicationPolicy
 
     /**
      * Students and alumni may apply to a posting that is open: status "open" AND
-     * the deadline has not passed (same meaning as JobPosting::scopeOpen).
+     * the deadline has not passed (same meaning as JobPosting::scopeOpen), and
+     * not full: every interview slot taken means no new applications.
      *
      * Approval and archived-company checks happen in ApplicationController@store,
      * and "CV ready" is checked there too, so the student gets a clear message
@@ -32,6 +33,7 @@ class JobApplicationPolicy
     {
         return in_array($user->role, ['student', 'alumni'])
             && $jobPosting->status === 'open'
+            && ! $jobPosting->isFull()
             && ($jobPosting->application_deadline === null
                 || $jobPosting->application_deadline->gte(now()->startOfDay()));
     }
@@ -55,3 +57,4 @@ class JobApplicationPolicy
             && in_array($application->status, ['rejected', 'withdrawn'], true);
     }
 }
+
