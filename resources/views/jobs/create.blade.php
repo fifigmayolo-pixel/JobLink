@@ -26,6 +26,15 @@
                 </select>
             </div>
 
+            <div class="mb-3">
+                <label for="slots" class="form-label">Number of slots needed</label>
+                <input type="number" name="slots" id="slots"
+                    class="form-control @error('slots') is-invalid @enderror"
+                    value="{{ old('slots', 1) }}" min="1" max="1000" step="1" required>
+                <div class="form-text">How many applicants you can invite to interview. The job closes by itself when every slot is filled.</div>
+                @error('slots') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+
             @if($companies)
                 <div class="mb-3">
                     <label class="form-label">Company</label>

@@ -18,13 +18,31 @@
                 <input type="text" name="title" value="{{ old('title', $jobPosting->title) }}" class="form-control" required>
             </div>
 
-            <div class="mb-3">
+                        <div class="mb-3">
                 <label class="form-label">Job type</label>
                 <select name="job_type" class="form-select" required>
                     <option value="">Select job type&hellip;</option>
                     <option value="full_time" @selected(old('job_type', $jobPosting->job_type) === 'full_time')>Full-time</option>
                     <option value="part_time" @selected(old('job_type', $jobPosting->job_type) === 'part_time')>Part-time</option>
                 </select>
+            </div>
+
+            {{-- Number of slots needed --}}
+            <div class="mb-3">
+                <label for="slots" class="form-label">Number of slots needed</label>
+                <input type="number" name="slots" id="slots"
+                       class="form-control @error('slots') is-invalid @enderror"
+                       value="{{ old('slots', $jobPosting->slots) }}"
+                       min="1" max="1000" step="1" required>
+
+                <div class="form-text">
+                    {{ $jobPosting->slotsLabel() }}. It cannot be lower than the number of applicants already invited to interview.
+                    Raising it reopens a job that closed because it was full.
+                </div>
+
+                @error('slots')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
 
             <div class="mb-3">
