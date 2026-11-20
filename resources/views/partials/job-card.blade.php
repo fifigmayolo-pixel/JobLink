@@ -4,6 +4,7 @@
     Expects:
       $job          a JobPosting with its company loaded
       $savedJobIds  (optional) ids of the jobs the signed-in user has saved
+      $relatedJobIds (optional) ids of the jobs related to the user's course and CV skills
 
     The whole card is one link (the title link is stretched over it); the save
     button sits above it. Only students and alumni get a save button, because
@@ -22,6 +23,7 @@
     $isUrgent = $daysLeft !== null && $daysLeft >= 0 && $daysLeft <= 14;
 
     $isSaved = in_array($job->id, $savedJobIds ?? []);
+    $isRelated = in_array($job->id, $relatedJobIds ?? []);
 
     // Interview slots (not hires). "Full" when JobLink closed the posting because every slot is taken.
     $slotsLabel = $job->slotsLabel();
@@ -85,6 +87,7 @@
     .jl-job-pill-new { background: #DDF4E7; color: #14683F; }
     .jl-job-pill-urgent { background: #FDECC8; color: #8A5A00; }
     .jl-job-pill-closed { background: rgba(107, 114, 128, 0.15); color: #4B5563; }
+    .jl-job-pill-related { background: rgba(201, 162, 39, 0.16); color: var(--jl-navy); }
 
     .jl-job-excerpt {
         margin: 0.8rem 0 0; font-size: 0.9rem; line-height: 1.5; color: #4B5563;
@@ -156,6 +159,9 @@
     </ul>
 
     <div class="jl-job-pills">
+        @if($isRelated)
+            <span class="jl-pill jl-job-pill-related"><i class="bi bi-mortarboard me-1" aria-hidden="true"></i>Related to your course</span>
+        @endif
         @if($typeLabel !== '')
             <span class="jl-pill jl-job-pill-type">{{ $typeLabel }}</span>
         @endif

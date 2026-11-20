@@ -8,6 +8,7 @@ use App\Jobs\NotifyNewJobPosting;
 use App\Jobs\NotifyTaggedCompany;
 use App\Models\Company;
 use App\Models\JobPosting;
+use App\Support\JobRelevance;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -26,17 +27,33 @@ class JobPostingController extends Controller
     // Only approved, open postings from active companies appear.
     // Search ignores upper and lower case (see likeLower): on PostgreSQL a plain LIKE is
     // case sensitive, so "developer" would not find "Web Developer" on the live site.
-    $jobPostings = JobPosting::query()
-        ->listed()
-        ->with('company')
-        ->withInterviewCount()
+    // The search and filters, written once so the page and the relevance scoring below use the same ones.
+    $filters = fn ($q) => $q
         ->when($this->term($request->query('search')), fn ($q, $search) => $this->likeLower($q, 'job_postings.title', $search))
         ->when($this->term($request->query('location')), fn ($q, $location) => $this->likeLower($q, 'job_postings.location', $location))
-        ->when($this->term($request->query('job_type')), fn ($q, $jobType) => $q->where('job_type', $jobType))
+        ->when($this->term($request->query('job_type')), fn ($q, $jobType) => $q->where('job_type', $jobType));
+
+    $query = $filters(JobPosting::query()->listed()->with('company')->withInterviewCount());
+
+    // Students and alumni: jobs related to their course and CV skills come first (see JobRelevance).
+    // Nothing is hidden: every other job follows, newest first. Anyone else, or a profile with no
+    // course words and no skills, keeps the normal newest-first order.
+    $related = JobRelevance::forUser($request->user(), $filters);
+
+    if ($related->active()) {
+        $query->orderByRaw($related->orderSql());
+    }
+
+    $jobPostings = $query
         ->latest('date_posted')
+        ->latest('id')
         ->paginate(15)->withQueryString();
 
-    return view('jobs.index', compact('jobPostings'));
+    return view('jobs.index', [
+        'jobPostings' => $jobPostings,
+        'relatedJobIds' => $related->ids(),
+        'relevanceActive' => $related->active(),
+    ]);
 }
 
     /**

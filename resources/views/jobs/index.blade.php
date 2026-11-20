@@ -57,11 +57,14 @@
 @if($jobPostings->total() > 0)
     <p class="text-secondary small mb-3">
         {{ $jobPostings->total() }} open position{{ $jobPostings->total() === 1 ? '' : 's' }}@if($filtersActive) matching your search @endif
+        @if($relevanceActive ?? false)
+            <br><i class="bi bi-mortarboard me-1" aria-hidden="true"></i>Jobs related to your course and CV skills are listed first.
+        @endif
     </p>
 
     <div class="jl-job-grid">
         @foreach($jobPostings as $job)
-            @include('partials.job-card', ['job' => $job, 'savedJobIds' => $savedJobIds])
+            @include('partials.job-card', ['job' => $job, 'savedJobIds' => $savedJobIds, 'relatedJobIds' => $relatedJobIds ?? []])
         @endforeach
     </div>
 
